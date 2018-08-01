@@ -43,7 +43,8 @@ class VideoCombiner(object):
     def _get_video_shape(self):
         self.all_images = [os.path.join(self.img_dir, i) for i in os.listdir(self.img_dir)]
         self.all_images = sorted(self.all_images)
-
+        for item in self.all_images[:int(len(self.all_images) // 2)]:
+            print(item)
         # order the images order.
 
         sample_img = np.random.choice(self.all_images)
