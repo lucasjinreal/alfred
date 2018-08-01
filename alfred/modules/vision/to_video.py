@@ -59,7 +59,8 @@ class VideoCombiner(object):
         size = (self.video_shape[1], self.video_shape[0])
         print('=> target video frame size: ', size)
         print('=> all {} frames to solve.'.format(len(self.all_images)))
-        video_writer = cv2.VideoWriter(target_file, cv2.VideoWriter_fourcc(*'DIVX'), 24, size)
+        target_f = 'combined_{}.mp4'.format(os.path.basename(self.img_dir))
+        video_writer = cv2.VideoWriter(target_f, cv2.VideoWriter_fourcc(*'DIVX'), 24, size)
         i = 0
         print('=> Solving, be patient.')
         for img in self.all_images:
