@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: alfred-py
+Version: 1.0.6
+Summary: alfred is a deep learning scripts collection, built with many standby functions for process image or text
+Home-page: https://github.com/jinfagang/alfred
+Author: Lucas Jin
+Author-email: jinfagang10@163.com
+License: GPL
+Description: UNKNOWN
+Keywords: deep learning,script helper,tools
+Platform: any
