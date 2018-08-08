@@ -29,9 +29,9 @@ from .modules.vision.video_extractor import VideoExtractor
 from .modules.scrap.image_scraper import ImageScraper
 from .modules.vision.to_video import VideoCombiner
 
-__VERSION__ = '1.0.6'
+__VERSION__ = '1.0.8'
 __AUTHOR__ = 'Lucas Jin'
-__DATE__ = '2018.07.18'
+__DATE__ = '2018.08.18'
 __LOC__ = 'Shenzhen, China'
 
 
