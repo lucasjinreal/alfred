@@ -18,8 +18,7 @@
 # ------------------------------------------------------------------------
 from .modules.vision.to_video import VideoCombiner
 import sys
+import numpy as np
 
 
-d = sys.argv[1]
-combiner = VideoCombiner(d)
-combiner.combine()
+a =

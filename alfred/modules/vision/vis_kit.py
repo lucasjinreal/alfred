@@ -8,6 +8,55 @@ import colorsys
 import cv2
 import time
 import os
+import tensorflow as tf
+
+
+def draw_box_without_score(img, boxes, classes=None, is_show=False):
+    """
+    Draw boxes on image, the box mostly are annotations, not the model predict box
+    """
+    assert isinstance(boxes,
+                      np.ndarray), 'boxes must nump array, with shape of (None, 5)\nevery element contains (x1,y1,x2,y2, label)'
+    if classes:
+        pass
+    else:
+        height = img.shape[0]
+        width = img.shape[1]
+
+        font = cv2.QT_FONT_NORMAL
+        font_scale = 0.4
+        font_thickness = 1
+        line_thickness = 1
+
+        all_cls = []
+        for i in range(boxes.shape[0]):
+            cls = boxes[i, -1]
+            all_cls.append(cls)
+            all_cls = set(all_cls)
+            unique_color = _create_unique_color_uchar(all_cls.index(cls))
+
+            y1 = int(boxes[i, 2])
+            x1 = int(boxes[i, 3])
+            y2 = int(boxes[i, 4])
+            x2 = int(boxes[i, 5])
+
+            cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness)
+
+            text_label = '{}'.format(cls)
+            (ret_val, base_line) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
+            text_org = (x1, y1 - 0)
+
+            cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
+                          (text_org[0] + ret_val[0] + 5, text_org[1] - ret_val[1] - 2), unique_color, line_thickness)
+            # this rectangle for fill text rect
+            cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
+                          (text_org[0] + ret_val[0] + 4, text_org[1] - ret_val[1] - 2),
+                          unique_color, -1)
+            cv2.putText(img, text_label, text_org, font, font_scale, (255, 255, 255), font_thickness)
+        if is_show:
+            cv2.imshow('image', img)
+            cv2.waitKey(0)
+        return img
 
 
 def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, background_id=-1):
@@ -59,7 +108,8 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
                 text_org = (x1, y1 - 0)
 
                 cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
-                              (text_org[0] + ret_val[0] + 5, text_org[1] - ret_val[1] - 2), unique_color, line_thickness)
+                              (text_org[0] + ret_val[0] + 5, text_org[1] - ret_val[1] - 2), unique_color,
+                              line_thickness)
                 # this rectangle for fill text rect
                 cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
                               (text_org[0] + ret_val[0] + 4, text_org[1] - ret_val[1] - 2),
@@ -85,7 +135,7 @@ def visualize_det_mask_cv2(img, detections, masks, classes=None, is_show=False, 
     :param is_video
     :return:
     """
-    assert isinstance(img, np.ndarray) and isinstance(detections, np.ndarray) and isinstance(masks, np.ndarray),\
+    assert isinstance(img, np.ndarray) and isinstance(detections, np.ndarray) and isinstance(masks, np.ndarray), \
         'images and detections and masks must be numpy array'
     assert detections.shape[0] == masks.shape[-1], 'detections nums and masks nums are not equal'
     assert is_show != is_video, 'you can not set is_show and is_video at the same time.'
@@ -109,6 +159,39 @@ def visualize_det_mask_cv2(img, detections, masks, classes=None, is_show=False, 
         cv2.imshow('image', masked_image)
         cv2.waitKey(0)
     return masked_image
+
+
+def draw_masks(img, masks, cls_color_list, is_show=False, background_id=-1, is_video=False):
+    """
+    draw masks pure on an image, the mask format is something like this:
+    [[[1], [1], [1], .., [2]],
+     [[1], [1], [1], .., [2]],
+     [[1], [1], [1], .., [2]]]
+    every pixel in image is a class
+    cls_color_list = [(223,  224, 225), (12, 23, 23), ...] a list of colors
+    :param img:
+    :param masks:
+    :param cls_color_list:
+    :param is_show:
+    :param background_id:
+    :param is_video:
+    :return:
+    """
+    # len(cls_color_list) must same with all classes
+    all_classes_num = len(cls_color_list)
+    # make masks one hot
+    n, h, w, c = masks.shape
+
+    # 1-dim now
+    mask_flatten = masks.flatten()
+    mask_one_hot = []
+    mask_one_hot = np.reshape(mask_one_hot, (-1, all_classes_num))
+    mask_color = np.matmul(mask_one_hot, cls_color_list)
+    # now 3 channel
+    mask_color = np.reshape(mask_color, (n, h, w, 3))
+    # add alpha with mask on original image
+
+
 
 
 def _apply_mask2(image, mask, color, alpha=0.5):
