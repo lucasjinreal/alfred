@@ -161,14 +161,18 @@ def visualize_det_mask_cv2(img, detections, masks, classes=None, is_show=False, 
     return masked_image
 
 
-def draw_masks(img, masks, cls_color_list, is_show=False, background_id=-1, is_video=False):
+def draw_masks(img, masks, cls_color_list, is_show=False, background_id=-1, is_video=False, convert_bgr=False):
     """
     draw masks pure on an image, the mask format is something like this:
     [[[1], [1], [1], .., [2]],
      [[1], [1], [1], .., [2]],
      [[1], [1], [1], .., [2]]]
     every pixel in image is a class
-    cls_color_list = [(223,  224, 225), (12, 23, 23), ...] a list of colors
+
+    the color list better using RGBA channel
+    cls_color_list = [(223,  224, 225, 0.4), (12, 23, 23, 0.4), ...] a list of colors
+
+    Note: suppose the img in BGR format, you should convert to RGB once img returned
     :param img:
     :param masks:
     :param cls_color_list:
@@ -177,21 +181,23 @@ def draw_masks(img, masks, cls_color_list, is_show=False, background_id=-1, is_v
     :param is_video:
     :return:
     """
-    # len(cls_color_list) must same with all classes
-    all_classes_num = len(cls_color_list)
-    # make masks one hot
     n, h, w, c = masks.shape
 
-    # 1-dim now
-    mask_flatten = masks.flatten()
-    mask_one_hot = []
-    mask_one_hot = np.reshape(mask_one_hot, (-1, all_classes_num))
-    mask_color = np.matmul(mask_one_hot, cls_color_list)
-    # now 3 channel
-    mask_color = np.reshape(mask_color, (n, h, w, 3))
-    # add alpha with mask on original image
+    mask_flatten = masks[0].flatten()
+    mask_color = np.array(list(map(lambda i: cls_color_list[i], mask_flatten)))
+    # reshape to normal image shape,
+    mask_color = np.reshape(mask_color, (h, w, 3)).astype('float32')
 
-
+    # add this mask on img
+    # img = cv2.add(img, mask_color)
+    if convert_bgr:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = cv2.addWeighted(img, 0.6, mask_color, 0.4, 0)
+    if is_show:
+        cv2.imshow('img', img)
+        cv2.imwrite('test_res.jpg', img)
+        cv2.waitKey(0)
+    return img
 
 
 def _apply_mask2(image, mask, color, alpha=0.5):

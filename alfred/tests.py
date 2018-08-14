@@ -20,5 +20,14 @@ from .modules.vision.to_video import VideoCombiner
 import sys
 import numpy as np
 
+from .modules.vision.vis_kit import draw_masks
+import cv2
 
-a =
+
+if __name__ == '__main__':
+    a = ''
+    img = cv2.imread(a)
+
+    b = [
+        [[2], [3], [4]]
+    ]
