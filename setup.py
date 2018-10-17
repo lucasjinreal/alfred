@@ -27,8 +27,9 @@ setup(name='alfred-py',
       description='alfred is a deep learning scripts collection, built with many standby functions for process image '
                   'or '
                   'text',
+        long_description='deeplearning helpful tools and some visualization kit.',
       license='GPL',
-      packages=find_packages(),
+      packages=['alfred'],
       entry_points={
           'console_scripts': [
               'alfred = alfred.alfred:main'

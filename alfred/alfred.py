@@ -28,6 +28,7 @@ from colorama import Fore, Back, Style
 from .modules.vision.video_extractor import VideoExtractor
 from .modules.scrap.image_scraper import ImageScraper
 from .modules.vision.to_video import VideoCombiner
+from .modules.vision.vis_kit import draw_box_without_score
 
 __VERSION__ = '1.0.8'
 __AUTHOR__ = 'Lucas Jin'
