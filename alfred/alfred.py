@@ -30,7 +30,7 @@ from .modules.scrap.image_scraper import ImageScraper
 from .modules.vision.to_video import VideoCombiner
 from .modules.vision.vis_kit import draw_box_without_score
 
-__VERSION__ = '1.0.8'
+__VERSION__ = '2.0'
 __AUTHOR__ = 'Lucas Jin'
 __DATE__ = '2018.08.18'
 __LOC__ = 'Shenzhen, China'

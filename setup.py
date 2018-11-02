@@ -22,14 +22,24 @@ install alfred into local bin dir.
 from setuptools import setup, find_packages
 
 setup(name='alfred-py',
-      version='1.0.8',
+      version='2.0',
       keywords=['deep learning', 'script helper', 'tools'],
-      description='alfred is a deep learning scripts collection, built with many standby functions for process image '
-                  'or '
-                  'text',
-        long_description='deeplearning helpful tools and some visualization kit.',
+      description='''
+      Alfred is a DeepLearning utility library.
+      ''',
+      long_description='''
+      Alfred is a DeepLearning utility library. it consist of text pre-processing,
+      computer vision visualization, and some sensor fusion functions. You can even
+      load some deep learning base nets from alfred. Everything is just include at you 
+      wish to call it.
+      
+      Also, you can using alfred as a console program to execute some functions, such as
+      combine video, image processing, scrap image from internet etc.
+      ''',
       license='GPL',
       packages=['alfred'],
+      # package_dir={'alfred': 'alfred'},
+      install_dir='/usr/lib',
       entry_points={
           'console_scripts': [
               'alfred = alfred.alfred:main'
@@ -37,7 +47,7 @@ setup(name='alfred-py',
       },
 
       author="Lucas Jin",
-      author_email="jinfagang10@163.com",
+      author_email="jinfagang19@163.com",
       url='https://github.com/jinfagang/alfred',
       platforms='any',
       install_requires=['colorama', 'opencv-python', 'requests', 'numpy']
