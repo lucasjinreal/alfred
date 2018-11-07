@@ -17,17 +17,10 @@
 # limitations under the License.
 # ------------------------------------------------------------------------
 """Bring in all of the public Alfred interface into this module."""
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
+import importlib
 # pylint: disable=g-bad-import-order
 
-from .modules import fusion
-from .modules import scrap
-from .modules import text
-from .modules import vision
-
-from .modules.fusion import fusion_utils
-from .modules.vision import vis_kit
+from .modules import *
+from .vis import *
+from .fusion import *
+globals().update(importlib.import_module('alfred').__dict__)
