@@ -39,6 +39,8 @@ setup(name='alfred-py',
       license='GPL',
       packages=[
           'alfred',
+          'alfred.dl',
+          'alfred.dl.torch'
           'alfred.vis',
           'alfred.modules',
           'alfred.modules.scrap',
