@@ -1,8 +1,8 @@
 # check setup is correct or not
 python setup.py check
 
-rm -r build/
-rm -r dist/
+sudo rm -r build/
+sudo rm -r dist/
 
 # pypi interface are not valid any longer
 # python3 setup.py sdist
