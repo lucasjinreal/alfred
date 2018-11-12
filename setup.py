@@ -41,6 +41,7 @@ setup(name='alfred-py',
           'alfred',
           'alfred.dl',
           'alfred.dl.torch',
+          'alfred.dl.torch.data',
           'alfred.vis',
           'alfred.modules',
           'alfred.modules.scrap',
@@ -61,5 +62,5 @@ setup(name='alfred-py',
       author_email="jinfagang19@163.com",
       url='https://github.com/jinfagang/alfred',
       platforms='any',
-      install_requires=['colorama', 'opencv-python', 'requests', 'numpy']
+      install_requires=['colorama', 'opencv-contrib-python', 'requests', 'numpy', 'future']
       )
