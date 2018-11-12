@@ -56,7 +56,22 @@ from alfred.fusion import fusion_utils
   alfred vision 2video -d ./video_images
   ```
 
-  
+
+## Capable
+
+**alfred** is both a library and a command line tool. It can do those things:
+
+```angular2html
+# extract images from video
+alfred vision extract -v video.mp4
+# combine image sequences into a video
+alfred vision 2video -d /path/to/images
+# get faces from images
+alfred vision getface -d /path/contains/images/
+
+```
+
+Just try it out!!
 
 ## Copyright
 
