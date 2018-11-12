@@ -29,10 +29,11 @@ from .modules.vision.video_extractor import VideoExtractor
 from .modules.scrap.image_scraper import ImageScraper
 from .modules.vision.to_video import VideoCombiner
 from .modules.vision.vis_kit import draw_box_without_score
+from .modules.vision.face_extractor import FaceExtractor
 
-__VERSION__ = '2.0'
+__VERSION__ = '2.3'
 __AUTHOR__ = 'Lucas Jin'
-__DATE__ = '2018.08.18'
+__DATE__ = '2018.11.11'
 __LOC__ = 'Shenzhen, China'
 
 
@@ -64,6 +65,10 @@ def arg_parse():
     vision_clean_parser = vision_sub_parser.add_parser('clean', help='clean images in a dir.')
     vision_clean_parser.set_defaults(which='vision-clean')
     vision_clean_parser.add_argument('--dir', '-d', help='dir contains images.')
+
+    vision_getface_parser = vision_sub_parser.add_parser('getface', help='get all faces inside an image and save it.')
+    vision_getface_parser.set_defaults(which='vision-getface')
+    vision_getface_parser.add_argument('--dir', '-d', help='dir contains images to extract faces.')
 
     # =============== text part ================
     text_parser = main_sub_parser.add_parser('text', help='text related commands.')
@@ -123,6 +128,18 @@ def main(args=None):
             elif action == 'clean':
                 d = args_dict['dir']
                 print(Fore.BLUE + Style.BRIGHT + 'Cleaning from {}'.format(d))
+
+            elif action == 'getface':
+                try:
+                    import dlib
+                    d = args_dict['dir']
+                    print(Fore.BLUE + Style.BRIGHT + 'Extract faces from {}'.format(d))
+
+                    face_extractor = FaceExtractor()
+                    face_extractor.get_faces(d)
+                except ImportError:
+                    print('This action needs to install dlib first. http://dlib.net')
+
         elif module == 'text':
             if action == 'clean':
                 f = args_dict['file']
