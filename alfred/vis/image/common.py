@@ -15,3 +15,5 @@ def create_unique_color_float(tag, hue_step=0.41, alpha=0.7):
 def create_unique_color_uchar(tag, hue_step=0.41, alpha=0.7):
     r, g, b, a = create_unique_color_float(tag, hue_step, alpha)
     return int(255 * r), int(255 * g), int(255 * b), int(255 * a)
+
+
