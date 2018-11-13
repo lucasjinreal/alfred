@@ -49,8 +49,10 @@ def draw_masks(img, masks, cls_color_list, is_show=False, background_id=-1, is_v
     return img
 
 
-def draw_seg(img, seg, cls_color_list, is_show=False, bgr_in=False):
+def draw_seg(img, seg, cls_color_list, alpha=0.6, is_show=False, bgr_in=False):
     """
+    NOTE: this method not work well, the add weight method just not work
+
     Show segmentation result on image.
     the seg is segmentation result which after np.argmax operation
 
@@ -60,36 +62,44 @@ def draw_seg(img, seg, cls_color_list, is_show=False, bgr_in=False):
     :param seg:
     :param cls_color_list:
     :param is_show:
+    :param alpha
     :param bgr_in
     :return:
     """
     h, w = seg.shape
     mask_flatten = seg.flatten()
     mask_color = np.array(list(map(lambda i: cls_color_list[i], mask_flatten)))
-    # reshape to normal image shape,
-    mask_color = np.reshape(mask_color, (h, w, 3)).astype('float32')
-    # add this mask on img
-    # img = cv2.add(img, mask_color)
-    if bgr_in:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = cv2.addWeighted(img, 0.6, mask_color, 0.4, 0)
+    mask_color = np.reshape(mask_color, (h, w, 3)).astype(np.float)
+
+    mask = (seg != 0)
+    # convert mask=(h, w) -> mask=(h, w, 3)
+    mask = np.dstack((mask, mask, mask)).astype(np.float)
+    mask *= alpha
+
+    # out = np.where(mask, mask_color, img)
+    out = mask_color * mask + img * (1.0 - mask)
     if is_show:
         cv2.imshow('img', img)
         cv2.waitKey(0)
-    return img
+    return out, mask_color
 
 
-def draw_seg_by_dataset(img, seg, dataset, is_show=False, bgr_in=False):
+def draw_seg_by_dataset(img, seg, dataset, alpha=0.5, is_show=False, bgr_in=False):
     assert dataset in [_PASCAL, _CITYSCAPES, _MAPILLARY_VISTAS, _ADE20K], 'dataset not support yet.'
-    img = np.asarray(img, dtype=np.int8)
-
-    mask_color = np.asarray(label_to_color_image(seg, dataset), dtype=np.int8)
-    # add this mask on img
-    # img = cv2.add(img, mask_color)
+    img = np.asarray(img, dtype=np.float)
     if bgr_in:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = cv2.addWeighted(img, 0.6, mask_color, 0.4, 0)
+
+    mask_color = np.asarray(label_to_color_image(seg, dataset), dtype=np.float)
+
+    mask = (seg != 0)
+    # convert mask=(h, w) -> mask=(h, w, 3)
+    mask = np.dstack((mask, mask, mask)).astype(np.float)
+    mask *= alpha
+
+    # out = np.where(mask, mask_color, img)
+    out = mask_color * mask + img * (1.0 - mask)
     if is_show:
         cv2.imshow('img', img)
         cv2.waitKey(0)
-    return img, mask_color
+    return out, mask_color
