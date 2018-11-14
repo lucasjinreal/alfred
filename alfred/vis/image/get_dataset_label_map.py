@@ -8,6 +8,7 @@ this ids are same with official one.
 
 # NOTE: coco has some skip category, such as skipped 83...
 # so we have to using map
+
 coco_label_map = {
     1: 'person',
     2: 'bicycle',
@@ -90,6 +91,8 @@ coco_label_map = {
     89: 'hair drier',
     90: 'toothbrush'
 }
+
+coco_label_map_list = list(coco_label_map.values())
 
 voc_label_map = {
 
