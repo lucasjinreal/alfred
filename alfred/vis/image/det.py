@@ -12,6 +12,19 @@ import os
 from .common import create_unique_color_uchar
 
 
+
+def draw_one_bbox(image, box, unique_color, thickness):
+    x1 = int(box[0])
+    y1 = int(box[1])
+    x2 = int(box[2])
+    y2 = int(box[3])
+    cv2.rectangle(image, (x1, y1), (x2, y2), unique_color, thickness)
+    return image
+
+
+# ==================== Below are deprecation API =================
+
+
 def draw_box_without_score(img, boxes, classes=None, is_show=False):
     """
     Draw boxes on image, the box mostly are annotations, not the model predict box

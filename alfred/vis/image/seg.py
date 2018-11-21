@@ -13,6 +13,10 @@ from .get_dataset_colormap import _ADE20K, _CITYSCAPES, _MAPILLARY_VISTAS, _PASC
 
 def draw_masks(img, masks, cls_color_list, is_show=False, background_id=-1, is_video=False, convert_bgr=False):
     """
+
+    DEPRACATION:
+
+    this method can not work...
     masks are:
     [ [[0, 1, 2,...],[4,...],],
       [[0, 1, 2,...],[4,...],],

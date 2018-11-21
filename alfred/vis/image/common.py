@@ -17,3 +17,12 @@ def create_unique_color_uchar(tag, hue_step=0.41, alpha=0.7):
     return int(255 * r), int(255 * g), int(255 * b), int(255 * a)
 
 
+def get_unique_color_by_id(idx, alpha=0.7):
+    """
+    this method can be using when get unique color from id
+    or something else
+    :param idx:
+    :param alpha:
+    :return:
+    """
+    return create_unique_color_uchar(idx, alpha)
