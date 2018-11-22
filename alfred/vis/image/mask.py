@@ -12,7 +12,8 @@ from .det import draw_one_bbox
 from PIL import Image
 
 
-def draw_masks_maskrcnn(image, boxes, scores, labels, masks, score_thresh=0.6, draw_box=True):
+def draw_masks_maskrcnn(image, boxes, scores, labels, masks, human_label_list=None,
+                        score_thresh=0.6, draw_box=True):
     """
     Standared mask drawing function
 
@@ -30,6 +31,7 @@ def draw_masks_maskrcnn(image, boxes, scores, labels, masks, score_thresh=0.6, d
     :param scores:
     :param labels:
     :param masks:
+    :param human_label_list
     :param score_thresh
     :param draw_box:
     :return:
@@ -56,16 +58,23 @@ def draw_masks_maskrcnn(image, boxes, scores, labels, masks, score_thresh=0.6, d
 
         # now adding masks to image, and colorize it
         if score >= score_thresh:
-            if draw_box:
-                image = draw_one_bbox(image, box, cls_color, 1)
 
-            # box works
-            # cv2.imshow('rr', image)
-            # cv2.waitKey(0)
             x1 = int(box[0])
             y1 = int(box[1])
             x2 = int(box[2])
             y2 = int(box[3])
+
+            if draw_box:
+                image = draw_one_bbox(image, box, cls_color, 1)
+                if human_label_list:
+                    # draw text on image
+                    font = cv2.QT_FONT_NORMAL
+                    font_scale = 0.4
+                    font_thickness = 1
+                    line_thickness = 1
+
+                    txt = '{} {:.2f}'.format(human_label_list[label], score)
+                    cv2.putText(image, txt, (x1, y1), font, font_scale, cls_color, font_thickness)
 
             # colorize mask
             m_w = int(x2-x1)
