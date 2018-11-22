@@ -95,6 +95,7 @@ coco_label_map = {
 coco_label_map_list = list(coco_label_map.values())
 
 voc_label_map = {
+    0: '_background_',
     1: 'aeroplane',
     2: 'bicycle',
     3: 'bird',
