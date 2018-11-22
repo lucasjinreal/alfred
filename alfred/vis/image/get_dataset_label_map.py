@@ -95,8 +95,29 @@ coco_label_map = {
 coco_label_map_list = list(coco_label_map.values())
 
 voc_label_map = {
-
+    1: 'aeroplane',
+    2: 'bicycle',
+    3: 'bird',
+    4: 'boat',
+    5: 'bottle',
+    6: 'bus',
+    7: 'car',
+    8: 'cat',
+    9: 'chair',
+    10: 'cow',
+    11: 'diningtable',
+    12: 'dog',
+    13: 'horse',
+    14: 'motorbike',
+    15: 'person',
+    16: 'pottedplant',
+    17: 'sheep',
+    18: 'sofa',
+    19: 'train',
+    20: 'tvmonitor',
 }
+
+voc_label_map_list = list(voc_label_map.values())
 
 cityscapes_label_map = {
     0: 'unlabeled',
@@ -135,4 +156,3 @@ cityscapes_label_map = {
     33: 'bicycle',
     -1: 'license plate',
 }
-
