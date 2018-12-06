@@ -9,6 +9,7 @@ mother method of all demos
 import cv2
 import os
 import sys
+import time
 
 
 class ImageInferEngine(object):
@@ -59,10 +60,11 @@ class ImageInferEngine(object):
         """
         raise NotImplementedError('solve_a_image method must be implemented')
 
-    def vis_result(self, net_out):
+    def vis_result(self, img, net_out):
         """
         this method must be implement to visualize result on image
 
+        :param img
         :param net_out:
         :return:
         """
@@ -75,8 +77,7 @@ class ImageInferEngine(object):
             res_img = self.vis_result(res)
             if self.is_show:
                 cv2.imshow('result', res_img)
-                cv2.waitKey(1)
-            return res, res_img
+                cv2.waitKey(0)
         elif self.mode == 'video' or self.mode == 'webcam':
 
             cap = cv2.VideoCapture(self.f)
@@ -91,15 +92,17 @@ class ImageInferEngine(object):
             while cap.isOpened():
                 ok, frame = cap.read()
                 if ok:
+                    tic = time.time()
                     res = self.solve_a_image(frame)
-                    res_img = self.vis_result(res)
+                    if self.is_show:
+                        print('fps: {}'.format(1 / (time.time() - tic)))
+                    res_img = self.vis_result(frame, res)
                     if self.record and self.mode == 'video':
                         video_writer.write(res_img)
 
                     if self.is_show:
                         cv2.imshow('result', res_img)
-                        cv2.waitKey(0)
-                    return res, res_img
+                        cv2.waitKey(1)
                 else:
                     print('Done')
                     exit(0)
