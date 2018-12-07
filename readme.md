@@ -77,7 +77,7 @@ from alfred.fusion import fusion_utils
 
   After that, you can directly inference from video. This usage can be found at git repo: 
 
-  <div align=center><img src="https://s1.ax1x.com/2018/12/07/F1bjwd.gif"/></div>
+  <div align=center><img src="https://s1.ax1x.com/2018/12/07/F1OKLF.gif"/></div>
 
   The repo using **alfred**: http://github.com/jinfagang/pt_enet
 
