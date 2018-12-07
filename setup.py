@@ -22,7 +22,7 @@ install alfred into local bin dir.
 from setuptools import setup, find_packages
 
 setup(name='alfred-py',
-      version='2.3.5',
+      version='2.3.7',
       keywords=['deep learning', 'script helper', 'tools'],
       description='''
       Alfred is a DeepLearning utility library.
@@ -63,5 +63,5 @@ setup(name='alfred-py',
       author_email="jinfagang19@163.com",
       url='https://github.com/jinfagang/alfred',
       platforms='any',
-      install_requires=['colorama', 'opencv-contrib-python', 'requests', 'numpy', 'future']
+      install_requires=['colorama', 'opencv-contrib-python', 'requests', 'numpy', 'future', 'deprecated']
       )

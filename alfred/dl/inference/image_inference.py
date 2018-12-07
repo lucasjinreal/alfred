@@ -10,6 +10,7 @@ import cv2
 import os
 import sys
 import time
+from deprecated import deprecated
 
 
 class ImageInferEngine(object):
@@ -49,7 +50,19 @@ class ImageInferEngine(object):
         else:
             pass
 
+    @deprecated(reason="This method has been deprecated, using solve_one_image instead")
     def solve_a_image(self, img):
+        """
+        this method must be implemented to solve a single image
+
+        img must be a numpy array
+        then return the detection or segmentation out
+        :param img:
+        :return:
+        """
+        raise NotImplementedError('solve_a_image method must be implemented')
+
+    def solve_one_image(self, img):
         """
         this method must be implemented to solve a single image
 
