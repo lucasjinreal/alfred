@@ -87,7 +87,7 @@ class ImageInferEngine(object):
         if self.mode == 'image':
             img = self.read_image_file(self.f)
             res = self.solve_a_image(img)
-            res_img = self.vis_result(res)
+            res_img = self.vis_result(img, res)
             if self.is_show:
                 cv2.imshow('result', res_img)
                 cv2.waitKey(0)
