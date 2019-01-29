@@ -64,14 +64,12 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
         dtype = torch.FloatTensor
 
     # multiple inputs to the network
-    if isinstance(input_size, tuple):
-        input_size = [input_size]
+    if isinstance(input_size, tuple) and input_size[0] <= 3:
         # batch_size of 2 for batchnorm
-        x = [torch.rand(2, *in_size).type(dtype) for in_size in input_size]
-    elif isinstance(input_size, list):
-        x = [torch.rand(2, 3, input_size[0], input_size[1]).type(dtype)]
+        x = torch.rand(2, *input_size).type(dtype)
     else:
-        x = [torch.rand(2, 3, input_size, input_size).type(dtype)]
+        print('Wrong! you should send input size specific without batch size, etc: (3, 64, 64), channel first.')
+        exit(0)
     # create properties
     summary = OrderedDict()
     hooks = []
@@ -81,10 +79,12 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
 
     # make a forward pass
     try:
-        model(*x)
+        print('fake data input: ', x.size())
+        model(x)
     except Exception as e:
         print('summary failed. error: {}'.format(e))
-        print('we summary with cuda if host machine enable it, make sure model device same with summary.')
+        print('make sure your called model.to(device) ')
+        exit(0)
 
     # remove these hooks
     for h in hooks:
