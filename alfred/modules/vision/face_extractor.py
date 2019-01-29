@@ -38,7 +38,7 @@ class FaceExtractor(object):
             print('=> get {} faces in {}'.format(len(dets), img_f))
             print('=> saving faces...')
             for i, d in enumerate(dets):
-                save_face_f = os.path.join(os.path.dirname(img_f), os.path.basename(img_f).split('.')[0]
+                save_face_f = os.path.join(os.path.dirname(img_f) + '_faces', os.path.basename(img_f).split('.')[0]
                                            + '_face_{}.png'.format(i))
 
                 # get the face crop
