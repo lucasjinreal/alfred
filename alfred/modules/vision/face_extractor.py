@@ -31,6 +31,10 @@ class FaceExtractor(object):
         for e in ['png', 'jpg', 'jpeg']:
             all_images.extend(glob.glob(os.path.join(img_d, '*.{}'.format(e))))
         print('Found all {} images under {}'.format(len(all_images), img_d))
+
+        s_d = os.path.dirname(img_d) + "_faces"
+        if not os.path.exists(s_d):
+            os.makedirs(s_d)
         for img_f in all_images:
             img = cv2.imread(img_f, cv2.COLOR_BGR2RGB)
 
@@ -38,7 +42,7 @@ class FaceExtractor(object):
             print('=> get {} faces in {}'.format(len(dets), img_f))
             print('=> saving faces...')
             for i, d in enumerate(dets):
-                save_face_f = os.path.join(os.path.dirname(img_f) + '_faces', os.path.basename(img_f).split('.')[0]
+                save_face_f = os.path.join(s_d, os.path.basename(img_f).split('.')[0]
                                            + '_face_{}.png'.format(i))
 
                 # get the face crop
