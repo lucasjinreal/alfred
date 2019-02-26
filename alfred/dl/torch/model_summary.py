@@ -68,8 +68,9 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
         # batch_size of 2 for batchnorm
         x = torch.rand(2, *input_size).type(dtype)
     else:
-        print('Wrong! you should send input size specific without batch size, etc: (3, 64, 64), channel first.')
-        exit(0)
+        x = torch.rand(2, *input_size).type(dtype)
+        # print('Wrong! you should send input size specific without batch size, etc: (3, 64, 64), channel first.')
+        # exit(0)
     # create properties
     summary = OrderedDict()
     hooks = []
@@ -84,6 +85,7 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
     except Exception as e:
         print('summary failed. error: {}'.format(e))
         print('make sure your called model.to(device) ')
+        print('also possibly error is input size should specific without batch, and using channel first, etc: (3, 128, 128)')
         exit(0)
 
     # remove these hooks

@@ -20,6 +20,21 @@ class FaceExtractor(object):
         self.detector = dlib.get_frontal_face_detector()
         # self.predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 
+    def get_faces_list(self, img):
+        assert isinstance(img, np.ndarray), 'img should be numpy array (cv2 frame)'
+        dets = self.detector(img, 1)
+        all_faces = []
+        for i, d in enumerate(dets):
+            # get the face crop
+            x = int(d.left())
+            y = int(d.top())
+            w = int(d.width())
+            h = int(d.height())
+
+            face_patch = np.array(img)[y: y + h, x: x + w, 0:3]
+            all_faces.append(face_patch)
+        return all_faces
+
     def get_faces(self, img_d):
         """
         get all faces from img_d

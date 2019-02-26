@@ -6,6 +6,7 @@
 # log
 # -----------------------
 from loguru import logger
+import sys
 
 
 def init_logger():
