@@ -12,18 +12,33 @@ except ImportError:
 import os
 import cv2
 import numpy as np
+from loguru import logger
 
 
 class FaceExtractor(object):
 
-    def __init__(self):
+    def __init__(self, predictor_path='shape_predictor_68_face_landmarks.dat'):
         self.detector = dlib.get_frontal_face_detector()
-        # self.predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+        self.predictor_path = predictor_path
+        self.predictor = dlib.shape_predictor(predictor_path)
 
-    def get_faces_list(self, img):
+
+    def get_faces_list(self, img, landmark=False):
+        """
+        get faces and locations
+        """
         assert isinstance(img, np.ndarray), 'img should be numpy array (cv2 frame)'
+        if landmark:
+            if os.path.exists(self.predictor_path):
+                predictor = dlib.shape_predictor(self.predictor_path)
+            else:
+                logger.error('Could not found model file {}, you should download '
+                'dlib landmark model: http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2'.format(self.predictor_path))
+                exit(0)
         dets = self.detector(img, 1)
         all_faces = []
+        locations = []
+        landmarks = []
         for i, d in enumerate(dets):
             # get the face crop
             x = int(d.left())
@@ -32,8 +47,16 @@ class FaceExtractor(object):
             h = int(d.height())
 
             face_patch = np.array(img)[y: y + h, x: x + w, 0:3]
+
+            if landmark:
+                shape = predictor(img, d)
+                landmarks.append(shape)
+            locations.append([x, y, w, h])
             all_faces.append(face_patch)
-        return all_faces
+        if landmark:
+            return all_faces, locations, landmarks
+        else:
+            return all_faces, locations
 
     def get_faces(self, img_d):
         """
