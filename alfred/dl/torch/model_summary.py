@@ -64,11 +64,12 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
         dtype = torch.FloatTensor
 
     # multiple inputs to the network
-    if isinstance(input_size, tuple) and input_size[0] <= 3:
+    if isinstance(input_size, tuple) or isinstance(input_size, list) and input_size[0] <= 3:
         # batch_size of 2 for batchnorm
         x = torch.rand(2, *input_size).type(dtype)
     else:
         x = torch.rand(2, *input_size).type(dtype)
+        print('[WARNING] channel more than 3, this may cause some errors. or you does not put channel as first dim.')
         # print('Wrong! you should send input size specific without batch size, etc: (3, 64, 64), channel first.')
         # exit(0)
     # create properties
@@ -80,12 +81,13 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
 
     # make a forward pass
     try:
-        print('fake data input: ', x.size())
+        print('[INFO] fake data input: ', x.size())
         model(x)
     except Exception as e:
-        print('summary failed. error: {}'.format(e))
-        print('make sure your called model.to(device) ')
+        print('[ERROR] summary failed. error: {}'.format(e))
+        print('[TIPS] make sure your called model.to(device) ')
         print('also possibly error is input size should specific without batch, and using channel first, etc: (3, 128, 128)')
+        print('full trace back: ', e.with_traceback())
         exit(0)
 
     # remove these hooks
