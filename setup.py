@@ -22,7 +22,7 @@ install alfred into local bin dir.
 from setuptools import setup, find_packages
 
 setup(name='alfred-py',
-      version='2.4.10',
+      version='2.5.1',
       keywords=['deep learning', 'script helper', 'tools'],
       description='''
       Alfred is a DeepLearning utility library.
@@ -42,7 +42,9 @@ setup(name='alfred-py',
           'alfred.dl',
           'alfred.dl.inference',
           'alfred.dl.torch',
-         # 'alfred.dl.torch.data',
+          'alfred.dl.torch.train',
+          'alfred.dl.torch.nn',
+          'alfred.dl.torch.ops',
           'alfred.vis',
           'alfred.modules',
           'alfred.modules.scrap',
