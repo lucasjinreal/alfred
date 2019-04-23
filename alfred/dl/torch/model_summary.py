@@ -27,7 +27,11 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
 
             m_key = "%s-%i" % (class_name, module_idx + 1)
             summary[m_key] = OrderedDict()
-            summary[m_key]["input_shape"] = list(input[0].size())
+            try:
+                summary[m_key]["input_shape"] = list(input[0].size())
+            except Exception as e:
+                print('error when fetching input shape: ', e)
+                summary[m_key]["input_shape"] = [2, -1, -1]
             summary[m_key]["input_shape"][0] = batch_size
             if isinstance(output, (list, tuple)):
                 summary[m_key]["output_shape"] = [
@@ -87,7 +91,7 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
         print('[ERROR] summary failed. error: {}'.format(e))
         print('[TIPS] make sure your called model.to(device) ')
         print('also possibly error is input size should specific without batch, and using channel first, etc: (3, 128, 128)')
-        print('full trace back: ', e.with_traceback())
+        print('full trace back: ', e.with_traceback(0))
         exit(0)
 
     # remove these hooks
