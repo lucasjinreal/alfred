@@ -15,7 +15,7 @@ from deprecated import deprecated
 
 class ImageInferEngine(object):
 
-    def __init__(self, f, is_show=True, record=False):
+    def __init__(self, f, is_show=False, record=False):
         """
         run on
 
