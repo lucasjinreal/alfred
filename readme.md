@@ -2,8 +2,6 @@
 
 *Alfred* is command line tool for deep-learning usage. if you want split an video into image frames or combine frames into a single video, then **alfred** is what you want.
 
-![showing using alfred combine a image sequence into video](https://i.loli.net/2018/08/01/5b612d34d9872.png)
-
 
 
 ## Install
@@ -25,14 +23,14 @@ from alfred.fusion import fusion_utils
 ## Updates
 
 
+- 2050-: *to be continue*
+- 2019-04-25: Adding KITTI fusion, now you can get projection from 3D label to image like this:
+we will also add more fusion utils such as for *nuScene* dataset.
+<p align="center">
+<img src="https://s2.ax1x.com/2019/04/24/EVrU0O.md.png" />
+</p>
 
-- 2050-:
-
-  *to be continue*
-
-- 2019-01-25:
-
-  We just adding network visualization tool for **pytorch** now!! How does it look? Simply print out *every layer network with output shape*,  I believe this is really helpful for people to visualize their models!
+- 2019-01-25: We just adding network visualization tool for **pytorch** now!! How does it look? Simply print out *every layer network with output shape*,  I believe this is really helpful for people to visualize their models!
 
   ```
   ➜  mask_yolo3 git:(master) ✗ python3 tests.py
@@ -41,38 +39,7 @@ from alfred.fusion import fusion_utils
   ================================================================
               Conv2d-1         [-1, 64, 224, 224]           1,792
                 ReLU-2         [-1, 64, 224, 224]               0
-              Conv2d-3         [-1, 64, 224, 224]          36,928
-                ReLU-4         [-1, 64, 224, 224]               0
-           MaxPool2d-5         [-1, 64, 112, 112]               0
-              Conv2d-6        [-1, 128, 112, 112]          73,856
-                ReLU-7        [-1, 128, 112, 112]               0
-              Conv2d-8        [-1, 128, 112, 112]         147,584
-                ReLU-9        [-1, 128, 112, 112]               0
-          MaxPool2d-10          [-1, 128, 56, 56]               0
-             Conv2d-11          [-1, 256, 56, 56]         295,168
-               ReLU-12          [-1, 256, 56, 56]               0
-             Conv2d-13          [-1, 256, 56, 56]         590,080
-               ReLU-14          [-1, 256, 56, 56]               0
-             Conv2d-15          [-1, 256, 56, 56]         590,080
-               ReLU-16          [-1, 256, 56, 56]               0
-          MaxPool2d-17          [-1, 256, 28, 28]               0
-             Conv2d-18          [-1, 512, 28, 28]       1,180,160
-               ReLU-19          [-1, 512, 28, 28]               0
-             Conv2d-20          [-1, 512, 28, 28]       2,359,808
-               ReLU-21          [-1, 512, 28, 28]               0
-             Conv2d-22          [-1, 512, 28, 28]       2,359,808
-               ReLU-23          [-1, 512, 28, 28]               0
-          MaxPool2d-24          [-1, 512, 14, 14]               0
-             Conv2d-25          [-1, 512, 14, 14]       2,359,808
-               ReLU-26          [-1, 512, 14, 14]               0
-             Conv2d-27          [-1, 512, 14, 14]       2,359,808
-               ReLU-28          [-1, 512, 14, 14]               0
-             Conv2d-29          [-1, 512, 14, 14]       2,359,808
-               ReLU-30          [-1, 512, 14, 14]               0
-          MaxPool2d-31            [-1, 512, 7, 7]               0
-             Linear-32                 [-1, 4096]     102,764,544
-               ReLU-33                 [-1, 4096]               0
-            Dropout-34                 [-1, 4096]               0
+                .........
              Linear-35                 [-1, 4096]      16,781,312
                ReLU-36                 [-1, 4096]               0
             Dropout-37                 [-1, 4096]               0
@@ -105,9 +72,7 @@ from alfred.fusion import fusion_utils
 
   Support you input (224, 224) image, you will got this output, or you can change any other size to see how output changes. (currently not support for 1 channel image)
 
-- 2018-12-7:
-
-  Now, we adding a extensible class for quickly write an image detection or segmentation demo.
+- 2018-12-7: Now, we adding a extensible class for quickly write an image detection or segmentation demo.
 
   If you want write a demo which **do inference on an image or an video or right from webcam**, now you can do this in standared alfred way:
 
@@ -156,13 +121,11 @@ from alfred.fusion import fusion_utils
 
   After that, you can directly inference from video. This usage can be found at git repo: 
 
-  <div align=center><img src="https://s1.ax1x.com/2018/12/07/F1OKLF.gif"/></div>
+  <p align="center"><img src="https://s1.ax1x.com/2018/12/07/F1OKLF.gif"/></p>
 
   The repo using **alfred**: http://github.com/jinfagang/pt_enet
 
-- 2018-11-6:
-
-  I am so glad to announce that alfred 2.0 released！😄⛽️👏👏  Let's have a quick look what have been updated:
+- 2018-11-6: I am so glad to announce that alfred 2.0 released！😄⛽️👏👏  Let's have a quick look what have been updated:
 
   ```
   # 2 new modules, fusion and vis
@@ -171,16 +134,12 @@ from alfred.fusion import fusion_utils
 
   For the module `fusion` contains many useful sensor fusion helper functions you may use, such as project lidar point cloud onto image.
 
-- 2018-08-01
-
-  Fix the video combined function not work well with sequence. Add a order algorithm to ensure video sequence right.
+- 2018-08-01:  Fix the video combined function not work well with sequence. Add a order algorithm to ensure video sequence right.
   also add some draw bbox functions into package.
 
   can be called like this:
 
-- 2018-03-16
-
-  Slightly update **alfred**, now we can using this tool to combine a video sequence back original video!
+- 2018-03-16: Slightly update **alfred**, now we can using this tool to combine a video sequence back original video!
   Simply do:
 
   ```shell

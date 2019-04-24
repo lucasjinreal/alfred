@@ -168,6 +168,34 @@ def lidar_pt_to_cam0_frame(pt3d, calib):
         raise ValueError('frame_calib must be an LidarCamCalibData type')
 
 
+def cam3d_to_pixel(cam3d, calib):
+    """
+    Convert a single point of lidar
+    :param cam3d:
+    :param calib:
+    :return:
+    """
+    # padding the 4th element to 1
+    pt3d = np.append(cam3d, 1)
+    # Pad the r0_rect matrix to a 4x4
+    if isinstance(calib, LidarCamCalibData):
+        if not calib.checked:
+            raise ValueError('calib not bootstrap, did you called calib_data.bootstrap()?')
+        else:
+            # 2. Get cam0 after rectify
+            ret_xyz = np.dot(calib.Rect_cam_0, pt3d)
+
+            # 3. if points not on image, then return None
+            if ret_xyz[2] >= 0:
+                # 6. Get projected coords
+                pts2d_cam = np.dot(calib.P_cam_0, ret_xyz)
+                return pts2d_cam / pts2d_cam[2]
+            else:
+                return None
+    else:
+        raise ValueError('frame_calib must be an LidarCamCalibData type')
+
+
 def load_pc_from_file(v_f):
     return np.fromfile(v_f, dtype=np.float32, count=-1).reshape([-1, 4])
 
