@@ -12,11 +12,13 @@ To install **alfred**, it is very simple:
 sudo pip3 install alfred-py
 ```
 
-And then you can do something like this in your python program:
+**alfred** is both a *package* and a *command line tool*. it can do those things for a command line tool:
 
-```python
-from alfred.fusion import fusion_utils
-```
+- combine a sequences images into a video;
+- extract all frames  of a video;
+- extract all faces from a bunch of images;
+
+*it's built for AI*.
 
 
 
@@ -24,11 +26,54 @@ from alfred.fusion import fusion_utils
 
 
 - 2050-: *to be continue*
+
 - 2019-04-25: Adding KITTI fusion, now you can get projection from 3D label to image like this:
-we will also add more fusion utils such as for *nuScene* dataset.
+  we will also add more fusion utils such as for *nuScene* dataset.
+
+  We providing kitti fusion kitti for convert `camera link 3d points` to image pixel, and convert `lidar link 3d points` to image pixel. Roughly going through of APIs like this:
+
+  ```
+  # convert lidar prediction to image pixel
+  from alfred.fusion.kitti_fusion import LidarCamCalibData, \
+      load_pc_from_file, lidar_pts_to_cam0_frame, lidar_pt_to_cam0_frame
+  from alfred.fusion.common import draw_3d_box, compute_3d_box_lidar_coords
+  
+  # consit of prediction of lidar
+  # which is x,y,z,h,w,l,rotation_y
+  res = [[4.481686, 5.147319, -1.0229858, 1.5728549, 3.646751, 1.5121397, 1.5486346],
+         [-2.5172017, 5.0262384, -1.0679419, 1.6241353, 4.0445814, 1.4938312, 1.620804],
+         [1.1783253, -2.9209857, -0.9852259, 1.5852798, 3.7360613, 1.4671413, 1.5811548]]
+  
+  for p in res:
+      xyz = np.array([p[: 3]])
+      c2d = lidar_pt_to_cam0_frame(xyz, frame_calib)
+      if c2d is not None:
+          cv2.circle(img, (int(c2d[0]), int(c2d[1])), 3, (0, 255, 255), -1)
+      hwl = np.array([p[3: 6]])
+      r_y = [p[6]]
+      pts3d = compute_3d_box_lidar_coords(xyz, hwl, angles=r_y, origin=(0.5, 0.5, 0.5), axis=2)
+  
+      pts2d = []
+      for pt in pts3d[0]:
+          coords = lidar_pt_to_cam0_frame(pt, frame_calib)
+          if coords is not None:
+              pts2d.append(coords[:2])
+      pts2d = np.array(pts2d)
+      draw_3d_box(pts2d, img)
+  ```
+
+  And you can see something like this:
+
+  **note**:
+
+  `compute_3d_box_lidar_coords` for lidar prediction, `compute_3d_box_cam_coords` for KITTI label, **cause KITTI label is based on camera coordinates!**.
 <p align="center">
 <img src="https://s2.ax1x.com/2019/04/24/EVrU0O.md.png" />
 </p>
+
+
+
+
 
 - 2019-01-25: We just adding network visualization tool for **pytorch** now!! How does it look? Simply print out *every layer network with output shape*,  I believe this is really helpful for people to visualize their models!
 

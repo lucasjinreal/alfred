@@ -52,8 +52,10 @@ def draw_3d_box(pts, img, color=(255, 0, 255), thickness=1):
                      thickness, lineType=cv2.LINE_AA)
 
 
-def compute_3d_box(xyz, lwh, rotation_y):
+def compute_3d_box_cam_coords(xyz, lwh, rotation_y):
     """
+    KITTI camera coordinates using -y as up
+    this only works on camera coordinates xyz
     center
     dim
     rotation
@@ -72,6 +74,7 @@ def compute_3d_box(xyz, lwh, rotation_y):
     l, w, h = dim[0], dim[1], dim[2]
     x_corners = [l / 2, l / 2, -l / 2, -l / 2, l / 2, l / 2, -l / 2, -l / 2]
     y_corners = [0, 0, 0, 0, -h, -h, -h, -h]
+    # y_corners = [0, 0, 0, 0, h, h, h, h]
     z_corners = [w / 2, -w / 2, -w / 2, w / 2, w / 2, -w / 2, -w / 2, w / 2]
 
     corners = np.array([x_corners, y_corners, z_corners], dtype=np.float32)
@@ -80,11 +83,11 @@ def compute_3d_box(xyz, lwh, rotation_y):
     return corners_3d.transpose(1, 0)
 
 
-def center_to_corner_3d(centers,
-                        dims,
-                        angles=None,
-                        origin=(0.5, 0.5, 0.5),
-                        axis=2):
+def compute_3d_box_lidar_coords(centers,
+                                dims,
+                                angles=None,
+                                origin=(0.5, 0.5, 0.5),
+                                axis=2):
     corners = _corners_nd(dims, origin=origin)
     # corners: [N, 8, 3]
     if angles is not None:

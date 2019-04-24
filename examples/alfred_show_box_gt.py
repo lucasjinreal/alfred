@@ -5,7 +5,7 @@ import numpy as np
 from alfred.vis.image.common import get_unique_color_by_id
 from alfred.fusion.kitti_fusion import LidarCamCalibData, \
     load_pc_from_file, cam3d_to_pixel, lidar_pt_to_cam0_frame
-from alfred.fusion.common import draw_3d_box, compute_3d_box, center_to_corner_3d
+from alfred.fusion.common import draw_3d_box, compute_3d_box_cam_coords, center_to_corner_3d
 import cv2
 
 
@@ -30,7 +30,7 @@ for p in res:
     # hwl -> lwh
     lwh = np.array([p[3: 6]])[:, [2, 1, 0]]
     r_y = p[6]
-    pts3d = compute_3d_box(xyz[0], lwh[0], r_y)
+    pts3d = compute_3d_box_cam_coords(xyz[0], lwh[0], r_y)
 
     pts2d = []
     for pt in pts3d:
