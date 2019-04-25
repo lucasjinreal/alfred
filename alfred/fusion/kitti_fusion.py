@@ -112,14 +112,17 @@ class LidarCamCalibData(object):
         )
 
 
-def lidar_pts_to_cam0_frame(pts3d, calib):
+def lidar_pts_to_cam0_frame(pts3d, calib, filter_intensity=False):
     """
     Directly convert all lidar points to camera frame
     :param pts3d:
     :param calib:
+    :param filter_intensity
     :return:
     """
-    pts3d = pts3d[pts3d[:, 3] > 0, :]
+    # filter out intensity <= 0
+    if filter_intensity:
+        pts3d = pts3d[pts3d[:, 3] > 0, :]
     pts3d[:, 3] = 1
     pts3d = np.transpose(pts3d)
     # Pad the r0_rect matrix to a 4x4
