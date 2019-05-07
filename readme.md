@@ -26,6 +26,17 @@ sudo pip3 install alfred-py
 
 
 - 2050-: *to be continue*
+- 2019-05-07: Adding some protos, now you can parsing tensorflow coco labelmap by using alfred:
+    ```
+    from alfred.protos.labelmap_pb2 import LabelMap
+    from google.protobuf import text_format
+
+    with open('coco.prototxt', 'r') as f:
+        lm = LabelMap()
+        lm = text_format.Merge(str(f.read()), lm)
+        names_list = [i.display_name for i in lm.item]
+        print(names_list)
+    ```
 
 - 2019-04-25: Adding KITTI fusion, now you can get projection from 3D label to image like this:
   we will also add more fusion utils such as for *nuScene* dataset.

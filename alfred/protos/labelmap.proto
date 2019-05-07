@@ -1,0 +1,15 @@
+syntax = "proto2";
+
+message LabelMapItem {
+    // Both name and label are required.
+    optional string name = 1;
+    optional int32 label = 2;
+    optional int32 id=4;
+    // display_name is optional.
+    optional string display_name = 3;
+  }
+  
+message LabelMap {
+repeated LabelMapItem item = 1;
+}
+  
