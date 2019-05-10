@@ -25,9 +25,16 @@ sudo pip3 install alfred-py
 ## Updates
 
 
-- 2050-: *to be continue*
-- 2019-05-07: Adding some protos, now you can parsing tensorflow coco labelmap by using alfred:
+- 2050-: *to be continue*;
+- 2019-05-10: A minor updates but **really useful** which we called **mute_tf**, do you want to disable tensorflow ignoring log? simply do this!!
+    ```python
+    from alfred.dl.tf.common import mute_tf
+    mute_tf()
+    import tensorflow as tf
     ```
+    Then, the logging message were gone....
+- 2019-05-07: Adding some protos, now you can parsing tensorflow coco labelmap by using alfred:
+    ```python
     from alfred.protos.labelmap_pb2 import LabelMap
     from google.protobuf import text_format
 
@@ -43,7 +50,7 @@ sudo pip3 install alfred-py
 
   We providing kitti fusion kitti for convert `camera link 3d points` to image pixel, and convert `lidar link 3d points` to image pixel. Roughly going through of APIs like this:
 
-  ```
+  ```python
   # convert lidar prediction to image pixel
   from alfred.fusion.kitti_fusion import LidarCamCalibData, \
       load_pc_from_file, lidar_pts_to_cam0_frame, lidar_pt_to_cam0_frame
