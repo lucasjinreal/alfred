@@ -1,1 +1,0 @@
-g++ -I/usr/local/include -I/usr/include/python -I/usr/include/python3.6m -lboost_python3 -o draw3dbox.so draw3dbox.cpp
