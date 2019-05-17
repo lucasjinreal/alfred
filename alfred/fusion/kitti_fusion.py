@@ -201,7 +201,5 @@ def cam3d_to_pixel(cam3d, calib):
 
 def load_pc_from_file(v_f):
     return np.fromfile(v_f, dtype=np.float32, count=-1).reshape([-1, 4])
-
-
 # ------------------------------ Drawing utilities ------------------------------------------
 

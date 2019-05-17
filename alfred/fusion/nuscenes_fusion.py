@@ -82,3 +82,8 @@ def compute_3d_box_cam_coords_nuscenes(xyz, lwh, quarternion):
     else:
         raise ValueError('quarternion must be a Quaternion object, make sure '\
             'you using pyquarternion.')
+
+
+def load_pc_from_file(pc_f):
+    # nuScenes lidar is 5 digits one line (last one the ring index)
+    return np.fromfile(pc_f, dtype=np.float32, count=-1).reshape([-1, 5])

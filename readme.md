@@ -26,18 +26,48 @@ sudo pip3 install alfred-py
 
 
 - 2050-: *to be continue*;
+
+- 2019-05-17: We adding **open3d** as a lib to visual 3d point cloud in python. Now you can do some simple preparation and visual 3d box right on lidar points and show like opencv!!
+
+    ![](https://user-images.githubusercontent.com/21303438/57909386-44313500-78b5-11e9-8146-c74c53038c9b.png)
+
+    ```python
+    geometries = []
+    pcs = np.array(points[:,:3])
+    pcobj = PointCloud()
+    pcobj.points = Vector3dVector(pcs)
+    geometries.append(pcobj)
+    # try getting 3d boxes coordinates
+    for p in box3d:
+        pts3d = compute_3d_box_lidar_coords(xyz, hwl, angles=r_y, origin=(0.5, 0.5, 0.5), 
+        lines = [[0,1],[1,2],[2,3],[3,0],
+                 [4,5],[5,6],[6,7],[7,4],
+                 [0,4],[1,5],[2,6],[3,7]]
+        colors = [[1, 0, 1] for i in range(len(lines))]
+        line_set = LineSet()
+        line_set.points = Vector3dVector(pts3d)
+        line_set.lines = Vector2iVector(lines)
+        line_set.colors = Vector3dVector(colors)
+        geometries.append(line_set)
+        draw_pcs_open3d(geometries)
+    ```
+
+    You can achieve this by only using **alfred-py** and **open3d**!
+
 - 2019-05-10: A minor updates but **really useful** which we called **mute_tf**, do you want to disable tensorflow ignoring log? simply do this!!
+
     ```python
     from alfred.dl.tf.common import mute_tf
     mute_tf()
     import tensorflow as tf
     ```
     Then, the logging message were gone....
+
 - 2019-05-07: Adding some protos, now you can parsing tensorflow coco labelmap by using alfred:
     ```python
     from alfred.protos.labelmap_pb2 import LabelMap
     from google.protobuf import text_format
-
+    
     with open('coco.prototxt', 'r') as f:
         lm = LabelMap()
         lm = text_format.Merge(str(f.read()), lm)

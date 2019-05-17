@@ -8,6 +8,7 @@
 import pykitti
 import cv2
 import numpy as np
+from alfred.vis.pointcloud.pointcloud_vis import draw_pcs_open3d
 
 
 base_dir = '/media/jintain/sg/permanent/datasets/KITTI/videos'
