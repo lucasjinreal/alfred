@@ -73,9 +73,13 @@ def draw_box_without_score(img, boxes, classes=None, is_show=False):
         return img
 
 
-def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, background_id=-1):
+def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, background_id=-1, mode='xyxy'):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
+
+    new add mode option
+    mode can be one of 'xyxy' and 'xywh', 'xyxy' as default
+    
     :param img:
     :param detections: ssd detections, numpy.array([[id, score, x1, y1, x2, y2]...])
             each row is one object
@@ -83,6 +87,7 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
     :param thresh:
     :param is_show:
     :param background_id: -1
+    :param mode:
     :return:
     """
     assert classes, 'from visualize_det_cv2, classes must be provided, each class in a list with' \
@@ -103,24 +108,22 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
             score = detections[i, 1]
             if score > thresh:
                 unique_color = create_unique_color_uchar(cls_id)
-
-                # if detection coordinates normalized, then do this step, otherwise not
-                # x1 = int(detections[i, 2] * width)
-                # y1 = int(detections[i, 3] * height)
-                # x2 = int(detections[i, 4] * width)
-                # y2 = int(detections[i, 5] * height)
-
-                y1 = int(detections[i, 2])
-                x1 = int(detections[i, 3])
-                y2 = int(detections[i, 4])
-                x2 = int(detections[i, 5])
+                x1, y1, x2, y2 = 0, 0, 0, 0
+                if mode == 'xyxy':
+                    x1 = int(detections[i, 2])
+                    y1 = int(detections[i, 3])
+                    x2 = int(detections[i, 4])
+                    y2 = int(detections[i, 5])
+                else:
+                    x1 = int(detections[i, 2])
+                    y1 = int(detections[i, 3])
+                    x2 = x1 + int(detections[i, 4])
+                    y2 = y1 + int(detections[i, 5])
 
                 cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness)
-
                 text_label = '{} {:.2f}'.format(classes[cls_id], score)
                 (ret_val, base_line) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
                 text_org = (x1, y1 - 0)
-
                 cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
                               (text_org[0] + ret_val[0] + 5, text_org[1] - ret_val[1] - 2), unique_color,
                               line_thickness)
