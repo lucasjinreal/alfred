@@ -28,11 +28,14 @@ from colorama import Fore, Back, Style
 from .modules.vision.video_extractor import VideoExtractor
 from .modules.scrap.image_scraper import ImageScraper
 from .modules.vision.to_video import VideoCombiner
+from .modules.vision.vis_kit import draw_box_without_score
+from .modules.vision.face_extractor import FaceExtractor
 
-__VERSION__ = '1.0.8'
+__VERSION__ = '2.3'
 __AUTHOR__ = 'Lucas Jin'
-__DATE__ = '2018.08.18'
+__DATE__ = '2018.11.11'
 __LOC__ = 'Shenzhen, China'
+__git__ = 'http://github.com/jinfagang/alfred'
 
 
 def arg_parse():
@@ -41,6 +44,7 @@ def arg_parse():
     :return:
     """
     parser = argparse.ArgumentParser(prog="alfred")
+    parser.add_argument('--version', '-v', action="store_true", help='show version info.')
 
     # vision, text, scrap
     main_sub_parser = parser.add_subparsers()
@@ -63,6 +67,10 @@ def arg_parse():
     vision_clean_parser = vision_sub_parser.add_parser('clean', help='clean images in a dir.')
     vision_clean_parser.set_defaults(which='vision-clean')
     vision_clean_parser.add_argument('--dir', '-d', help='dir contains images.')
+
+    vision_getface_parser = vision_sub_parser.add_parser('getface', help='get all faces inside an image and save it.')
+    vision_getface_parser.set_defaults(which='vision-getface')
+    vision_getface_parser.add_argument('--dir', '-d', help='dir contains images to extract faces.')
 
     # =============== text part ================
     text_parser = main_sub_parser.add_parser('text', help='text related commands.')
@@ -93,54 +101,71 @@ def print_welcome_msg():
     print('Author: ' + Fore.RED + Style.BRIGHT + __AUTHOR__ + Style.RESET_ALL)
     print('At    : ' + Fore.RED + Style.BRIGHT + __DATE__ + Style.RESET_ALL)
     print('Loc   : ' + Fore.RED + Style.BRIGHT + __LOC__ + Style.RESET_ALL)
+    print('Star  : ' + Fore.RED + Style.BRIGHT + __git__ + Style.RESET_ALL)
+    print('Ver.  : ' + Fore.RED + Style.BRIGHT + __VERSION__ + Style.RESET_ALL)
 
 
 def main(args=None):
     args = arg_parse()
-    args_dict = vars(args)
-    print_welcome_msg()
-    try:
-        module = args_dict['which'].split('-')[0]
-        action = args_dict['which'].split('-')[1]
-        print(Fore.GREEN + Style.BRIGHT)
-        print('=> Module: ' + Fore.WHITE + Style.BRIGHT + module + Fore.GREEN + Style.BRIGHT)
-        print('=> Action: ' + Fore.WHITE + Style.BRIGHT + action)
-        if module == 'vision':
-            if action == 'extract':
-                v_f = args_dict['video']
-                j = args_dict['jumps']
-                print(Fore.BLUE + Style.BRIGHT + 'Extracting from {}'.format(v_f))
-                video_extractor = VideoExtractor(jump_frames=j)
-                video_extractor.extract(v_f)
-            elif action == '2video':
-                d = args_dict['dir']
-                combiner = VideoCombiner(img_dir=d)
-                print(Fore.BLUE + Style.BRIGHT + 'Combine video from {}'.format(d))
-                print(Fore.BLUE + Style.BRIGHT + 'What the hell.. {}'.format(d))
-                combiner.combine()
+    if args.version:
+        print(print_welcome_msg())
+        exit(0)
+    else:
+        args_dict = vars(args)
+        print_welcome_msg()
+        try:
+            module = args_dict['which'].split('-')[0]
+            action = args_dict['which'].split('-')[1]
+            print(Fore.GREEN + Style.BRIGHT)
+            print('=> Module: ' + Fore.WHITE + Style.BRIGHT + module + Fore.GREEN + Style.BRIGHT)
+            print('=> Action: ' + Fore.WHITE + Style.BRIGHT + action)
+            if module == 'vision':
+                if action == 'extract':
+                    v_f = args_dict['video']
+                    j = args_dict['jumps']
+                    print(Fore.BLUE + Style.BRIGHT + 'Extracting from {}'.format(v_f))
+                    video_extractor = VideoExtractor(jump_frames=j)
+                    video_extractor.extract(v_f)
+                elif action == '2video':
+                    d = args_dict['dir']
+                    combiner = VideoCombiner(img_dir=d)
+                    print(Fore.BLUE + Style.BRIGHT + 'Combine video from {}'.format(d))
+                    print(Fore.BLUE + Style.BRIGHT + 'What the hell.. {}'.format(d))
+                    combiner.combine()
 
-            elif action == 'clean':
-                d = args_dict['dir']
-                print(Fore.BLUE + Style.BRIGHT + 'Cleaning from {}'.format(d))
-        elif module == 'text':
-            if action == 'clean':
-                f = args_dict['file']
-                print(Fore.BLUE + Style.BRIGHT + 'Cleaning from {}'.format(f))
-            elif action == 'translate':
-                f = args.v
-                print(Fore.BLUE + Style.BRIGHT + 'Translate from {}'.format(f))
-        elif module == 'scrap':
-            if action == 'image':
-                q = args_dict['query']
-                q_list = q.split(',')
-                q_list = [i.replace(' ', '') for i in q_list]
-                image_scraper = ImageScraper()
-                image_scraper.scrap(q_list)
+                elif action == 'clean':
+                    d = args_dict['dir']
+                    print(Fore.BLUE + Style.BRIGHT + 'Cleaning from {}'.format(d))
 
-    except Exception as e:
-        print(Fore.RED, 'parse args error, type -h to see help. msg: {}'.format(e))
+                elif action == 'getface':
+                    try:
+                        import dlib
+                        d = args_dict['dir']
+                        print(Fore.BLUE + Style.BRIGHT + 'Extract faces from {}'.format(d))
+
+                        face_extractor = FaceExtractor()
+                        face_extractor.get_faces(d)
+                    except ImportError:
+                        print('This action needs to install dlib first. http://dlib.net')
+
+            elif module == 'text':
+                if action == 'clean':
+                    f = args_dict['file']
+                    print(Fore.BLUE + Style.BRIGHT + 'Cleaning from {}'.format(f))
+                elif action == 'translate':
+                    f = args.v
+                    print(Fore.BLUE + Style.BRIGHT + 'Translate from {}'.format(f))
+            elif module == 'scrap':
+                if action == 'image':
+                    q = args_dict['query']
+                    q_list = q.split(',')
+                    q_list = [i.replace(' ', '') for i in q_list]
+                    image_scraper = ImageScraper()
+                    image_scraper.scrap(q_list)
+
+        except Exception as e:
+            print(Fore.RED, 'parse args error, type -h to see help. msg: {}'.format(e))
 
 
 if __name__ == '__main__':
-    print('what the fuck..')
     main()

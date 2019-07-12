@@ -16,3 +16,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------------
+"""Bring in all of the public Alfred interface into this module."""
+import importlib
+# pylint: disable=g-bad-import-order
+
+from .modules import *
+from .vis import *
+from .fusion import *
+globals().update(importlib.import_module('alfred').__dict__)

@@ -1,18 +1,28 @@
 """
-this file contains a tool kit for computer vision kit
-we can using this powerful kit to display detection or
-segmentation skillfully
+draw detection result base on various format
+
+after detection
+
+also include draw 3d box on image
 """
 import numpy as np
-import colorsys
 import cv2
-import time
 import os
-import tensorflow as tf
-from PIL import Image
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import matplotlib.patheffects as patheffects
+
+from .common import create_unique_color_uchar
+
+
+
+def draw_one_bbox(image, box, unique_color, thickness):
+    x1 = int(box[0])
+    y1 = int(box[1])
+    x2 = int(box[2])
+    y2 = int(box[3])
+    cv2.rectangle(image, (x1, y1), (x2, y2), unique_color, thickness)
+    return image
+
+
+# ==================== Below are deprecation API =================
 
 
 def draw_box_without_score(img, boxes, classes=None, is_show=False):
@@ -37,7 +47,7 @@ def draw_box_without_score(img, boxes, classes=None, is_show=False):
             cls = boxes[i, -1]
             all_cls.append(cls)
             all_cls = set(all_cls)
-            unique_color = _create_unique_color_uchar(all_cls.index(cls))
+            unique_color = create_unique_color_uchar(all_cls.index(cls))
 
             y1 = int(boxes[i, 2])
             x1 = int(boxes[i, 3])
@@ -63,9 +73,13 @@ def draw_box_without_score(img, boxes, classes=None, is_show=False):
         return img
 
 
-def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, background_id=-1):
+def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, background_id=-1, mode='xyxy'):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
+
+    new add mode option
+    mode can be one of 'xyxy' and 'xywh', 'xyxy' as default
+    
     :param img:
     :param detections: ssd detections, numpy.array([[id, score, x1, y1, x2, y2]...])
             each row is one object
@@ -73,6 +87,7 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
     :param thresh:
     :param is_show:
     :param background_id: -1
+    :param mode:
     :return:
     """
     assert classes, 'from visualize_det_cv2, classes must be provided, each class in a list with' \
@@ -92,25 +107,23 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
         if cls_id != background_id:
             score = detections[i, 1]
             if score > thresh:
-                unique_color = _create_unique_color_uchar(cls_id)
-
-                # if detection coordinates normalized, then do this step, otherwise not
-                # x1 = int(detections[i, 2] * width)
-                # y1 = int(detections[i, 3] * height)
-                # x2 = int(detections[i, 4] * width)
-                # y2 = int(detections[i, 5] * height)
-
-                y1 = int(detections[i, 2])
-                x1 = int(detections[i, 3])
-                y2 = int(detections[i, 4])
-                x2 = int(detections[i, 5])
+                unique_color = create_unique_color_uchar(cls_id)
+                x1, y1, x2, y2 = 0, 0, 0, 0
+                if mode == 'xyxy':
+                    x1 = int(detections[i, 2])
+                    y1 = int(detections[i, 3])
+                    x2 = int(detections[i, 4])
+                    y2 = int(detections[i, 5])
+                else:
+                    x1 = int(detections[i, 2])
+                    y1 = int(detections[i, 3])
+                    x2 = x1 + int(detections[i, 4])
+                    y2 = y1 + int(detections[i, 5])
 
                 cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness)
-
                 text_label = '{} {:.2f}'.format(classes[cls_id], score)
                 (ret_val, base_line) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
                 text_org = (x1, y1 - 0)
-
                 cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
                               (text_org[0] + ret_val[0] + 5, text_org[1] - ret_val[1] - 2), unique_color,
                               line_thickness)
@@ -152,7 +165,7 @@ def visualize_det_mask_cv2(img, detections, masks, classes=None, is_show=False, 
     for i in range(num_instances):
         cls_id = int(detections[i, 0])
         if cls_id != background_id:
-            unique_color = _create_unique_color_uchar(cls_id)
+            unique_color = create_unique_color_uchar(cls_id)
             mask = masks[:, :, i]
             masked_image = _apply_mask2(masked_image, mask, unique_color)
     # masked_image = masked_image.astype(int)
@@ -165,44 +178,6 @@ def visualize_det_mask_cv2(img, detections, masks, classes=None, is_show=False, 
     return masked_image
 
 
-def draw_masks(img, masks, cls_color_list, is_show=False, background_id=-1, is_video=False, convert_bgr=False):
-    """
-    draw masks pure on an image, the mask format is something like this:
-    [[[1], [1], [1], .., [2]],
-     [[1], [1], [1], .., [2]],
-     [[1], [1], [1], .., [2]]]
-    every pixel in image is a class
-
-    the color list better using RGBA channel
-    cls_color_list = [(223,  224, 225, 0.4), (12, 23, 23, 0.4), ...] a list of colors
-
-    Note: suppose the img in BGR format, you should convert to RGB once img returned
-    :param img:
-    :param masks:
-    :param cls_color_list:
-    :param is_show:
-    :param background_id:
-    :param is_video:
-    :return:
-    """
-    n, h, w, c = masks.shape
-
-    mask_flatten = masks[0].flatten()
-    mask_color = np.array(list(map(lambda i: cls_color_list[i], mask_flatten)))
-    # reshape to normal image shape,
-    mask_color = np.reshape(mask_color, (h, w, 3)).astype('float32')
-
-    # add this mask on img
-    # img = cv2.add(img, mask_color)
-    if convert_bgr:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = cv2.addWeighted(img, 0.6, mask_color, 0.4, 0)
-    if is_show:
-        cv2.imshow('img', img)
-        cv2.imwrite('test_res.jpg', img)
-        cv2.waitKey(0)
-    return img
-
 
 def _apply_mask2(image, mask, color, alpha=0.5):
     for c in range(3):
@@ -211,16 +186,91 @@ def _apply_mask2(image, mask, color, alpha=0.5):
     return image
 
 
-def create_unique_color_float(tag, hue_step=0.41, alpha=0.7):
-    h, v = (tag * hue_step) % 1, 1. - (int(tag * hue_step) % 4) / 5.
-    r, g, b = colorsys.hsv_to_rgb(h, 1., v)
-    return r, g, b, alpha
+# --------------- Drawing 3d box on image parts --------------
+def draw_one_3d_box_cv2(img, box_3d, obj_id_name_map, score, tlwhy_format=False, calib_cam_to_img_p2=None,
+                        force_color=None):
+    """
+    provide a obj id name map like: {1, 'car'}
+    id to distinguish with previous object type
 
+    tlwhy means input box are in format: [x, y, z, l, w, h, ry]
+    that means we should convert it first.
+    :param img:
+    :param box_3d:
+    :param obj_id_name_map:
+    :param score:
+    :param tlwhy_format:
+    :param calib_cam_to_img_p2:
+    :param force_color:
+    :return:
+    """
+    assert isinstance(obj_id_name_map, dict), 'obj_id_name_map must be dict'
+    # color = None
+    if force_color:
+        color = force_color
+    else:
+        color = create_unique_color_uchar(list(obj_id_name_map.keys())[0])
+    if tlwhy_format:
+        # transform [x, y, z, l, w, h, ry] to normal box
+        assert calib_cam_to_img_p2, 'You should provide calibration matrix, convert camera to image coordinate.'
+        center = box_3d[0: 3]
+        dims = box_3d[3: 6]
+        rot_y = -box_3d[6] / 180 * np.pi
+        # alpha / 180 * np.pi + np.arctan(center[0] / center[2])
 
-def create_unique_color_uchar(tag, hue_step=0.41, alpha=0.7):
-    r, g, b, a = create_unique_color_float(tag, hue_step, alpha)
-    return int(255 * r), int(255 * g), int(255 * b), int(255 * a)
+        converted_box_3d = []
+        for i in [1, -1]:
+            for j in [1, -1]:
+                for k in [0, 1]:
+                    point = np.copy(center)
+                    point[0] = center[0] + i * dims[1] / 2 * np.cos(-rot_y + np.pi / 2) + \
+                               (j * i) * dims[2] / 2 * np.cos(-rot_y)
+                    point[2] = center[2] + i * dims[1] / 2 * np.sin(-rot_y + np.pi / 2) + \
+                               (j * i) * dims[2] / 2 * np.sin(-rot_y)
+                    point[1] = center[1] - k * dims[0]
 
+                    point = np.append(point, 1)
+                    point = np.dot(calib_cam_to_img_p2, point)
+                    point = point[:2] / point[2]
+                    point = point.astype(np.int16)
+                    converted_box_3d.append(point)
+        print('final box: ', converted_box_3d)
+        # box_3d = np.asarray(converted_box_3d)
+        box_3d = converted_box_3d
+        # print(box_3d.shape)
+        for i in range(4):
+            point_1_ = box_3d[2 * i]
+            point_2_ = box_3d[2 * i + 1]
+            cv2.line(img, (point_1_[0], point_1_[1]), (point_2_[0], point_2_[1]), color, 1)
 
-# ----------------------- 3D drawing functionality ----------------------
+        for i in range(8):
+            point_1_ = box_3d[i]
+            point_2_ = box_3d[(i + 2) % 8]
+            cv2.line(img, (point_1_[0], point_1_[1]), (point_2_[0], point_2_[1]), color, 1)
+        return img
+    else:
+        # assert len(box_3d) == 8, 'every box 3d should have 8 points. if you got 7, you may want tlwhy=True'
+        face_idx = np.array([0, 1, 5, 4,  # front face
+                             1, 2, 6, 5,  # left face
+                             2, 3, 7, 6,  # back face
+                             3, 0, 4, 7]).reshape((4, 4))
+        # print('start draw...')
+        for i in range(4):
+            x = np.append(box_3d[0, face_idx[i,]],
+                          box_3d[0, face_idx[i, 0]])
+            y = np.append(box_3d[1, face_idx[i,]],
+                          box_3d[1, face_idx[i, 0]])
+            # print('x: ', x)
+            # print('y: ', y)
+            # cv2.line(img, (point_1_, point_1_), (point_2_, point_2_), color, 1)
+            pts = np.vstack((x, y)).T
+            # filter negative values
+            pts = (pts + abs(pts)) / 2
+            pts = np.array([pts], dtype=int)
+            # print(pts)
+            cv2.polylines(img, pts, isClosed=True, color=color, thickness=1)
+            if i == 3:
+                # add text
+                ori_txt = pts[0][1]
 
+        return img

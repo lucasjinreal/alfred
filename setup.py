@@ -22,13 +22,44 @@ install alfred into local bin dir.
 from setuptools import setup, find_packages
 
 setup(name='alfred-py',
-      version='1.0.8',
+      version='2.5.13',
       keywords=['deep learning', 'script helper', 'tools'],
-      description='alfred is a deep learning scripts collection, built with many standby functions for process image '
-                  'or '
-                  'text',
-      license='GPL',
-      packages=find_packages(),
+      description='''
+      Alfred is a DeepLearning utility library.
+      ''',
+      long_description='''
+      Alfred is a DeepLearning utility library. it consist of text pre-processing,
+      computer vision visualization, and some sensor fusion functions. You can even
+      load some deep learning base nets from alfred. Everything is just include at you 
+      wish to call it.
+      
+      Also, you can using alfred as a console program to execute some functions, such as
+      combine video, image processing, scrap image from internet etc.
+      ''',
+      license='Apache 2.0',
+      packages=[
+          'alfred',
+          'alfred.dl',
+          'alfred.dl.inference',
+          'alfred.dl.torch',
+          'alfred.dl.torch.train',
+          'alfred.dl.torch.nn',
+          'alfred.dl.torch.nn.modules',
+          'alfred.dl.torch.ops',
+          'alfred.dl.tf',
+          'alfred.vis',
+          'alfred.modules',
+          'alfred.modules.scrap',
+          'alfred.modules.text',
+          'alfred.modules.vision',
+          'alfred.modules',
+          'alfred.fusion',
+          'alfred.vis.image',
+          'alfred.vis.pointcloud',
+          'alfred.utils',
+          'alfred.protos'
+      ],
+      # package_dir={'alfred': 'alfred'},
       entry_points={
           'console_scripts': [
               'alfred = alfred.alfred:main'
@@ -36,8 +67,9 @@ setup(name='alfred-py',
       },
 
       author="Lucas Jin",
-      author_email="jinfagang10@163.com",
+      author_email="jinfagang19@163.com",
       url='https://github.com/jinfagang/alfred',
       platforms='any',
-      install_requires=['colorama', 'opencv-python', 'requests', 'numpy']
+      install_requires=['colorama', 'opencv-contrib-python', 'requests', 'numpy',
+                        'future', 'deprecated', 'loguru', 'pyquaternion']
       )

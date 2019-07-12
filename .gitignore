@@ -5,4 +5,4 @@ alfred_py.egg-info/
 alfred.egg-info/
 dist/
 build/
-upload_pypi.sh
+.vscode/
