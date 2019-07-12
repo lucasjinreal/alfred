@@ -28,8 +28,7 @@ from colorama import Fore, Back, Style
 from .modules.vision.video_extractor import VideoExtractor
 from .modules.scrap.image_scraper import ImageScraper
 from .modules.vision.to_video import VideoCombiner
-from .modules.vision.vis_kit import draw_box_without_score
-from .modules.vision.face_extractor import FaceExtractor
+
 
 __VERSION__ = '2.3'
 __AUTHOR__ = 'Lucas Jin'
@@ -92,6 +91,14 @@ def arg_parse():
     scrap_image_parser.set_defaults(which='scrap-image')
     scrap_image_parser.add_argument('--query', '-q', help='query words.')
 
+    # =============== data part ================
+    data_parser = main_sub_parser.add_parser('data', help='data related commands.')
+    data_sub_parser = data_parser.add_subparsers()
+
+    view_voc_parser = scrap_sub_parser.add_parser('voc_view', help='view voc.')
+    view_voc_parser.set_defaults(which='scrap-image')
+    view_voc_parser.add_argument('--root', '-r', help='Root path of VOC.')
+
     return parser.parse_args()
 
 
@@ -139,7 +146,9 @@ def main(args=None):
 
                 elif action == 'getface':
                     try:
+                        from .modules.vision.face_extractor import FaceExtractor
                         import dlib
+                        
                         d = args_dict['dir']
                         print(Fore.BLUE + Style.BRIGHT + 'Extract faces from {}'.format(d))
 
