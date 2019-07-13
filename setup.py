@@ -23,7 +23,7 @@ from setuptools import setup, find_packages
 
 
 setup(name='alfred-py',
-      version='2.5.13',
+      version='2.5.14',
       keywords=['deep learning', 'script helper', 'tools'],
       description='''
       Alfred is a DeepLearning utility library.
@@ -73,5 +73,5 @@ setup(name='alfred-py',
       url='https://github.com/jinfagang/alfred',
       platforms='any',
       install_requires=['colorama', 'opencv-contrib-python', 'requests', 'numpy',
-                        'future', 'deprecated', 'loguru', 'pyquaternion']
+                        'future', 'deprecated', 'loguru', 'pyquaternion', 'lxml']
       )
