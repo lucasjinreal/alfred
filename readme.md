@@ -37,9 +37,13 @@ sudo pip3 install alfred-py
     from alfred.vis.image.get_dataset_labelmap import voc_labelmap
     from alfred.vis.image.get_dataset_labelmap import cityscapes_labelmap
     ```
-
     
+- 2019-07-13: We add a VOC check module in command line usage, you can now visualize your VOC format detection data like this:
 
+    ```
+    alfred data voc_view -i ./images -l labels/
+    ```
+    ​
 - 2019-05-17: We adding **open3d** as a lib to visual 3d point cloud in python. Now you can do some simple preparation and visual 3d box right on lidar points and show like opencv!!
 
     ![](https://user-images.githubusercontent.com/21303438/57909386-44313500-78b5-11e9-8146-c74c53038c9b.png)
@@ -80,7 +84,7 @@ sudo pip3 install alfred-py
     ```python
     from alfred.protos.labelmap_pb2 import LabelMap
     from google.protobuf import text_format
-    
+
     with open('coco.prototxt', 'r') as f:
         lm = LabelMap()
         lm = text_format.Merge(str(f.read()), lm)
@@ -98,13 +102,13 @@ sudo pip3 install alfred-py
   from alfred.fusion.kitti_fusion import LidarCamCalibData, \
       load_pc_from_file, lidar_pts_to_cam0_frame, lidar_pt_to_cam0_frame
   from alfred.fusion.common import draw_3d_box, compute_3d_box_lidar_coords
-  
+
   # consit of prediction of lidar
   # which is x,y,z,h,w,l,rotation_y
   res = [[4.481686, 5.147319, -1.0229858, 1.5728549, 3.646751, 1.5121397, 1.5486346],
          [-2.5172017, 5.0262384, -1.0679419, 1.6241353, 4.0445814, 1.4938312, 1.620804],
          [1.1783253, -2.9209857, -0.9852259, 1.5852798, 3.7360613, 1.4671413, 1.5811548]]
-  
+
   for p in res:
       xyz = np.array([p[: 3]])
       c2d = lidar_pt_to_cam0_frame(xyz, frame_calib)
@@ -113,7 +117,7 @@ sudo pip3 install alfred-py
       hwl = np.array([p[3: 6]])
       r_y = [p[6]]
       pts3d = compute_3d_box_lidar_coords(xyz, hwl, angles=r_y, origin=(0.5, 0.5, 0.5), axis=2)
-  
+
       pts2d = []
       for pt in pts3d[0]:
           coords = lidar_pt_to_cam0_frame(pt, frame_calib)
@@ -128,9 +132,9 @@ sudo pip3 install alfred-py
   **note**:
 
   `compute_3d_box_lidar_coords` for lidar prediction, `compute_3d_box_cam_coords` for KITTI label, **cause KITTI label is based on camera coordinates!**.
-<p align="center">
-<img src="https://s2.ax1x.com/2019/04/24/EVrU0O.md.png" />
-</p>
+  <p align="center">
+  <img src="https://s2.ax1x.com/2019/04/24/EVrU0O.md.png" />
+  </p>
 
 
 

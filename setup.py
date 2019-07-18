@@ -21,6 +21,7 @@ install alfred into local bin dir.
 """
 from setuptools import setup, find_packages
 
+
 setup(name='alfred-py',
       version='2.5.14',
       keywords=['deep learning', 'script helper', 'tools'],
@@ -52,6 +53,7 @@ setup(name='alfred-py',
           'alfred.modules.scrap',
           'alfred.modules.text',
           'alfred.modules.vision',
+          'alfred.modules.data',
           'alfred.modules',
           'alfred.fusion',
           'alfred.vis.image',
@@ -71,5 +73,5 @@ setup(name='alfred-py',
       url='https://github.com/jinfagang/alfred',
       platforms='any',
       install_requires=['colorama', 'opencv-contrib-python', 'requests', 'numpy',
-                        'future', 'deprecated', 'loguru', 'pyquaternion']
+                        'future', 'deprecated', 'loguru', 'pyquaternion', 'lxml']
       )
