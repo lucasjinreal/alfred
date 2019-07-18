@@ -27,6 +27,19 @@ sudo pip3 install alfred-py
 
 - 2050-: *to be continue*;
 
+- 2019-07-18: 1000 classes imagenet labelmap added. Call it from:
+
+    ```python
+    from alfred.vis.image.get_dataset_labelmap import imagenet_labelmap
+    
+    # also, coco, voc, cityscapes labelmap were all added in
+    from alfred.vis.image.get_dataset_labelmap import coco_labelmap
+    from alfred.vis.image.get_dataset_labelmap import voc_labelmap
+    from alfred.vis.image.get_dataset_labelmap import cityscapes_labelmap
+    ```
+
+    
+
 - 2019-05-17: We adding **open3d** as a lib to visual 3d point cloud in python. Now you can do some simple preparation and visual 3d box right on lidar points and show like opencv!!
 
     ![](https://user-images.githubusercontent.com/21303438/57909386-44313500-78b5-11e9-8146-c74c53038c9b.png)
@@ -215,9 +228,8 @@ sudo pip3 install alfred-py
   After that, you can directly inference from video. This usage can be found at git repo: 
 
   <p align="center"><img src="https://s1.ax1x.com/2018/12/07/F1OKLF.gif"/></p>
-
-  The repo using **alfred**: http://github.com/jinfagang/pt_enet
-
+The repo using **alfred**: http://github.com/jinfagang/pt_enet
+  
 - 2018-11-6: I am so glad to announce that alfred 2.0 released！😄⛽️👏👏  Let's have a quick look what have been updated:
 
   ```
