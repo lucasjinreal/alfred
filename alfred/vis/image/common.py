@@ -8,6 +8,7 @@ import colorsys
 
 def create_unique_color_float(tag, hue_step=0.41, alpha=0.7):
     h, v = (tag * hue_step) % 1, 1. - (int(tag * hue_step) % 4) / 5.
+    print(h, v)
     r, g, b = colorsys.hsv_to_rgb(h, 1., v)
     return r, g, b, alpha
 
@@ -26,3 +27,8 @@ def get_unique_color_by_id(idx, alpha=0.7):
     :return:
     """
     return create_unique_color_uchar(idx, alpha)
+
+
+if __name__ == '__main__':
+    c = create_unique_color_uchar(1)
+    print(c)
