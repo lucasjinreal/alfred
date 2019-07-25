@@ -30,9 +30,10 @@ from .modules.scrap.image_scraper import ImageScraper
 from .modules.vision.to_video import VideoCombiner
 
 from .modules.data.voc_view import vis_voc
+from .modules.data.gather_voclabels import gather_labels
 
 
-__VERSION__ = '2.3'
+__VERSION__ = '2.5.15'
 __AUTHOR__ = 'Lucas Jin'
 __DATE__ = '2018.11.11'
 __LOC__ = 'Shenzhen, China'
@@ -101,6 +102,9 @@ def arg_parse():
     view_voc_parser.set_defaults(which='scrap-image')
     view_voc_parser.add_argument('--image_dir', '-i', help='Root path of VOC image.')
     view_voc_parser.add_argument('--label_dir', '-l', help='Root path of VOC label.')
+
+    voc_label_parser = data_sub_parser.add_parser('voc_label', help='gather labels from annotations dir.')
+    voc_label_parser.add_argument('--anno_dir', '-d', help='dir to annotations.')
 
     return parser.parse_args()
 
@@ -179,6 +183,9 @@ def main(args=None):
                     image_dir = args_dict['image_dir']
                     label_dir = args_dict['label_dir']
                     vis_voc(img_root=image_dir, label_root=label_dir)
+                elif action == 'voc_label':
+                    anno_dir = args_dict['anno_dir']
+                    gather_labels(anno_dir)
 
         except Exception as e:
             print(Fore.RED, 'parse args error, type -h to see help. msg: {}'.format(e))
