@@ -42,7 +42,9 @@ class VideoCombiner(object):
 
     def _get_video_shape(self):
         self.all_images = [os.path.join(self.img_dir, i) for i in os.listdir(self.img_dir)]
-        self.all_images = sorted(self.all_images)
+
+        # this sorted method seems has problem
+        self.all_images.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
         for item in self.all_images[:int(len(self.all_images) // 2)]:
             print(item)
         # order the images order.
@@ -70,7 +72,6 @@ class VideoCombiner(object):
             video_writer.write(img)
         video_writer.release()
         print('Done!')
-
 
 
 # d = sys.argv[1]
