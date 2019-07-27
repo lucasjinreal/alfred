@@ -99,12 +99,22 @@ def arg_parse():
     data_sub_parser = data_parser.add_subparsers()
 
     view_voc_parser = data_sub_parser.add_parser('voc_view', help='view voc.')
-    view_voc_parser.set_defaults(which='scrap-image')
+    view_voc_parser.set_defaults(which='data-vocview')
     view_voc_parser.add_argument('--image_dir', '-i', help='Root path of VOC image.')
     view_voc_parser.add_argument('--label_dir', '-l', help='Root path of VOC label.')
 
     voc_label_parser = data_sub_parser.add_parser('voc_label', help='gather labels from annotations dir.')
+    voc_label_parser.set_defaults(which='data-voclabel')
     voc_label_parser.add_argument('--anno_dir', '-d', help='dir to annotations.')
+
+    split_voc_parser = data_sub_parser.add_parser('split_voc', help='split VOC to train and val.')
+    split_voc_parser.set_defaults(which='data-splitvoc')
+    split_voc_parser.add_argument('--image_dir', '-i', help='Root path of VOC image.')
+    split_voc_parser.add_argument('--label_dir', '-l', help='Root path of VOC label.')
+
+    labelone2voc_parser = data_sub_parser.add_parser('labelone2voc', help='convert labelone to VOC.')
+    labelone2voc_parser.set_defaults(which='data-labelone2voc')
+    labelone2voc_parser.add_argument('--json_dir', '-j', help='Root of labelone json dir.')
 
     return parser.parse_args()
 
@@ -179,13 +189,17 @@ def main(args=None):
                     image_scraper = ImageScraper()
                     image_scraper.scrap(q_list)
             elif module == 'data':
-                if action == 'voc_view':
+                if action == 'vocview':
                     image_dir = args_dict['image_dir']
                     label_dir = args_dict['label_dir']
                     vis_voc(img_root=image_dir, label_root=label_dir)
-                elif action == 'voc_label':
+                elif action == 'voclabel':
                     anno_dir = args_dict['anno_dir']
                     gather_labels(anno_dir)
+                elif action == 'splitvoc':
+                    pass
+                elif action == 'labelone2voc':
+                    pass
 
         except Exception as e:
             print(Fore.RED, 'parse args error, type -h to see help. msg: {}'.format(e))
