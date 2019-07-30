@@ -24,7 +24,9 @@ def draw_masks_maskrcnn(image, boxes, scores, labels, masks, human_label_list=No
 
     NOTE: if masks not same with box, then it will resize inside this function
 
-    TODO: To adding human readable text drawing
+    this function has speed issue be kind of slow.
+    and it overlays a box on another mask rather than mask by mask, this is not best
+    way.
 
     :param image:
     :param boxes:
@@ -92,19 +94,12 @@ def draw_masks_maskrcnn(image, boxes, scores, labels, masks, human_label_list=No
     combined = cv2.addWeighted(image, 0.5, empty_image, 0.6, 0)
     return combined
 
+
 def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list=None,
                         score_thresh=0.6, draw_box=True):
     """
-    fixme: this function should be accerlerate.
-    Standared mask drawing function
+    We change way to draw masks on image
 
-    boxes: a list of boxes, or numpy array
-    scores: a list of scores or numpy array
-    labels: same as scores
-    masks: resize to same width and height as box masks
-
-    NOTE: if masks not same with box, then it will resize inside this function
-    TODO: To adding human readable text drawing
     :param image:
     :param boxes:
     :param scores:
