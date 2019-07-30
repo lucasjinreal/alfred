@@ -16,18 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ------------------------------------------------------------------------
-from .modules.vision.to_video import VideoCombiner
-import sys
-import numpy as np
-
-from .modules.vision.vis_kit import draw_masks
-import cv2
+from utils.mana import welcome
 
 
 if __name__ == '__main__':
-    a = ''
-    img = cv2.imread(a)
-
-    b = [
-        [[2], [3], [4]]
-    ]
+    welcome('')
