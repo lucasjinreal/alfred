@@ -29,6 +29,7 @@ class ImageInferEngine(object):
         self.f = f
         self.is_show = is_show
         self.record = record
+        self.crt_cost = 0
 
         if not f:
             self.mode = 'webcam'
@@ -109,6 +110,7 @@ class ImageInferEngine(object):
                     res = self.solve_a_image(frame)
                     if self.is_show:
                         print('fps: {}'.format(1 / (time.time() - tic)))
+                    self.crt_cost = time.time() - tic
                     res_img = self.vis_result(frame, res)
                     if self.record and self.mode == 'video':
                         video_writer.write(res_img)
