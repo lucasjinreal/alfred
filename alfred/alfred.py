@@ -35,7 +35,7 @@ from .modules.data.gather_voclabels import gather_labels
 
 __VERSION__ = '2.5.15'
 __AUTHOR__ = 'Lucas Jin'
-__DATE__ = '2018.11.11'
+__DATE__ = '2019.11.11'
 __LOC__ = 'Shenzhen, China'
 __git__ = 'http://github.com/jinfagang/alfred'
 
