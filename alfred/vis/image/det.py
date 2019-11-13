@@ -10,7 +10,33 @@ import cv2
 import os
 
 from .common import create_unique_color_uchar
+import warnings
 
+
+def _draw_round_dot_border(img, pt1, pt2, color, thickness, r=2, d=5):
+    x1, y1 = pt1
+    x2, y2 = pt2
+
+    # Top left
+    cv2.line(img, (x1 + r, y1), (x1 + r + d, y1), color, thickness)
+    cv2.line(img, (x1, y1 + r), (x1, y1 + r + d), color, thickness)
+    cv2.ellipse(img, (x1 + r, y1 + r), (r, r), 180, 0, 90, color, thickness)
+
+    # Top right
+    cv2.line(img, (x2 - r, y1), (x2 - r - d, y1), color, thickness)
+    cv2.line(img, (x2, y1 + r), (x2, y1 + r + d), color, thickness)
+    cv2.ellipse(img, (x2 - r, y1 + r), (r, r), 270, 0, 90, color, thickness)
+
+    # Bottom left
+    cv2.line(img, (x1 + r, y2), (x1 + r + d, y2), color, thickness)
+    cv2.line(img, (x1, y2 - r), (x1, y2 - r - d), color, thickness)
+    cv2.ellipse(img, (x1 + r, y2 - r), (r, r), 90, 0, 90, color, thickness)
+
+    # Bottom right
+    cv2.line(img, (x2 - r, y2), (x2 - r - d, y2), color, thickness)
+    cv2.line(img, (x2, y2 - r), (x2, y2 - r - d), color, thickness)
+    cv2.ellipse(img, (x2 - r, y2 - r), (r, r), 0, 0, 90, color, thickness)
+    return img
 
 
 def draw_one_bbox(image, box, unique_color, thickness):
@@ -21,14 +47,11 @@ def draw_one_bbox(image, box, unique_color, thickness):
     cv2.rectangle(image, (x1, y1), (x2, y2), unique_color, thickness)
     return image
 
-
-# ==================== Below are deprecation API =================
-
-
 def draw_box_without_score(img, boxes, classes=None, is_show=False):
     """
     Draw boxes on image, the box mostly are annotations, not the model predict box
     """
+    warnings.warn('this method is deprecated, using visiualize_det_cv2 instead', DeprecationWarning)
     assert isinstance(boxes,
                       np.ndarray), 'boxes must nump array, with shape of (None, 5)\nevery element contains (x1,y1,x2,y2, label)'
     if classes:
@@ -97,8 +120,8 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
     height = img.shape[0]
     width = img.shape[1]
 
-    font = cv2.QT_FONT_NORMAL
-    font_scale = 0.4
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.35
     font_thickness = 1
     line_thickness = 1
 
@@ -131,7 +154,65 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
                 cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
                               (text_org[0] + ret_val[0] + 4, text_org[1] - ret_val[1] - 2),
                               unique_color, -1)
-                cv2.putText(img, text_label, text_org, font, font_scale, (255, 255, 255), font_thickness)
+                cv2.putText(img, text_label, text_org, font, font_scale, (255, 255, 255), font_thickness, lineType=cv2.LINE_AA)
+    if is_show:
+        cv2.imshow('image', img)
+        cv2.waitKey(0)
+    return img
+
+
+def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.6, is_show=False, background_id=-1, mode='xyxy', r=4, d=6):
+    """
+    visualize detections with a more fancy way
+
+    new add mode option
+    mode can be one of 'xyxy' and 'xywh', 'xyxy' as default
+    
+    :param img:
+    :param detections: ssd detections, numpy.array([[id, score, x1, y1, x2, y2]...])
+            each row is one object
+    :param classes:
+    :param thresh:
+    :param is_show:
+    :param background_id: -1
+    :param mode:
+    :return:
+    """
+    assert classes, 'from visualize_det_cv2, classes must be provided, each class in a list with' \
+                    'certain order.'
+    assert isinstance(img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
+
+    height = img.shape[0]
+    width = img.shape[1]
+
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.35
+    font_thickness = 1
+    line_thickness = 2
+
+    for i in range(detections.shape[0]):
+        cls_id = int(detections[i, 0])
+        if cls_id != background_id:
+            score = detections[i, 1]
+            if score > thresh:
+                unique_color = create_unique_color_uchar(cls_id)
+                x1, y1, x2, y2 = 0, 0, 0, 0
+                if mode == 'xyxy':
+                    x1 = int(detections[i, 2])
+                    y1 = int(detections[i, 3])
+                    x2 = int(detections[i, 4])
+                    y2 = int(detections[i, 5])
+                else:
+                    x1 = int(detections[i, 2])
+                    y1 = int(detections[i, 3])
+                    x2 = x1 + int(detections[i, 4])
+                    y2 = y1 + int(detections[i, 5])
+
+                _draw_round_dot_border(img, (x1, y1), (x2, y2), unique_color, line_thickness, r, d)
+                text_label = '{} {:.2f}'.format(classes[cls_id], score)
+                (txt_size, line_h) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
+                txt_org = (int((x1+x2)/2 - txt_size[0]/2), int(y1+line_h+2))
+                cv2.putText(img, text_label, txt_org, font, font_scale, (255, 255, 255), font_thickness, lineType=cv2.LINE_AA)
     if is_show:
         cv2.imshow('image', img)
         cv2.waitKey(0)

@@ -33,7 +33,7 @@ from .modules.data.voc_view import vis_voc
 from .modules.data.gather_voclabels import gather_labels
 
 
-__VERSION__ = '2.5.15'
+__VERSION__ = '2.6.0'
 __AUTHOR__ = 'Lucas Jin'
 __DATE__ = '2019.11.11'
 __LOC__ = 'Shenzhen, China'
