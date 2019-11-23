@@ -10,6 +10,7 @@ this ids are same with official one.
 # so we have to using map
 
 coco_label_map = {
+    0: '__background__',
     1: 'person',
     2: 'bicycle',
     3: 'car',

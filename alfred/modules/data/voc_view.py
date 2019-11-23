@@ -46,10 +46,10 @@ def vis_voc(img_root, label_root):
                 for obj in get(root, 'object'):
                     category = get_and_check(obj, 'name', 1).text
                     bndbox = get_and_check(obj, 'bndbox', 1)
-                    xmin = int(get_and_check(bndbox, 'xmin', 1).text)
-                    ymin = int(get_and_check(bndbox, 'ymin', 1).text)
-                    xmax = int(get_and_check(bndbox, 'xmax', 1).text)
-                    ymax = int(get_and_check(bndbox, 'ymax', 1).text)
+                    xmin = int(float(get_and_check(bndbox, 'xmin', 1).text))
+                    ymin = int(float(get_and_check(bndbox, 'ymin', 1).text))
+                    xmax = int(float(get_and_check(bndbox, 'xmax', 1).text))
+                    ymax = int(float(get_and_check(bndbox, 'ymax', 1).text))
 
                     cv2.putText(img, category, (xmin, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.7, (255, 255, 255))
                     cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2, 1)

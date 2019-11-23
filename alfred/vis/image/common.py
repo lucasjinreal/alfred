@@ -8,7 +8,6 @@ import colorsys
 
 def create_unique_color_float(tag, hue_step=0.41, alpha=0.7):
     h, v = (tag * hue_step) % 1, 1. - (int(tag * hue_step) % 4) / 5.
-    print(h, v)
     r, g, b = colorsys.hsv_to_rgb(h, 1., v)
     return r, g, b, alpha
 
