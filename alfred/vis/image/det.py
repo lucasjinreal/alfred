@@ -23,8 +23,6 @@ def draw_one_bbox(image, box, unique_color, thickness):
 
 
 # ==================== Below are deprecation API =================
-
-
 def draw_box_without_score(img, boxes, classes=None, is_show=False):
     """
     Draw boxes on image, the box mostly are annotations, not the model predict box
@@ -122,6 +120,71 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
 
                 cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness)
                 text_label = '{} {:.2f}'.format(classes[cls_id], score)
+                (ret_val, base_line) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
+                text_org = (x1, y1 - 0)
+                cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
+                              (text_org[0] + ret_val[0] + 5, text_org[1] - ret_val[1] - 2), unique_color,
+                              line_thickness)
+                # this rectangle for fill text rect
+                cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
+                              (text_org[0] + ret_val[0] + 4, text_org[1] - ret_val[1] - 2),
+                              unique_color, -1)
+                cv2.putText(img, text_label, text_org, font, font_scale, (255, 255, 255), font_thickness)
+    if is_show:
+        cv2.imshow('image', img)
+        cv2.waitKey(0)
+    return img
+
+
+def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0.6, is_show=False, background_id=-1, mode='xyxy'):
+    """
+    visualize detection on image using cv2, this is the standard way to visualize detections
+
+    new add mode option
+    mode can be one of 'xyxy' and 'xywh', 'xyxy' as default
+    
+    :param img:
+    :param detections: ssd detections, numpy.array([[id, score, x1, y1, x2, y2]...])
+            each row is one object
+    :param classes:
+    :param thresh:
+    :param is_show:
+    :param background_id: -1
+    :param mode:
+    :return:
+    """
+    assert class_names, 'from visualize_det_cv2, classes must be provided, each class in a list with' \
+                    'certain order.'
+    assert isinstance(img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
+
+    height = img.shape[0]
+    width = img.shape[1]
+
+    font = cv2.QT_FONT_NORMAL
+    font_scale = 0.4
+    font_thickness = 1
+    line_thickness = 1
+
+    for i in range(locs.shape[0]):
+        cls_id = int(cls_ids[i])
+        if cls_id != background_id:
+            score = confs[i]
+            if score > thresh:
+                unique_color = create_unique_color_uchar(cls_id)
+                x1, y1, x2, y2 = 0, 0, 0, 0
+                if mode == 'xyxy':
+                    x1 = int(locs[i, 0])
+                    y1 = int(locs[i, 1])
+                    x2 = int(locs[i, 2])
+                    y2 = int(locs[i, 3])
+                else:
+                    x1 = int(locs[i, 0])
+                    y1 = int(locs[i, 1])
+                    x2 = x1 + int(locs[i, 2])
+                    y2 = y1 + int(locs[i, 3])
+
+                cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness)
+                text_label = '{} {:.2f}'.format(class_names[cls_id], score)
                 (ret_val, base_line) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
                 text_org = (x1, y1 - 0)
                 cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
