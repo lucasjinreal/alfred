@@ -2,6 +2,10 @@
 
 *Alfred* is command line tool for deep-learning usage. if you want split an video into image frames or combine frames into a single video, then **alfred** is what you want.
 
+**[cry]: I have lost the latest update of alfred source codes...............**.
+
+I need to re-write all the thing from scratch now... 
+
 
 
 ## Install
