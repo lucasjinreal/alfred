@@ -72,6 +72,6 @@ setup(name='alfred-py',
       author_email="jinfagang19@163.com",
       url='https://github.com/jinfagang/alfred',
       platforms='any',
-      install_requires=['colorama', 'opencv-contrib-python', 'requests', 'numpy',
+      install_requires=['colorama', 'requests',
                         'future', 'deprecated', 'loguru', 'pyquaternion', 'lxml']
       )
