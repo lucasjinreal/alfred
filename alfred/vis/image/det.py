@@ -10,7 +10,33 @@ import cv2
 import os
 
 from .common import create_unique_color_uchar
+import warnings
 
+
+def _draw_round_dot_border(img, pt1, pt2, color, thickness, r=2, d=5):
+    x1, y1 = pt1
+    x2, y2 = pt2
+
+    # Top left
+    cv2.line(img, (x1 + r, y1), (x1 + r + d, y1), color, thickness)
+    cv2.line(img, (x1, y1 + r), (x1, y1 + r + d), color, thickness)
+    cv2.ellipse(img, (x1 + r, y1 + r), (r, r), 180, 0, 90, color, thickness)
+
+    # Top right
+    cv2.line(img, (x2 - r, y1), (x2 - r - d, y1), color, thickness)
+    cv2.line(img, (x2, y1 + r), (x2, y1 + r + d), color, thickness)
+    cv2.ellipse(img, (x2 - r, y1 + r), (r, r), 270, 0, 90, color, thickness)
+
+    # Bottom left
+    cv2.line(img, (x1 + r, y2), (x1 + r + d, y2), color, thickness)
+    cv2.line(img, (x1, y2 - r), (x1, y2 - r - d), color, thickness)
+    cv2.ellipse(img, (x1 + r, y2 - r), (r, r), 90, 0, 90, color, thickness)
+
+    # Bottom right
+    cv2.line(img, (x2 - r, y2), (x2 - r - d, y2), color, thickness)
+    cv2.line(img, (x2, y2 - r), (x2, y2 - r - d), color, thickness)
+    cv2.ellipse(img, (x2 - r, y2 - r), (r, r), 0, 0, 90, color, thickness)
+    return img
 
 
 def draw_one_bbox(image, box, unique_color, thickness):
@@ -27,6 +53,8 @@ def draw_box_without_score(img, boxes, classes=None, is_show=False):
     """
     Draw boxes on image, the box mostly are annotations, not the model predict box
     """
+    warnings.warn(
+        'this method is deprecated, using visiualize_det_cv2 instead', DeprecationWarning)
     assert isinstance(boxes,
                       np.ndarray), 'boxes must nump array, with shape of (None, 5)\nevery element contains (x1,y1,x2,y2, label)'
     if classes:
@@ -52,19 +80,23 @@ def draw_box_without_score(img, boxes, classes=None, is_show=False):
             y2 = int(boxes[i, 4])
             x2 = int(boxes[i, 5])
 
-            cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness)
+            cv2.rectangle(img, (x1, y1), (x2, y2),
+                          unique_color, line_thickness)
 
             text_label = '{}'.format(cls)
-            (ret_val, base_line) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
+            (ret_val, base_line) = cv2.getTextSize(
+                text_label, font, font_scale, font_thickness)
             text_org = (x1, y1 - 0)
 
             cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
                           (text_org[0] + ret_val[0] + 5, text_org[1] - ret_val[1] - 2), unique_color, line_thickness)
             # this rectangle for fill text rect
             cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
-                          (text_org[0] + ret_val[0] + 4, text_org[1] - ret_val[1] - 2),
+                          (text_org[0] + ret_val[0] + 4,
+                           text_org[1] - ret_val[1] - 2),
                           unique_color, -1)
-            cv2.putText(img, text_label, text_org, font, font_scale, (255, 255, 255), font_thickness)
+            cv2.putText(img, text_label, text_org, font,
+                        font_scale, (255, 255, 255), font_thickness)
         if is_show:
             cv2.imshow('image', img)
             cv2.waitKey(0)
@@ -77,7 +109,7 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
 
     new add mode option
     mode can be one of 'xyxy' and 'xywh', 'xyxy' as default
-    
+
     :param img:
     :param detections: ssd detections, numpy.array([[id, score, x1, y1, x2, y2]...])
             each row is one object
@@ -90,10 +122,12 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
     """
     assert classes, 'from visualize_det_cv2, classes must be provided, each class in a list with' \
                     'certain order.'
-    assert isinstance(img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
+    assert isinstance(
+        img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
 
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_scale = 0.36
+
     font_thickness = 1
     line_thickness = 1
 
@@ -123,6 +157,143 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
                               (txt_bottom_left[0] + ret_val[0] + 2, txt_bottom_left[1]+4),
                               (0, 0, 0), -1)
                 cv2.putText(img, text_label, txt_bottom_left, font, font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
+    if is_show:
+        cv2.imshow('image', img)
+        cv2.waitKey(0)
+    return img
+
+
+def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thresh=0.6, suit_color=False, is_show=False, background_id=-1, mode='xyxy'):
+    """
+    visualize detection on image using cv2, this is the standard way to visualize detections
+
+    new add mode option
+    mode can be one of 'xyxy' and 'xywh', 'xyxy' as default
+
+    :param img:
+    :param detections: ssd detections, numpy.array([[id, score, x1, y1, x2, y2]...])
+            each row is one object
+    :param classes:
+    :param cls_colors:
+    :param thresh:
+    :param is_show:
+    :param background_id: -1
+    :param mode:
+    :return:
+    """
+    assert classes, 'from visualize_det_cv2, classes must be provided, each class in a list with' \
+                    'certain order.'
+    assert isinstance(
+        img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
+    if cls_colors:
+        assert len(cls_colors) == len(
+            classes), 'cls_colors must be same with classes length if you specific cls_colors.'
+
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.36
+    font_thickness = 1
+    line_thickness = 1
+
+    for i in range(detections.shape[0]):
+        cls_id = int(detections[i, 0])
+        if cls_id != background_id:
+            score = detections[i, 1]
+            if score > thresh:
+                if cls_colors:
+                    unique_color = cls_colors[cls_id]
+                else:
+                    unique_color = create_unique_color_uchar(cls_id)
+                x1, y1, x2, y2 = 0, 0, 0, 0
+                if mode == 'xyxy':
+                    x1 = int(detections[i, 2])
+                    y1 = int(detections[i, 3])
+                    x2 = int(detections[i, 4])
+                    y2 = int(detections[i, 5])
+                else:
+                    x1 = int(detections[i, 2])
+                    y1 = int(detections[i, 3])
+                    x2 = x1 + int(detections[i, 4])
+                    y2 = y1 + int(detections[i, 5])
+
+                cv2.rectangle(img, (x1, y1), (x2, y2),
+                              unique_color, line_thickness)
+                text_label = '{} {:.1f}'.format(classes[cls_id], score)
+
+                ((txt_w, txt_h), _) = cv2.getTextSize(
+                    text_label, font, font_scale, 1)
+                # Place text background.
+                back_tl = x1, y1 - int(1.4 * txt_h)
+                back_br = x1 + txt_w, y1+1
+                if suit_color:
+                    cv2.rectangle(img, back_tl, back_br, unique_color, -1)
+                else:
+                    cv2.rectangle(img, back_tl, back_br, (0, 0, 0), -1)
+
+                txt_tl = x1, y1 - int(0.3 * txt_h)
+                cv2.putText(img, text_label, txt_tl, font, font_scale,
+                            (255, 255, 255), font_thickness, lineType=cv2.LINE_AA)
+    if is_show:
+        cv2.imshow('image', img)
+        cv2.waitKey(0)
+    return img
+
+
+def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.6, is_show=False, background_id=-1, mode='xyxy', r=4, d=6):
+    """
+    visualize detections with a more fancy way
+
+    new add mode option
+    mode can be one of 'xyxy' and 'xywh', 'xyxy' as default
+
+    :param img:
+    :param detections: ssd detections, numpy.array([[id, score, x1, y1, x2, y2]...])
+            each row is one object
+    :param classes:
+    :param thresh:
+    :param is_show:
+    :param background_id: -1
+    :param mode:
+    :return:
+    """
+    assert classes, 'from visualize_det_cv2, classes must be provided, each class in a list with' \
+                    'certain order.'
+    assert isinstance(
+        img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
+
+    height = img.shape[0]
+    width = img.shape[1]
+
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.35
+    font_thickness = 1
+    line_thickness = 2
+
+    for i in range(detections.shape[0]):
+        cls_id = int(detections[i, 0])
+        if cls_id != background_id:
+            score = detections[i, 1]
+            if score > thresh:
+                unique_color = create_unique_color_uchar(cls_id)
+                x1, y1, x2, y2 = 0, 0, 0, 0
+                if mode == 'xyxy':
+                    x1 = int(detections[i, 2])
+                    y1 = int(detections[i, 3])
+                    x2 = int(detections[i, 4])
+                    y2 = int(detections[i, 5])
+                else:
+                    x1 = int(detections[i, 2])
+                    y1 = int(detections[i, 3])
+                    x2 = x1 + int(detections[i, 4])
+                    y2 = y1 + int(detections[i, 5])
+
+                _draw_round_dot_border(
+                    img, (x1, y1), (x2, y2), unique_color, line_thickness, r, d)
+                text_label = '{} {:.2f}'.format(classes[cls_id], score)
+                (txt_size, line_h) = cv2.getTextSize(
+                    text_label, font, font_scale, font_thickness)
+                txt_org = (int((x1+x2)/2 - txt_size[0]/2), int(y1+line_h+2))
+                cv2.putText(img, text_label, txt_org, font, font_scale,
+                            (255, 255, 255), font_thickness, lineType=cv2.LINE_AA)
     if is_show:
         cv2.imshow('image', img)
         cv2.waitKey(0)
@@ -227,7 +398,6 @@ def visualize_det_mask_cv2(img, detections, masks, classes=None, is_show=False, 
     return masked_image
 
 
-
 def _apply_mask2(image, mask, color, alpha=0.5):
     for c in range(3):
         image[:, :, c] = np.where(mask == 1, image[:, :, c] * (1 - alpha) + alpha * color[c],
@@ -273,9 +443,9 @@ def draw_one_3d_box_cv2(img, box_3d, obj_id_name_map, score, tlwhy_format=False,
                 for k in [0, 1]:
                     point = np.copy(center)
                     point[0] = center[0] + i * dims[1] / 2 * np.cos(-rot_y + np.pi / 2) + \
-                               (j * i) * dims[2] / 2 * np.cos(-rot_y)
+                        (j * i) * dims[2] / 2 * np.cos(-rot_y)
                     point[2] = center[2] + i * dims[1] / 2 * np.sin(-rot_y + np.pi / 2) + \
-                               (j * i) * dims[2] / 2 * np.sin(-rot_y)
+                        (j * i) * dims[2] / 2 * np.sin(-rot_y)
                     point[1] = center[1] - k * dims[0]
 
                     point = np.append(point, 1)
@@ -290,12 +460,14 @@ def draw_one_3d_box_cv2(img, box_3d, obj_id_name_map, score, tlwhy_format=False,
         for i in range(4):
             point_1_ = box_3d[2 * i]
             point_2_ = box_3d[2 * i + 1]
-            cv2.line(img, (point_1_[0], point_1_[1]), (point_2_[0], point_2_[1]), color, 1)
+            cv2.line(img, (point_1_[0], point_1_[1]),
+                     (point_2_[0], point_2_[1]), color, 1)
 
         for i in range(8):
             point_1_ = box_3d[i]
             point_2_ = box_3d[(i + 2) % 8]
-            cv2.line(img, (point_1_[0], point_1_[1]), (point_2_[0], point_2_[1]), color, 1)
+            cv2.line(img, (point_1_[0], point_1_[1]),
+                     (point_2_[0], point_2_[1]), color, 1)
         return img
     else:
         # assert len(box_3d) == 8, 'every box 3d should have 8 points. if you got 7, you may want tlwhy=True'
@@ -305,9 +477,9 @@ def draw_one_3d_box_cv2(img, box_3d, obj_id_name_map, score, tlwhy_format=False,
                              3, 0, 4, 7]).reshape((4, 4))
         # print('start draw...')
         for i in range(4):
-            x = np.append(box_3d[0, face_idx[i,]],
+            x = np.append(box_3d[0, face_idx[i, ]],
                           box_3d[0, face_idx[i, 0]])
-            y = np.append(box_3d[1, face_idx[i,]],
+            y = np.append(box_3d[1, face_idx[i, ]],
                           box_3d[1, face_idx[i, 0]])
             # print('x: ', x)
             # print('y: ', y)

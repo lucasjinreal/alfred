@@ -31,11 +31,11 @@ def draw_border(img, pt1, pt2, color, thickness, r, d):
 # ============================================================================
 
 
-img = np.zeros((256, 256, 3), dtype=np.uint8)
+img = np.zeros((512, 512, 3), dtype=np.uint8)
 
 draw_border(img, (10, 10), (100, 100), (127, 255, 255), 2, 10, 20)
 draw_border(img, (128, 128), (240, 160), (255, 255, 127), 2, 10, 5)
-draw_border(img, (26, 68), (56, 89), (0, 255, 0), 2, 5, 5)
+draw_border(img, (68, 68), (123, 289), (0, 255, 0), 1, 2, 5)
 
 cv2.imshow('round_rect.png', img)
 cv2.waitKey(0)
