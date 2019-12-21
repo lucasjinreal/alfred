@@ -11,6 +11,7 @@ import os
 import sys
 import time
 from deprecated import deprecated
+from alfred.utils.log import logger as logging
 
 
 class ImageInferEngine(object):
@@ -37,7 +38,7 @@ class ImageInferEngine(object):
             self.mode = 'image'
         elif os.path.basename(f).split('.')[-1] in self.video_ext:
             self.mode = 'video'
-        print('[Demo] in {} mode.'.format(self.mode))
+        logging.info('[Demo] in {} mode.'.format(self.mode))
 
     def read_image_file(self, img_f):
         """
@@ -93,14 +94,13 @@ class ImageInferEngine(object):
                 cv2.imshow('result', res_img)
                 cv2.waitKey(0)
         elif self.mode == 'video' or self.mode == 'webcam':
-
             cap = cv2.VideoCapture(self.f)
             if self.record and self.mode == 'video':
                 fps = cap.get(cv2.CAP_PROP_FPS)
                 size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
                         int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
                 save_f = os.path.join(os.path.dirname(self.f), 'result_' + os.path.basename(self.f))
-                print('Result video will record into {}'.format(save_f))
+                logging.info('Result video will record into {}'.format(save_f))
                 video_writer = cv2.VideoWriter(save_f, cv2.VideoWriter_fourcc(*'DIVX'), fps, size)
 
             while cap.isOpened():
@@ -109,7 +109,7 @@ class ImageInferEngine(object):
                     tic = time.time()
                     res = self.solve_a_image(frame)
                     if self.is_show:
-                        print('fps: {}'.format(1 / (time.time() - tic)))
+                        logging.info('fps: {}'.format(1 / (time.time() - tic)))
                     self.crt_cost = time.time() - tic
                     res_img = self.vis_result(frame, res)
                     if self.record and self.mode == 'video':
@@ -119,7 +119,7 @@ class ImageInferEngine(object):
                         cv2.imshow('result', res_img)
                         cv2.waitKey(1)
                 else:
-                    print('Done')
+                    logging.info('Done')
                     exit(0)
 
 
