@@ -125,11 +125,9 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
     assert isinstance(
         img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
 
-    height = img.shape[0]
-    width = img.shape[1]
-
     font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.35
+    font_scale = 0.36
+
     font_thickness = 1
     line_thickness = 1
 
@@ -151,23 +149,14 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
                     x2 = x1 + int(detections[i, 4])
                     y2 = y1 + int(detections[i, 5])
 
-                cv2.rectangle(img, (x1, y1), (x2, y2),
-                              unique_color, line_thickness)
+                cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness, cv2.LINE_AA)
                 text_label = '{} {:.2f}'.format(classes[cls_id], score)
-                (ret_val, base_line) = cv2.getTextSize(
-                    text_label, font, font_scale, font_thickness)
-                text_org = (x1, y1 - 0)
-                cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
-                              (text_org[0] + ret_val[0] + 5,
-                               text_org[1] - ret_val[1] - 2), unique_color,
-                              line_thickness)
-                # this rectangle for fill text rect
-                cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
-                              (text_org[0] + ret_val[0] + 4,
-                               text_org[1] - ret_val[1] - 2),
-                              unique_color, -1)
-                cv2.putText(img, text_label, text_org, font, font_scale,
-                            (255, 255, 255), font_thickness, lineType=cv2.LINE_AA)
+                (ret_val, _) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
+                txt_bottom_left = (x1+4, y1-4)
+                cv2.rectangle(img, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
+                              (txt_bottom_left[0] + ret_val[0] + 2, txt_bottom_left[1]+4),
+                              (0, 0, 0), -1)
+                cv2.putText(img, text_label, txt_bottom_left, font, font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
     if is_show:
         cv2.imshow('image', img)
         cv2.waitKey(0)
@@ -199,11 +188,9 @@ def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thr
     if cls_colors:
         assert len(cls_colors) == len(
             classes), 'cls_colors must be same with classes length if you specific cls_colors.'
-    height = img.shape[0]
-    width = img.shape[1]
 
     font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.34
+    font_scale = 0.36
     font_thickness = 1
     line_thickness = 1
 
@@ -334,11 +321,8 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
                     'certain order.'
     assert isinstance(img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
 
-    height = img.shape[0]
-    width = img.shape[1]
-
-    font = cv2.QT_FONT_NORMAL
-    font_scale = 0.4
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.36
     font_thickness = 1
     line_thickness = 1
 
@@ -360,18 +344,14 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
                     x2 = x1 + int(locs[i, 2])
                     y2 = y1 + int(locs[i, 3])
 
-                cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness)
+                cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness, cv2.LINE_AA)
                 text_label = '{} {:.2f}'.format(class_names[cls_id], score)
-                (ret_val, base_line) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
-                text_org = (x1, y1 - 0)
-                cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
-                              (text_org[0] + ret_val[0] + 5, text_org[1] - ret_val[1] - 2), unique_color,
-                              line_thickness)
-                # this rectangle for fill text rect
-                cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
-                              (text_org[0] + ret_val[0] + 4, text_org[1] - ret_val[1] - 2),
-                              unique_color, -1)
-                cv2.putText(img, text_label, text_org, font, font_scale, (255, 255, 255), font_thickness)
+                (ret_val, _) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
+                txt_bottom_left = (x1+4, y1-4)
+                cv2.rectangle(img, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
+                              (txt_bottom_left[0] + ret_val[0] + 2, txt_bottom_left[1]+4),
+                              (0, 0, 0), -1)
+                cv2.putText(img, text_label, txt_bottom_left, font, font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
     if is_show:
         cv2.imshow('image', img)
         cv2.waitKey(0)

@@ -162,3 +162,6 @@ def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list
     # now we got mask
     combined = cv2.addWeighted(image, 0.5, empty_image, 0.6, 0)
     return combined
+
+
+# more fast mask drawing here
