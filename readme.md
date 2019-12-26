@@ -34,12 +34,12 @@ sudo pip3 install alfred-py
 - 2019-07-18: 1000 classes imagenet labelmap added. Call it from:
 
     ```python
-    from alfred.vis.image.get_dataset_labelmap import imagenet_labelmap
+    from alfred.vis.image.get_dataset_label_map import imagenet_labelmap
     
     # also, coco, voc, cityscapes labelmap were all added in
-    from alfred.vis.image.get_dataset_labelmap import coco_labelmap
-    from alfred.vis.image.get_dataset_labelmap import voc_labelmap
-    from alfred.vis.image.get_dataset_labelmap import cityscapes_labelmap
+    from alfred.vis.image.get_dataset_label_map import coco_labelmap
+    from alfred.vis.image.get_dataset_label_map import voc_labelmap
+    from alfred.vis.image.get_dataset_label_map import cityscapes_labelmap
     ```
     
 - 2019-07-13: We add a VOC check module in command line usage, you can now visualize your VOC format detection data like this:
