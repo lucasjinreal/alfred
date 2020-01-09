@@ -168,7 +168,7 @@ def main(args=None):
                 elif action == 'reduce':
                     v_f = args_dict['video']
                     j = args_dict['jumps']
-                    print(Fore.BLUE + Style.BRIGHT + 'Reduce from {}'.format(v_f))
+                    print(Fore.BLUE + Style.BRIGHT + 'Reduce from {}, jumps: {}'.format(v_f, j))
                     video_reducer = VideoReducer(jump_frames=j)
                     video_reducer.act(v_f)
                 elif action == '2video':

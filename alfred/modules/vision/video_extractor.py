@@ -35,7 +35,7 @@ class VideoExtractor(object):
         self.current_frame = 0
         self.current_save_frame = 0
         if jump_frames:
-            self.jump_frames = jump_frames
+            self.jump_frames = int(jump_frames)
         else:
             self.jump_frames = 6
         self.save_format = save_format
