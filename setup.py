@@ -23,7 +23,7 @@ from setuptools import setup, find_packages
 
 
 setup(name='alfred-py',
-      version='2.6.3',
+      version='2.6.5',
       keywords=['deep learning', 'script helper', 'tools'],
       description='''
       Alfred is a DeepLearning utility library.

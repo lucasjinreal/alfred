@@ -28,9 +28,14 @@ from colorama import Fore, Back, Style
 from .modules.vision.video_extractor import VideoExtractor
 from .modules.scrap.image_scraper import ImageScraper
 from .modules.vision.to_video import VideoCombiner
+from .modules.vision.video_reducer import VideoReducer
 
 from .modules.data.voc_view import vis_voc
 from .modules.data.gather_voclabels import gather_labels
+from .modules.data.voc2coco import convert
+
+
+from alfred.utils.log import logger as logging
 
 
 __VERSION__ = '2.6.0'
@@ -60,6 +65,12 @@ def arg_parse():
     vision_extract_parser.set_defaults(which='vision-extract')
     vision_extract_parser.add_argument('--video', '-v', help='video to extract')
     vision_extract_parser.add_argument('--jumps', '-j', help='jump frames for wide extract')
+
+    vision_reduce_parser = vision_sub_parser.add_parser('reduce', help='reduce video by drop frames'
+                                                                         '\nalfred vision reduce -v a.mp4 -j 10')
+    vision_reduce_parser.set_defaults(which='vision-reduce')
+    vision_reduce_parser.add_argument('--video', '-v', help='video to extract')
+    vision_reduce_parser.add_argument('--jumps', '-j', help='jump frames for wide extract')
 
     vision_2video_parser = vision_sub_parser.add_parser('2video', help='combine into a video: alfred vision '
                                                                        '2video  -d ./images')
@@ -116,6 +127,10 @@ def arg_parse():
     labelone2voc_parser.set_defaults(which='data-labelone2voc')
     labelone2voc_parser.add_argument('--json_dir', '-j', help='Root of labelone json dir.')
 
+    voc2coco_parser = data_sub_parser.add_parser('voc2coco', help='convert VOC to coco.')
+    voc2coco_parser.set_defaults(which='data-voc2coco')
+    voc2coco_parser.add_argument('--xml_dir', '-d', help='Root of xmls dir (Annotations/).')
+
     return parser.parse_args()
 
 
@@ -150,6 +165,12 @@ def main(args=None):
                     print(Fore.BLUE + Style.BRIGHT + 'Extracting from {}'.format(v_f))
                     video_extractor = VideoExtractor(jump_frames=j)
                     video_extractor.extract(v_f)
+                elif action == 'reduce':
+                    v_f = args_dict['video']
+                    j = args_dict['jumps']
+                    print(Fore.BLUE + Style.BRIGHT + 'Reduce from {}'.format(v_f))
+                    video_reducer = VideoReducer(jump_frames=j)
+                    video_reducer.act(v_f)
                 elif action == '2video':
                     d = args_dict['dir']
                     combiner = VideoCombiner(img_dir=d)
@@ -197,9 +218,14 @@ def main(args=None):
                     anno_dir = args_dict['anno_dir']
                     gather_labels(anno_dir)
                 elif action == 'splitvoc':
+                    logging.info('split VOC to train and val not implement yet.')
                     pass
                 elif action == 'labelone2voc':
+                    logging.info('labelone2voc not implement yet.')
                     pass
+                elif action == 'voc2coco':
+                    logging.info('start convert VOC to coco... Annotations root: {}'.format(args_dict['xml_dir']))
+                    convert(args_dict['xml_dir'])
 
         except Exception as e:
             print(Fore.RED, 'parse args error, type -h to see help. msg: {}'.format(e))

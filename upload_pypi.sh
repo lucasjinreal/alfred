@@ -1,3 +1,4 @@
+#! /bin/bash
 # check setup is correct or not
 python setup.py check
 

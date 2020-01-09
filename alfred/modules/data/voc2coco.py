@@ -46,7 +46,7 @@ def get_filename_as_int(filename):
 """
 xml_list is optional, we at least need xml_dir and json_file
 """
-def convert(xml_dir, json_file, xml_list=None):
+def convert(xml_dir, json_file=None, xml_list=None):
     if xml_list:
         list_fp = open(xml_list, 'r')
     else:
@@ -116,11 +116,15 @@ def convert(xml_dir, json_file, xml_list=None):
     for cate, cid in categories.items():
         cat = {'supercategory': 'none', 'id': cid, 'name': cate}
         json_dict['categories'].append(cat)
+    if not json_file:
+        json_file = 'annotations_coco.json'
+        logging.info('converted coco format will saved into: {}'.format(json_file))
     json_fp = open(json_file, 'w')
     json_str = json.dumps(json_dict)
     json_fp.write(json_str)
     json_fp.close()
     logging.info('done.')
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
