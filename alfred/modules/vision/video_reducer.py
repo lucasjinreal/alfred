@@ -56,7 +56,7 @@ class VideoReducer(object):
             while res:
                 res, image = cap.read()
                 self.current_frame += 1
-                if self.current_frame % self.jump_frames == 0:
+                if (self.current_frame % self.jump_frames == 0) or self.current_frame < 15:
                     print('Read frame: {} jump frames: {}'.format(self.current_frame, self.jump_frames))
                     self.current_save_frame += 1
                     video_writer.write(image)
