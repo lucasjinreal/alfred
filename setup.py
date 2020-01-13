@@ -22,13 +22,15 @@ install alfred into local bin dir.
 from setuptools import setup, find_packages
 from setuptools import setup, Extension
 
+from os import path
 
-with open("readme.md", "r") as fh:
-    long_description = fh.read()
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'readme.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 
 setup(name='alfred-py',
-      version='2.6.7',
+      version='2.6.8',
       keywords=['deep learning', 'script helper', 'tools'],
       description='''
       Alfred is a DeepLearning utility library.
