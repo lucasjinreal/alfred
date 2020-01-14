@@ -35,6 +35,7 @@ from .modules.data.view_coco import vis_coco
 from .modules.data.gather_voclabels import gather_labels
 from .modules.data.voc2coco import convert
 
+from .modules.cabinet.count_file import count_file
 
 from alfred.utils.log import logger as logging
 
@@ -105,6 +106,16 @@ def arg_parse():
     scrap_image_parser = scrap_sub_parser.add_parser('image', help='scrap images.')
     scrap_image_parser.set_defaults(which='scrap-image')
     scrap_image_parser.add_argument('--query', '-q', help='query words.')
+
+
+    # =============== cabinet part ================
+    cabinet_parser = main_sub_parser.add_parser('cabinet', help='cabinet related commands.')
+    cabinet_sub_parser = cabinet_parser.add_subparsers()
+
+    count_file_parser = cabinet_sub_parser.add_parser('count', help='scrap images.')
+    count_file_parser.set_defaults(which='cabinet-count')
+    count_file_parser.add_argument('--dir', '-d', default='./', help='dir to count.')
+    count_file_parser.add_argument('--type', '-t', help='dir to count.')
 
     # =============== data part ================
     data_parser = main_sub_parser.add_parser('data', help='data related commands.')
@@ -215,6 +226,12 @@ def main(args=None):
                     q_list = [i.replace(' ', '') for i in q_list]
                     image_scraper = ImageScraper()
                     image_scraper.scrap(q_list)
+            elif module == 'cabinet':
+                if action == 'count':
+                    d = args_dict['dir']
+                    t = args_dict['type']
+                    logging.info('dir: {}, types: {}'.format(d, t))
+                    count_file(d, t)
             elif module == 'data':
                 if action == 'vocview':
                     image_dir = args_dict['image_dir']
