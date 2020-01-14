@@ -76,7 +76,12 @@ def convert(xml_dir, json_file=None, xml_list=None):
             # if not equal, we replace filename with xml file name
             # print('{} != {}'.format(os.path.basename(xml_f).split('.')[0], filename.split('.')[0]))
             filename = os.path.basename(xml_f).split('.')[0] + '.' + filename.split('.')[-1]
+            # filename could be wrong sufix
             print('revise filename to: {}'.format(filename))
+            if not os.path.exists(os.path.join(os.path.dirname(xml_f), filename)):
+                logging.info('revise filename wrong, try change sufix (but also could be wrong, check your VOC format pls.)')
+                filename = filename.split('.')[0] + '.jpg'
+            
         ## The filename must be a number
         # image_id = get_filename_as_int(filename)
         image_id = i
