@@ -2,10 +2,6 @@
 
 *Alfred* is command line tool for deep-learning usage. if you want split an video into image frames or combine frames into a single video, then **alfred** is what you want.
 
-**[cry]: I have lost the latest update of alfred source codes...............**.
-
-I need to re-write all the thing from scratch now... 
-
 
 
 ## Install
@@ -16,13 +12,21 @@ To install **alfred**, it is very simple:
 sudo pip3 install alfred-py
 ```
 
-**alfred** is both a *package* and a *command line tool*. it can do those things for a command line tool:
+A glance of alfred, after you installed above package, you will have `alfred`:
 
-- combine a sequences images into a video;
-- extract all frames  of a video;
-- extract all faces from a bunch of images;
+```
+# show VOC annotations
+alfred data vocview -i JPEGImages/ -l Annotations/
+# show more of data
+alfred data -h
 
-*it's built for AI*.
+# cabinet module
+alfred cab -h
+# count jpg file number under current dir
+alfred cab count -t jpg
+```
+
+
 
 
 
@@ -30,6 +34,8 @@ sudo pip3 install alfred-py
 
 
 - 2050-: *to be continue*;
+
+- 2020-01-14: Added cabinet module, also add some utils under data module;
 
 - 2019-07-18: 1000 classes imagenet labelmap added. Call it from:
 
@@ -47,7 +53,8 @@ sudo pip3 install alfred-py
     ```
     alfred data voc_view -i ./images -l labels/
     ```
-    ​
+    
+    
 - 2019-05-17: We adding **open3d** as a lib to visual 3d point cloud in python. Now you can do some simple preparation and visual 3d box right on lidar points and show like opencv!!
 
     ![](https://user-images.githubusercontent.com/21303438/57909386-44313500-78b5-11e9-8146-c74c53038c9b.png)

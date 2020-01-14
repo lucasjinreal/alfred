@@ -109,11 +109,11 @@ def arg_parse():
 
 
     # =============== cabinet part ================
-    cabinet_parser = main_sub_parser.add_parser('cabinet', help='cabinet related commands.')
+    cabinet_parser = main_sub_parser.add_parser('cab', help='cabinet related commands.')
     cabinet_sub_parser = cabinet_parser.add_subparsers()
 
     count_file_parser = cabinet_sub_parser.add_parser('count', help='scrap images.')
-    count_file_parser.set_defaults(which='cabinet-count')
+    count_file_parser.set_defaults(which='cab-count')
     count_file_parser.add_argument('--dir', '-d', default='./', help='dir to count.')
     count_file_parser.add_argument('--type', '-t', help='dir to count.')
 
@@ -226,7 +226,7 @@ def main(args=None):
                     q_list = [i.replace(' ', '') for i in q_list]
                     image_scraper = ImageScraper()
                     image_scraper.scrap(q_list)
-            elif module == 'cabinet':
+            elif module == 'cab':
                 if action == 'count':
                     d = args_dict['dir']
                     t = args_dict['type']
