@@ -28,8 +28,7 @@ def gather_labels(anno_dir):
         print('parsing {}'.format(label))
         root = ET.parse(label).getroot()
         for obj in root.iter('object'):
-            name = obj.find('name').text.lower().strip()
-            print(name)
+            name = obj.find('name').text
             if name not in all_names:
                 all_names.append(name)
     print('Done. summary...')
