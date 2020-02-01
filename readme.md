@@ -35,6 +35,8 @@ alfred cab count -t jpg
 
 - 2050-: *to be continue*;
 
+- 2020-02-01: **武汉加油**! *alfred*  fix windows pip install problem related to encoding 'gbk';
+
 - 2020-01-14: Added cabinet module, also add some utils under data module;
 
 - 2019-07-18: 1000 classes imagenet labelmap added. Call it from:
