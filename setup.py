@@ -30,7 +30,7 @@ with open(path.join(this_directory, 'readme.md'), encoding='utf-8') as f:
 
 
 setup(name='alfred-py',
-      version='2.6.10',
+      version='2.6.11',
       keywords=['deep learning', 'script helper', 'tools'],
       description='''
       Alfred is a DeepLearning utility library.
