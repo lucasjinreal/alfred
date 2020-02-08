@@ -31,7 +31,7 @@ with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 
 setup(name='alfred-py',
-      version='2.6.11',
+      version='2.6.12',
       keywords=['deep learning', 'script helper', 'tools'],
       description='''
       Alfred is a DeepLearning utility library.
@@ -74,6 +74,6 @@ setup(name='alfred-py',
       author_email="jinfagang19@163.com",
       url='https://github.com/jinfagang/alfred',
       platforms='any',
-      install_requires=['colorama', 'requests', 'pycocotools',
+      install_requires=['colorama', 'requests',
                         'future', 'deprecated', 'loguru', 'pyquaternion', 'lxml']
       )

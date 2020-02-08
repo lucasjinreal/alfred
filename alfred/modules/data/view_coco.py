@@ -5,7 +5,12 @@ draw our converted annotation to check
 if result is right or not
 
 """
-from pycocotools.coco import COCO
+try:
+    from pycocotools.coco import COCO
+except ImportError as e:
+    print('you are not install pycocotools, using pip install pycocotools install it.')
+    print('if you are on Windows, install pycocotools by searching it.')
+    exit(-1)
 import os
 import sys
 import cv2

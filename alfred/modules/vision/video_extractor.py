@@ -18,7 +18,10 @@
 # ------------------------------------------------------------------------
 import os
 import sys
-import cv2
+try:
+    import cv2
+except ImportError:
+    print('you are not install opencv-python, using pip install opencv-python install it.')
 from colorama import Fore, Back, Style
 
 
