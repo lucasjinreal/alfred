@@ -26,7 +26,7 @@ alfred cab -h
 alfred cab count -t jpg
 ```
 
-
+> if you are on windows, you can install pycocotools via: `pip  install "git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI"`, we have made pycocotools as an dependencies since we need pycoco API.
 
 
 
@@ -34,6 +34,8 @@ alfred cab count -t jpg
 
 
 - 2050-: *to be continue*;
+
+- 2020-02-10: **alfred** now support windows (experimental);
 
 - 2020-02-01: **武汉加油**! *alfred*  fix windows pip install problem related to encoding 'gbk';
 
