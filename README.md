@@ -35,6 +35,10 @@ alfred cab count -t jpg
 
 - 2050-: *to be continue*;
 
+- 2020-02-11: open3d has changed their API. we have updated new open3d inside alfred, you can simply using latest open3d and run `python3 examples/draw_3d_pointcloud.py` you will see this:
+
+    ![](https://s2.ax1x.com/2020/02/11/1o9VhV.png)
+
 - 2020-02-10: **alfred** now support windows (experimental);
 
 - 2020-02-01: **武汉加油**! *alfred*  fix windows pip install problem related to encoding 'gbk';
@@ -45,46 +49,26 @@ alfred cab count -t jpg
 
     ```python
     from alfred.vis.image.get_dataset_label_map import imagenet_labelmap
-    
+
     # also, coco, voc, cityscapes labelmap were all added in
     from alfred.vis.image.get_dataset_label_map import coco_labelmap
     from alfred.vis.image.get_dataset_label_map import voc_labelmap
     from alfred.vis.image.get_dataset_label_map import cityscapes_labelmap
     ```
-    
+
 - 2019-07-13: We add a VOC check module in command line usage, you can now visualize your VOC format detection data like this:
 
     ```
     alfred data voc_view -i ./images -l labels/
     ```
-    
-    
+
 - 2019-05-17: We adding **open3d** as a lib to visual 3d point cloud in python. Now you can do some simple preparation and visual 3d box right on lidar points and show like opencv!!
 
     ![](https://user-images.githubusercontent.com/21303438/57909386-44313500-78b5-11e9-8146-c74c53038c9b.png)
 
-    ```python
-    geometries = []
-    pcs = np.array(points[:,:3])
-    pcobj = PointCloud()
-    pcobj.points = Vector3dVector(pcs)
-    geometries.append(pcobj)
-    # try getting 3d boxes coordinates
-    for p in box3d:
-        pts3d = compute_3d_box_lidar_coords(xyz, hwl, angles=r_y, origin=(0.5, 0.5, 0.5), 
-        lines = [[0,1],[1,2],[2,3],[3,0],
-                 [4,5],[5,6],[6,7],[7,4],
-                 [0,4],[1,5],[2,6],[3,7]]
-        colors = [[1, 0, 1] for i in range(len(lines))]
-        line_set = LineSet()
-        line_set.points = Vector3dVector(pts3d)
-        line_set.lines = Vector2iVector(lines)
-        line_set.colors = Vector3dVector(colors)
-        geometries.append(line_set)
-        draw_pcs_open3d(geometries)
-    ```
-
     You can achieve this by only using **alfred-py** and **open3d**!
+
+    example code can be seen under  `examples/draw_3d_pointcloud.py`. **code updated with latest open3d API**!.
 
 - 2019-05-10: A minor updates but **really useful** which we called **mute_tf**, do you want to disable tensorflow ignoring log? simply do this!!
 
@@ -150,6 +134,8 @@ alfred cab count -t jpg
   <p align="center">
   <img src="https://s2.ax1x.com/2019/04/24/EVrU0O.md.png" />
   </p>
+
+  **since many users ask me how to reproduces this result, you can checkout demo file under `examples/draw_3d_box.py`**;
 
 
 

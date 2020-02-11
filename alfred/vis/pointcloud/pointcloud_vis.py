@@ -6,6 +6,7 @@ import cv2
 import matplotlib.pyplot as plt
 try:
     from open3d import *
+    import open3d as o3d
 except ImportError:
     print('importing 3d_vis in alfred-py need open3d installed.')
     exit(0)
@@ -44,7 +45,7 @@ def draw_pcs_open3d(geometries):
         plt.imshow(np.asarray(image))
         plt.show()
         return False
-    vis = Visualizer()
+    vis = o3d.visualization.Visualizer()
     vis.create_window()
     for g in geometries:
         vis.add_geometry(g)
