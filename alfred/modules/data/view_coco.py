@@ -8,8 +8,8 @@ if result is right or not
 try:
     from pycocotools.coco import COCO
 except ImportError as e:
-    print('you are not install pycocotools, using pip install pycocotools install it.')
-    print('if you are on Windows, install pycocotools by searching it.')
+    print('Got import error: {}'.format(e))
+    print('you are not either install pycocotools or its dependencies. pls install first.')
     exit(-1)
 import os
 import sys
