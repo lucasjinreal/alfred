@@ -14,17 +14,27 @@ sudo pip3 install alfred-py
 
 A glance of alfred, after you installed above package, you will have `alfred`:
 
-```
-# show VOC annotations
-alfred data vocview -i JPEGImages/ -l Annotations/
-# show more of data
-alfred data -h
-
-# cabinet module
-alfred cab -h
-# count jpg file number under current dir
-alfred cab count -t jpg
-```
+- `data` module:
+  ```
+    # show VOC annotations
+    alfred data vocview -i JPEGImages/ -l Annotations/
+    # show coco anntations
+    alfred data cocoview -j annotations/instance_2017.json -i images/
+    # show more of data
+    alfred data -h
+  ```
+- `cab` module:
+  ```
+    # count files number of a type
+    alfred cab count -d ./images -t jpg
+    # split a txt file into train and test
+    alfred cab split -f all.txt -r 0.9,0.1 -n train,val
+  ```
+- `vision` module;
+  ```
+    # extract video to images
+    alfred vision extract -v video.mp4
+  ```
 
 > if you are on windows, you can install pycocotools via: `pip  install "git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI"`, we have made pycocotools as an dependencies since we need pycoco API.
 
