@@ -27,7 +27,7 @@ A glance of alfred, after you installed above package, you will have `alfred`:
   alfred data -h
   ```
   
-- **`cab` **module:
+- **`cab`** module:
   
   ```shell
   # count files number of a type
@@ -47,7 +47,7 @@ A glance of alfred, after you installed above package, you will have `alfred`:
   
 - `-h` to see more:
 
-  ```
+  ```shell
   usage: alfred [-h] [--version] {vision,text,scrap,cab,data} ...
   
   positional arguments:
