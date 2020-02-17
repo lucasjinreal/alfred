@@ -43,6 +43,6 @@ def split_txt_file(f, ratios, names):
             with open(names[i], 'w') as ff:
                 ff.writelines(one)
                 logging.info('Part {} saved into: {}. portion: {}/{}={}'.format(
-                    i, names[i], int(r*len(lines)), len(lines), int(r*len(lines))/(len(lines))))
-            last_lines += int(r*len(lines))
+                    i, names[i], len(one), len(lines), len(one)/(len(lines))))
+            last_lines += len(one)
     logging.info('split done.')
