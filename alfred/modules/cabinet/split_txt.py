@@ -29,7 +29,7 @@ def split_txt_file(f, ratios, names):
     a = sum(ratios)
     if a != 1.:
         logging.info(
-            'ratios: {} does sum to 1. you must change it first.'.format(ratios))
+            'ratios: {} does not sum to 1. you must change it first.'.format(ratios))
         exit(1)
 
     # read txt file
@@ -39,7 +39,7 @@ def split_txt_file(f, ratios, names):
         # split with ratios
         last_lines = 0
         for i, r in enumerate(ratios):
-            one = lines[last_lines: int(r * len(lines))]
+            one = lines[last_lines: last_lines+int(r * len(lines))]
             with open(names[i], 'w') as ff:
                 ff.writelines(one)
                 logging.info('Part {} saved into: {}. portion: {}/{}={}'.format(
