@@ -36,6 +36,7 @@ from .modules.data.gather_voclabels import gather_labels
 from .modules.data.voc2coco import convert
 
 from .modules.cabinet.count_file import count_file
+from .modules.cabinet.split_txt import split_txt_file
 
 from alfred.utils.log import logger as logging
 
@@ -116,6 +117,12 @@ def arg_parse():
     count_file_parser.set_defaults(which='cab-count')
     count_file_parser.add_argument('--dir', '-d', default='./', help='dir to count.')
     count_file_parser.add_argument('--type', '-t', help='dir to count.')
+
+    split_txt_parser = cabinet_sub_parser.add_parser('split', help='split txt file.')
+    split_txt_parser.set_defaults(which='cab-split')
+    split_txt_parser.add_argument('--file', '-f', required=True, help='file to split.')
+    split_txt_parser.add_argument('--ratios', '-r', help='ratios.')
+    split_txt_parser.add_argument('--names', '-n', help='names.')
 
     # =============== data part ================
     data_parser = main_sub_parser.add_parser('data', help='data related commands.')
@@ -232,6 +239,12 @@ def main(args=None):
                     t = args_dict['type']
                     logging.info('dir: {}, types: {}'.format(d, t))
                     count_file(d, t)
+                if action == 'split':
+                    f = args_dict['file']
+                    r = args_dict['ratios']
+                    n = args_dict['names']
+                    logging.info('files: {}, ratios: {}, names: {}'.format(f, r, n))
+                    split_txt_file(f, r, n)
             elif module == 'data':
                 if action == 'vocview':
                     image_dir = args_dict['image_dir']
