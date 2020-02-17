@@ -12,29 +12,60 @@ To install **alfred**, it is very simple:
 sudo pip3 install alfred-py
 ```
 
+**alfred is both a lib and a tool, you can import it's APIs, or you can directly call it inside your terminal**.
+
 A glance of alfred, after you installed above package, you will have `alfred`:
 
-- `data` module:
+- **`data`** module:
+  
+  ```shell
+  # show VOC annotations
+  alfred data vocview -i JPEGImages/ -l Annotations/
+  # show coco anntations
+  alfred data cocoview -j annotations/instance_2017.json -i images/
+  # show more of data
+  alfred data -h
   ```
-    # show VOC annotations
-    alfred data vocview -i JPEGImages/ -l Annotations/
-    # show coco anntations
-    alfred data cocoview -j annotations/instance_2017.json -i images/
-    # show more of data
-    alfred data -h
+  
+- **`cab` **module:
+  
+  ```shell
+  # count files number of a type
+  alfred cab count -d ./images -t jpg
+  # split a txt file into train and test
+  alfred cab split -f all.txt -r 0.9,0.1 -n train,val
   ```
-- `cab` module:
+  
+- **`vision`** module;
+  
+  ```shell
+  # extract video to images
+  alfred vision extract -v video.mp4
+  # combine images to video
+  alfred vision 2video -d images/
   ```
-    # count files number of a type
-    alfred cab count -d ./images -t jpg
-    # split a txt file into train and test
-    alfred cab split -f all.txt -r 0.9,0.1 -n train,val
+  
+- `-h` to see more:
+
   ```
-- `vision` module;
+  usage: alfred [-h] [--version] {vision,text,scrap,cab,data} ...
+  
+  positional arguments:
+    {vision,text,scrap,cab,data}
+      vision              vision related commands.
+      text                text related commands.
+      scrap               scrap related commands.
+      cab                 cabinet related commands.
+      data                data related commands.
+  
+  optional arguments:
+    -h, --help            show this help message and exit
+    --version, -v         show version info.
   ```
-    # extract video to images
-    alfred vision extract -v video.mp4
-  ```
+
+  **inside every child module, you can call it's `-h` as well: `alfred text -h`.**
+
+  
 
 > if you are on windows, you can install pycocotools via: `pip  install "git+https://github.com/philferriere/cocoapi.git#egg=pycocotools&subdirectory=PythonAPI"`, we have made pycocotools as an dependencies since we need pycoco API.
 
