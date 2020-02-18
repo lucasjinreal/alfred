@@ -334,7 +334,7 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
     else:
         print('locs with unsupported type, boxes must be ndarray or list.')
 
-    for i in n_boxes:
+    for i in range(n_boxes):
         cls_id = int(cls_ids[i])
         if cls_id != background_id:
             score = confs[i]
