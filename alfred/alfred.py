@@ -37,11 +37,11 @@ from .modules.data.voc2coco import convert
 
 from .modules.cabinet.count_file import count_file
 from .modules.cabinet.split_txt import split_txt_file
+from .modules.cabinet.license import apply_license
 
 from alfred.utils.log import logger as logging
 
-
-__VERSION__ = '2.6.0'
+__VERSION__ = '2.6.15'
 __AUTHOR__ = 'Lucas Jin'
 __DATE__ = '2019.11.11'
 __LOC__ = 'Shenzhen, China'
@@ -70,7 +70,7 @@ def arg_parse():
     vision_extract_parser.add_argument('--jumps', '-j', help='jump frames for wide extract')
 
     vision_reduce_parser = vision_sub_parser.add_parser('reduce', help='reduce video by drop frames'
-                                                                         '\nalfred vision reduce -v a.mp4 -j 10')
+                                                                       '\nalfred vision reduce -v a.mp4 -j 10')
     vision_reduce_parser.set_defaults(which='vision-reduce')
     vision_reduce_parser.add_argument('--video', '-v', help='video to extract')
     vision_reduce_parser.add_argument('--jumps', '-j', help='jump frames for wide extract')
@@ -108,7 +108,6 @@ def arg_parse():
     scrap_image_parser.set_defaults(which='scrap-image')
     scrap_image_parser.add_argument('--query', '-q', help='query words.')
 
-
     # =============== cabinet part ================
     cabinet_parser = main_sub_parser.add_parser('cab', help='cabinet related commands.')
     cabinet_sub_parser = cabinet_parser.add_subparsers()
@@ -123,6 +122,15 @@ def arg_parse():
     split_txt_parser.add_argument('--file', '-f', required=True, help='file to split.')
     split_txt_parser.add_argument('--ratios', '-r', help='ratios.')
     split_txt_parser.add_argument('--names', '-n', help='names.')
+
+    apply_license_parser = cabinet_sub_parser.add_parser('license', help='automatically add/update license.')
+    apply_license_parser.set_defaults(which='cab-license')
+    apply_license_parser.add_argument('--owner', '-o', required=True, help='owner of license.')
+    apply_license_parser.add_argument('--name', '-n', help='project name.')
+    apply_license_parser.add_argument('--year', '-y', help='project year: 2016-2020.')
+    apply_license_parser.add_argument('--url', '-u', default='manaai.cn', help='your website url.')
+    apply_license_parser.add_argument('--dir', '-d', default='./', help='to apply license dir.')
+    apply_license_parser.add_argument('--except', '-e', help='except extensions: xml,cc,h')
 
     # =============== data part ================
     data_parser = main_sub_parser.add_parser('data', help='data related commands.')
@@ -239,12 +247,19 @@ def main(args=None):
                     t = args_dict['type']
                     logging.info('dir: {}, types: {}'.format(d, t))
                     count_file(d, t)
-                if action == 'split':
+                elif action == 'split':
                     f = args_dict['file']
                     r = args_dict['ratios']
                     n = args_dict['names']
                     logging.info('files: {}, ratios: {}, names: {}'.format(f, r, n))
                     split_txt_file(f, r, n)
+                elif action == 'license':
+                    owner = args_dict['owner']
+                    project_name = args_dict['name']
+                    year = args_dict['year']
+                    url = args_dict['url']
+                    d = args_dict['dir']
+                    apply_license(owner, project_name, year, url, d)
             elif module == 'data':
                 if action == 'vocview':
                     image_dir = args_dict['image_dir']

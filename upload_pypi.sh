@@ -12,3 +12,4 @@ sudo rm -r dist/
 # using twine instead
 python3 setup.py sdist
 twine upload dist/*
+vendor/

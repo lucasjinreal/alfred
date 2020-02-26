@@ -24,14 +24,12 @@ from setuptools import setup, Extension
 import io
 from os import path
 
-
 this_directory = path.abspath(path.dirname(__file__))
 with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
-
 setup(name='alfred-py',
-      version='2.6.14',
+      version='2.6.15',
       keywords=['deep learning', 'script helper', 'tools'],
       description='''
       Alfred is a DeepLearning utility library.
@@ -69,7 +67,7 @@ setup(name='alfred-py',
               'alfred = alfred.alfred:main'
           ]
       },
-
+      include_package_data=True,
       author="Lucas Jin",
       author_email="jinfagang19@163.com",
       url='https://github.com/jinfagang/alfred',
