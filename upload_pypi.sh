@@ -1,6 +1,5 @@
-#! /bin/bash
 # check setup is correct or not
-python setup.py check
+python3 setup.py check
 
 sudo rm -r build/
 sudo rm -r dist/
@@ -12,4 +11,4 @@ sudo rm -r dist/
 # using twine instead
 python3 setup.py sdist
 twine upload dist/*
-vendor/
+
