@@ -76,6 +76,13 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 
 - 2050-: *to be continue*;
 
+- 2020-02-27: We just update a `license` module inside alfred, say you want apply license to your project or update license, simple:
+
+    ```shell script
+     alfred cab license -o 'MANA' -n 'YoloV3' -u 'manaai.cn'
+    ```
+    you can found more detail usage with `alfred cab license -h`
+
 - 2020-02-11: open3d has changed their API. we have updated new open3d inside alfred, you can simply using latest open3d and run `python3 examples/draw_3d_pointcloud.py` you will see this:
 
     ![](https://s2.ax1x.com/2020/02/11/1o9VhV.png)
