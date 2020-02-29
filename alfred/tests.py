@@ -29,6 +29,7 @@ from vis.image.det import visualize_det_cv2
 import cv2
 import numpy as np
 from vis.image.get_dataset_label_map import coco_label_map_list
+from vis.image.common import draw_rect_with_style
 
 
 if __name__ == '__main__':
@@ -44,4 +45,6 @@ if __name__ == '__main__':
     ]
     dets = np.array(dets)
     print(type(a))
+
+    draw_rect_with_style(a, (78, 478), (478, 223), (0, 255, 255), style='dashed')
     visualize_det_cv2(a, dets, coco_label_map_list, is_show=True)

@@ -33,6 +33,7 @@ import cv2
 import os
 
 from .common import create_unique_color_uchar
+from .common import draw_rect_with_style
 import warnings
 
 
@@ -172,14 +173,18 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
                     x2 = x1 + int(detections[i, 4])
                     y2 = y1 + int(detections[i, 5])
 
-                cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness, cv2.LINE_AA)
+                cv2.rectangle(img, (x1, y1), (x2, y2),
+                              unique_color, line_thickness, cv2.LINE_AA)
                 text_label = '{} {:.2f}'.format(classes[cls_id], score)
-                (ret_val, _) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
+                (ret_val, _) = cv2.getTextSize(
+                    text_label, font, font_scale, font_thickness)
                 txt_bottom_left = (x1+4, y1-4)
                 cv2.rectangle(img, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
-                              (txt_bottom_left[0] + ret_val[0] + 2, txt_bottom_left[1]+4),
+                              (txt_bottom_left[0] + ret_val[0] +
+                               2, txt_bottom_left[1]+4),
                               (0, 0, 0), -1)
-                cv2.putText(img, text_label, txt_bottom_left, font, font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
+                cv2.putText(img, text_label, txt_bottom_left, font,
+                            font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
     if is_show:
         cv2.imshow('image', img)
         cv2.waitKey(0)
@@ -323,13 +328,14 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.6, is_show=F
     return img
 
 
-def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0.6, is_show=False, background_id=-1, mode='xyxy'):
+def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0.6,
+                           is_show=False, background_id=-1, mode='xyxy', style='none'):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
 
     new add mode option
     mode can be one of 'xyxy' and 'xywh', 'xyxy' as default
-    
+
     :param img:
     :param detections: ssd detections, numpy.array([[id, score, x1, y1, x2, y2]...])
             each row is one object
@@ -341,8 +347,9 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
     :return:
     """
     assert class_names, 'from visualize_det_cv2, classes must be provided, each class in a list with' \
-                    'certain order.'
-    assert isinstance(img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
+        'certain order.'
+    assert isinstance(
+        img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
 
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_scale = 0.36
@@ -375,18 +382,26 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
                     x2 = x1 + int(locs[i, 2])
                     y2 = y1 + int(locs[i, 3])
 
-                cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness, cv2.LINE_AA)
+                if style in ['dashed', 'dotted']:
+                    draw_rect_with_style(img, (x1, y1), (x2, y2), unique_color, line_thickness, style=style)
+                else:
+                    cv2.rectangle(img, (x1, y1), (x2, y2),
+                              unique_color, line_thickness, cv2.LINE_AA)
                 text_label = '{} {:.2f}'.format(class_names[cls_id], score)
-                (ret_val, _) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
+                (ret_val, _) = cv2.getTextSize(
+                    text_label, font, font_scale, font_thickness)
                 txt_bottom_left = (x1+4, y1-4)
                 cv2.rectangle(img, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
-                              (txt_bottom_left[0] + ret_val[0] + 2, txt_bottom_left[1]+4),
+                              (txt_bottom_left[0] + ret_val[0] +
+                               2, txt_bottom_left[1]+4),
                               (0, 0, 0), -1)
-                cv2.putText(img, text_label, txt_bottom_left, font, font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
+                cv2.putText(img, text_label, txt_bottom_left, font,
+                            font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
     if is_show:
         cv2.imshow('image', img)
         cv2.waitKey(0)
     return img
+
 
 
 def visualize_det_mask_cv2(img, detections, masks, classes=None, is_show=False, background_id=-1, is_video=False):

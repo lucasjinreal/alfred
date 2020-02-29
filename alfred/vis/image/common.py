@@ -51,6 +51,54 @@ def get_unique_color_by_id(idx, alpha=0.7):
     return create_unique_color_uchar(idx, alpha)
 
 
+"""
+we need some help functions to draw doted rectangle in opencv
+"""
+
+
+def _drawline(img, pt1, pt2, color, thickness=1, style='dotted', gap=20):
+    dist = ((pt1[0]-pt2[0])**2+(pt1[1]-pt2[1])**2)**.5
+    pts = []
+    for i in np.arange(0, dist, gap):
+        r = i/dist
+        x = int((pt1[0]*(1-r)+pt2[0]*r)+.5)
+        y = int((pt1[1]*(1-r)+pt2[1]*r)+.5)
+        p = (x, y)
+        pts.append(p)
+
+    if style == 'dotted':
+        for p in pts:
+            cv2.circle(img, p, thickness, color, -1)
+    elif style == 'dashed':
+        s = pts[0]
+        e = pts[0]
+        i = 0
+        for p in pts:
+            s = e
+            e = p
+            if i % 2 == 1:
+                cv2.line(img, s, e, color, thickness)
+            i += 1
+    else:
+        ValueError('style can only be dotted or dashed for now!')
+
+
+def _drawpoly(img, pts, color, thickness=1, style='dotted',):
+    s = pts[0]
+    e = pts[0]
+    pts.append(pts.pop(0))
+    for p in pts:
+        s = e
+        e = p
+        _drawline(img, s, e, color, thickness, style, gap=6)
+
+
+def draw_rect_with_style(img, pt1, pt2, color, thickness=1, style='dotted'):
+    pts = [pt1, (pt2[0], pt1[1]), pt2, (pt1[0], pt2[1])]
+    _drawpoly(img, pts, color, thickness, style)
+    return img
+
+
 if __name__ == '__main__':
     c = create_unique_color_uchar(1)
     print(c)
