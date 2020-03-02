@@ -58,7 +58,10 @@ def split_txt_file(f, ratios, names):
     # read txt file
     with open(f, 'r') as f:
         lines = f.readlines()
-        logging.info('to split file have all {} lines.'.format(len(lines)))
+        lines_no_empty = [i for i in lines if i != '']
+        logging.info('to split file have all {} lines. droped {} empty lines.'.format(len(lines),
+                                                                                      len(lines) - len(lines_no_empty)))
+        lines = lines_no_empty
         # split with ratios
         last_lines = 0
         for i, r in enumerate(ratios):
