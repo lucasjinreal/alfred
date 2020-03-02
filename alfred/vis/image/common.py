@@ -1,3 +1,26 @@
+#
+# Copyright (c) 2020 JinTian.
+#
+# This file is part of alfred
+# (see http://jinfagang.github.io).
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 """
 common functionality in visualization kit
 """
@@ -26,6 +49,54 @@ def get_unique_color_by_id(idx, alpha=0.7):
     :return:
     """
     return create_unique_color_uchar(idx, alpha)
+
+
+"""
+we need some help functions to draw doted rectangle in opencv
+"""
+
+
+def _drawline(img, pt1, pt2, color, thickness=1, style='dotted', gap=20):
+    dist = ((pt1[0]-pt2[0])**2+(pt1[1]-pt2[1])**2)**.5
+    pts = []
+    for i in np.arange(0, dist, gap):
+        r = i/dist
+        x = int((pt1[0]*(1-r)+pt2[0]*r)+.5)
+        y = int((pt1[1]*(1-r)+pt2[1]*r)+.5)
+        p = (x, y)
+        pts.append(p)
+
+    if style == 'dotted':
+        for p in pts:
+            cv2.circle(img, p, thickness, color, -1)
+    elif style == 'dashed':
+        s = pts[0]
+        e = pts[0]
+        i = 0
+        for p in pts:
+            s = e
+            e = p
+            if i % 2 == 1:
+                cv2.line(img, s, e, color, thickness)
+            i += 1
+    else:
+        ValueError('style can only be dotted or dashed for now!')
+
+
+def _drawpoly(img, pts, color, thickness=1, style='dotted',):
+    s = pts[0]
+    e = pts[0]
+    pts.append(pts.pop(0))
+    for p in pts:
+        s = e
+        e = p
+        _drawline(img, s, e, color, thickness, style, gap=6)
+
+
+def draw_rect_with_style(img, pt1, pt2, color, thickness=1, style='dotted'):
+    pts = [pt1, (pt2[0], pt1[1]), pt2, (pt1[0], pt2[1])]
+    _drawpoly(img, pts, color, thickness, style)
+    return img
 
 
 if __name__ == '__main__':
