@@ -25,6 +25,9 @@ A glance of alfred, after you installed above package, you will have `alfred`:
   alfred data cocoview -j annotations/instance_2017.json -i images/
   # show more of data
   alfred data -h
+  
+  # eval tools
+  alfred data evalvoc -h
   ```
   
 - **`cab`** module:
@@ -75,6 +78,29 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 
 
 - 2050-: *to be continue*;
+
+- 2020-03-04: We have added some **evaluation tool** to calculate mAP for object detection model performance evaluation, it's useful and can visualize result:
+
+    ![](/home/fagangjin/.config/Typora/typora-user-images/1583305054780.png)
+
+    ![](https://s2.ax1x.com/2020/03/04/3INr01.png)
+
+    this usage is also quite simple:
+    
+    ```
+alfred data evalvoc -g ground-truth -d detection-results -im images
+    ```
+
+    where `-g` is your ground truth dir (contains xmls or txts), `-d` is your detection result files dir, `-im` is your images fodler. You only need save all your detected results into txts, one image one txt, and format like this:
+    
+    ```
+    bottle 0.14981 80 1 295 500  
+    bus 0.12601 36 13 404 316  
+    horse 0.12526 430 117 500 307  
+    pottedplant 0.14585 212 78 292 118  
+    tvmonitor 0.070565 388 89 500 196 
+    ```
+
 
 - 2020-02-27: We just update a `license` module inside alfred, say you want apply license to your project or update license, simple:
 

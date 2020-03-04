@@ -39,6 +39,7 @@ from .modules.data.view_voc import vis_voc
 from .modules.data.view_coco import vis_coco
 from .modules.data.gather_voclabels import gather_labels
 from .modules.data.voc2coco import convert
+from .modules.data.eval_voc import eval_voc
 
 from .modules.cabinet.count_file import count_file
 from .modules.cabinet.split_txt import split_txt_file
@@ -168,6 +169,17 @@ def arg_parse():
     voc2coco_parser.set_defaults(which='data-voc2coco')
     voc2coco_parser.add_argument('--xml_dir', '-d', help='Root of xmls dir (Annotations/).')
 
+    evalvoc_parser = data_sub_parser.add_parser('evalvoc', help='evaluation on VOC.')
+    evalvoc_parser.set_defaults(which='data-evalvoc')
+    evalvoc_parser.add_argument('-g', '--gt_dir', type=str, required=True, help="Ground truth path (can be xml dir or txt dir, coco json will support soon)")
+    evalvoc_parser.add_argument('-d', '--det_dir', type=str, required=True, help="Detection result (should saved into txt format)")
+    evalvoc_parser.add_argument('-im', '--images_dir', type=str, default='images', help="Raw images dir for animation.")
+    evalvoc_parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true")
+    evalvoc_parser.add_argument('-np', '--no-plot', help="no plot is shown.", action="store_true")
+    evalvoc_parser.add_argument('-q', '--quiet', help="minimalistic console output.", action="store_true")
+    evalvoc_parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
+    evalvoc_parser.add_argument('--set-class-iou', nargs='+', type=str, help="set IoU for a specific class.")
+
     return parser.parse_args()
 
 
@@ -286,6 +298,9 @@ def main(args=None):
                 elif action == 'voc2coco':
                     logging.info('start convert VOC to coco... Annotations root: {}'.format(args_dict['xml_dir']))
                     convert(args_dict['xml_dir'])
+                elif action == 'evalvoc':
+                    logging.info('start eval on VOC dataset..')
+                    eval_voc(args)
 
         except Exception as e:
             print(Fore.RED, 'parse args error, type -h to see help. msg: {}'.format(e))
