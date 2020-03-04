@@ -32,6 +32,8 @@ import os
 import glob
 import xml.etree.ElementTree as ET
 import numpy as np
+import cv2
+from alfred.utils.log import logger as logging
 
 
 MINOVERLAP = 0.5  # default value (defined in the PASCAL VOC2012 challenge)
@@ -73,7 +75,6 @@ def log_average_miss_rate(precision, fp_cumsum, num_images):
 
     # log(0) is undefined, so we use the np.maximum(1e-10, ref)
     lamr = math.exp(np.mean(np.log(np.maximum(1e-10, ref))))
-
     return lamr, mr, fppi
 
 
@@ -147,15 +148,6 @@ def voc_ap(rec, prec):
     for i in i_list:
         ap += ((mrec[i]-mrec[i-1])*mpre[i])
     return ap, mrec, mpre
-
-
-def file_lines_to_list(path):
-    # open txt file lines to a list
-    with open(path) as f:
-        content = f.readlines()
-    # remove whitespace characters like `\n` at the end of each line
-    content = [x.strip() for x in content]
-    return content
 
 
 def draw_text_in_image(img, text, pos, color, line_width):
@@ -284,32 +276,41 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
     plt.close()
 
 
-def load_voc_xml_as_txt(xml_f):
-    root = ET.parse(xml_f).getroot()
-    for obj in root.findall('object'):
-        obj_name = obj.find('name').text
-        bndbox = obj.find('bndbox')
-        left = bndbox.find('xmin').text
-        top = bndbox.find('ymin').text
-        right = bndbox.find('xmax').text
-        bottom = bndbox.find('ymax').text
-    return []
+def load_txt_or_xml_format(t_f):
+    if t_f.endswith('txt'):
+        # open txt file lines to a list
+        with open(t_f) as f:
+            content = f.readlines()
+        # remove whitespace characters like `\n` at the end of each line
+        content = [x.strip() for x in content]
+        return content
+    elif t_f.endswith('xml'):
+        root = ET.parse(t_f).getroot()
+        all_gts = []
+        for obj in root.findall('object'):
+            obj_name = obj.find('name').text
+            bndbox = obj.find('bndbox')
+            left = bndbox.find('xmin').text
+            top = bndbox.find('ymin').text
+            right = bndbox.find('xmax').text
+            bottom = bndbox.find('ymax').text
+            all_gts.append(' '.join([obj_name, left, top, right, bottom]))
+        return all_gts
+    else:
+        logging.error('unsupported gt file format.')
+        exit(0)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-na', '--no-animation',
-                        help="no animation is shown.", action="store_true")
-    parser.add_argument('-np', '--no-plot',
-                        help="no plot is shown.", action="store_true")
-    parser.add_argument(
-        '-q', '--quiet', help="minimalistic console output.", action="store_true")
-    # argparse receiving list of classes to be ignored
-    parser.add_argument('-i', '--ignore', nargs='+', type=str,
-                        help="ignore a list of classes.")
-    # argparse receiving list of classes with specific IoU (e.g., python main.py --set-class-iou person 0.7)
-    parser.add_argument('--set-class-iou', nargs='+', type=str,
-                        help="set IoU for a specific class.")
+    parser.add_argument('-g', '--gt_dir', type=str, required=True, help="Ground truth path (can be xml dir or txt dir, coco json will support soon)")
+    parser.add_argument('-d', '--det_dir', type=str, required=True, help="Detection result (should saved into txt format)")
+    parser.add_argument('-im', '--images_dir', type=str, default='images', help="Raw images dir for animation.")
+    parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true")
+    parser.add_argument('-np', '--no-plot', help="no plot is shown.", action="store_true")
+    parser.add_argument('-q', '--quiet', help="minimalistic console output.", action="store_true")
+    parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
+    parser.add_argument('--set-class-iou', nargs='+', type=str, help="set IoU for a specific class.")
     args = parser.parse_args()
 
     if args.ignore is None:
@@ -320,9 +321,9 @@ if __name__ == '__main__':
         specific_iou_flagged = True
 
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    GT_PATH = os.path.join(os.getcwd(), 'input', 'ground-truth')
-    DR_PATH = os.path.join(os.getcwd(), 'input', 'detection-results')
-    IMG_PATH = os.path.join(os.getcwd(), 'input', 'images-optional')
+    GT_PATH = args.gt_dir
+    DR_PATH = args.det_dir
+    IMG_PATH = args.images_dir
 
     if os.path.exists(IMG_PATH):
         for dirpath, dirnames, files in os.walk(IMG_PATH):
@@ -365,26 +366,43 @@ if __name__ == '__main__':
                                  "images", "detections_one_by_one"))
 
     # get a list with the ground-truth files
-    ground_truth_files_list = glob.glob(GT_PATH + '/*.txt')
+    # Make can solve both txt ground truth and xml ground truth
+    if os.path.isfile(GT_PATH):
+        logging.info('{} is a file, eval on coco not support now.'.format(GT_PATH))
+        exit(0)
+    else:
+        all_files_gt = os.listdir(GT_PATH)
+        ground_truth_files_list = []
+        gt_format = 'txt'
+        if all_files_gt[0].endswith('txt'):
+            logging.info('detected your ground truth were txt format, start eval....')
+            ground_truth_files_list = glob.glob(os.path.join(GT_PATH, '*.txt'))
+        elif all_files_gt[0].endswith('xml'):
+            logging.info('detected your ground truth were xml format, start eval....')
+            ground_truth_files_list = glob.glob(os.path.join(GT_PATH, '*.xml'))
+            gt_format = 'xml'
+        else:
+            logging.error('unsupported ground truth format, pls using xml or txt as ground truth format.')
+            exit(0)
+
     if len(ground_truth_files_list) == 0:
-        error("Error: No ground-truth files found!")
+        logging.error("Error: No ground-truth files found!")
+        exit(0)
     ground_truth_files_list.sort()
     # dictionary with counter per class
     gt_counter_per_class = {}
     counter_images_per_class = {}
 
     # todo: Ground truth can be txt or xml both can be converted
-    for txt_file in ground_truth_files_list:
-        # print(txt_file)
-        file_id = txt_file.split(".txt", 1)[0]
-        file_id = os.path.basename(os.path.normpath(file_id))
+    for gt_file in ground_truth_files_list:
+        file_id = os.path.basename(gt_file).split('.')[0]
         # check if there is a correspondent detection-results file
         temp_path = os.path.join(DR_PATH, (file_id + ".txt"))
         if not os.path.exists(temp_path):
             error_msg = "Error. File not found: {}\n".format(temp_path)
             error_msg += "(You can avoid this error message by running extra/intersect-gt-and-dr.py)"
-            error(error_msg)
-        lines_list = file_lines_to_list(txt_file)
+            logging.error(error_msg)
+        lines_list = load_txt_or_xml_format(gt_file)
         # create ground-truth dictionary
         bounding_boxes = []
         is_difficult = False
@@ -397,12 +415,12 @@ if __name__ == '__main__':
                 else:
                     class_name, left, top, right, bottom = line.split()
             except ValueError:
-                error_msg = "Error: File " + txt_file + " in the wrong format.\n"
+                error_msg = "Error: File " + gt_file + " in the wrong format.\n"
                 error_msg += " Expected: <class_name> <left> <top> <right> <bottom> ['difficult']\n"
                 error_msg += " Received: " + line
                 error_msg += "\n\nIf you have a <class_name> with spaces between words you should remove them\n"
                 error_msg += "by running the script \"remove_space.py\" or \"rename_class.py\" in the \"extra/\" folder."
-                error(error_msg)
+                logging.error(error_msg)
             # check if class is in the ignore list, if yes skip
             if class_name in args.ignore:
                 continue
@@ -428,12 +446,12 @@ if __name__ == '__main__':
                         # if class didn't exist yet
                         counter_images_per_class[class_name] = 1
                     already_seen_classes.append(class_name)
-
         # dump bounding_boxes into a ".json" file
         with open(TEMP_FILES_PATH + "/" + file_id + "_ground_truth.json", 'w') as outfile:
             json.dump(bounding_boxes, outfile)
 
     gt_classes = list(gt_counter_per_class.keys())
+    logging.info('gt_classes gathered: {}'.format(gt_classes))
     # let's sort the classes alphabetically
     gt_classes = sorted(gt_classes)
     n_classes = len(gt_classes)
@@ -445,24 +463,25 @@ if __name__ == '__main__':
         error_msg = \
             '\n --set-class-iou [class_1] [IoU_1] [class_2] [IoU_2] [...]'
         if n_args % 2 != 0:
-            error('Error, missing arguments. Flag usage:' + error_msg)
+            logging.error('Error, missing arguments. Flag usage:' + error_msg)
         # [class_1] [IoU_1] [class_2] [IoU_2]
         # specific_iou_classes = ['class_1', 'class_2']
         specific_iou_classes = args.set_class_iou[::2]  # even
         # iou_list = ['IoU_1', 'IoU_2']
         iou_list = args.set_class_iou[1::2]  # odd
         if len(specific_iou_classes) != len(iou_list):
-            error('Error, missing arguments. Flag usage:' + error_msg)
+            logging.error('Error, missing arguments. Flag usage:' + error_msg)
         for tmp_class in specific_iou_classes:
             if tmp_class not in gt_classes:
-                error('Error, unknown class \"' + tmp_class +
+                logging.error('Error, unknown class \"' + tmp_class +
                       '\". Flag usage:' + error_msg)
         for num in iou_list:
             if not is_float_between_0_and_1(num):
-                error('Error, IoU must be between 0.0 and 1.0. Flag usage:' + error_msg)
+                logging.error('Error, IoU must be between 0.0 and 1.0. Flag usage:' + error_msg)
 
     # get a list with the detection-results files
-    dr_files_list = glob.glob(DR_PATH + '/*.txt')
+    dr_files_list = glob.glob(os.path.join(DR_PATH, '*.txt'))
+    logging.info('detection files detected: {}, vs ground truth: {}'.format(len(dr_files_list), len(ground_truth_files_list)))
     dr_files_list.sort()
 
     for class_index, class_name in enumerate(gt_classes):
@@ -470,15 +489,19 @@ if __name__ == '__main__':
         for txt_file in dr_files_list:
             # print(txt_file)
             # the first time it checks if all the corresponding ground-truth files exist
-            file_id = txt_file.split(".txt", 1)[0]
-            file_id = os.path.basename(os.path.normpath(file_id))
-            temp_path = os.path.join(GT_PATH, (file_id + ".txt"))
+            file_id = os.path.basename(txt_file).split(".")[0]
+            temp_path = ''
+            if gt_format == 'txt':
+                temp_path = os.path.join(GT_PATH, (file_id + ".txt"))
+            elif gt_format == 'xml':
+                temp_path = os.path.join(GT_PATH, (file_id + ".xml"))
+
             if class_index == 0:
                 if not os.path.exists(temp_path):
-                    error_msg = "Error. File not found: {}\n".format(temp_path)
+                    error_msg = "Error. according ground truth File not found: {}\n".format(temp_path)
                     error_msg += "(You can avoid this error message by running extra/intersect-gt-and-dr.py)"
-                    error(error_msg)
-            lines = file_lines_to_list(txt_file)
+                    logging.error(error_msg)
+            lines = load_txt_or_xml_format(txt_file)
             for line in lines:
                 try:
                     tmp_class_name, confidence, left, top, right, bottom = line.split()
@@ -486,7 +509,7 @@ if __name__ == '__main__':
                     error_msg = "Error: File " + txt_file + " in the wrong format.\n"
                     error_msg += " Expected: <class_name> <confidence> <left> <top> <right> <bottom>\n"
                     error_msg += " Received: " + line
-                    error(error_msg)
+                    logging.error(error_msg)
                 if tmp_class_name == class_name:
                     # print("match")
                     bbox = left + " " + top + " " + right + " " + bottom
@@ -497,7 +520,7 @@ if __name__ == '__main__':
         bounding_boxes.sort(key=lambda x: float(x['confidence']), reverse=True)
         with open(TEMP_FILES_PATH + "/" + class_name + "_dr.json", 'w') as outfile:
             json.dump(bounding_boxes, outfile)
-
+    logging.info('ground truth and det files solved, start calculating mAP...')
     sum_AP = 0.0
     ap_dictionary = {}
     lamr_dictionary = {}
@@ -526,9 +549,9 @@ if __name__ == '__main__':
                     ground_truth_img = glob.glob1(IMG_PATH, file_id + ".*")
                     #tifCounter = len(glob.glob1(myPath,"*.tif"))
                     if len(ground_truth_img) == 0:
-                        error("Error. Image not found with id: " + file_id)
+                        logging.error("Error. Image not found with id: " + file_id)
                     elif len(ground_truth_img) > 1:
-                        error("Error. Multiple image with id: " + file_id)
+                        logging.error("Error. Multiple image with id: " + file_id)
                     else:  # found image
                         #print(IMG_PATH + "/" + ground_truth_img[0])
                         # Load image
@@ -763,7 +786,7 @@ if __name__ == '__main__':
     det_counter_per_class = {}
     for txt_file in dr_files_list:
         # get lines to list
-        lines_list = file_lines_to_list(txt_file)
+        lines_list = load_txt_or_xml_format(txt_file)
         for line in lines_list:
             class_name = line.split()[0]
             # check if class is in the ignore list, if yes skip
