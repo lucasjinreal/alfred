@@ -23,6 +23,8 @@ A glance of alfred, after you installed above package, you will have `alfred`:
   alfred data vocview -i JPEGImages/ -l Annotations/
   # show coco anntations
   alfred data cocoview -j annotations/instance_2017.json -i images/
+  # show detection label with txt format
+  alfred data txtview -i images/ -l txts/
   # show more of data
   alfred data -h
   
@@ -93,7 +95,7 @@ alfred data evalvoc -g ground-truth -d detection-results -im images
 
     where `-g` is your ground truth dir (contains xmls or txts), `-d` is your detection result files dir, `-im` is your images fodler. You only need save all your detected results into txts, one image one txt, and format like this:
     
-    ```
+    ```shell
     bottle 0.14981 80 1 295 500  
     bus 0.12601 36 13 404 316  
     horse 0.12526 430 117 500 307  
