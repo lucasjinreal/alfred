@@ -37,6 +37,7 @@ from .modules.vision.video_reducer import VideoReducer
 
 from .modules.data.view_voc import vis_voc
 from .modules.data.view_coco import vis_coco
+from .modules.data.view_txt import vis_det_txt
 from .modules.data.gather_voclabels import gather_labels
 from .modules.data.voc2coco import convert
 from .modules.data.eval_voc import eval_voc
@@ -47,7 +48,7 @@ from .modules.cabinet.license import apply_license
 
 from alfred.utils.log import logger as logging
 
-__VERSION__ = '2.6.15'
+__VERSION__ = '2.7.0'
 __AUTHOR__ = 'Lucas Jin'
 __DATE__ = '2019.11.11'
 __LOC__ = 'Shenzhen, China'
@@ -146,6 +147,11 @@ def arg_parse():
     view_voc_parser.set_defaults(which='data-vocview')
     view_voc_parser.add_argument('--image_dir', '-i', help='Root path of VOC image.')
     view_voc_parser.add_argument('--label_dir', '-l', help='Root path of VOC label.')
+
+    view_txt_parser = data_sub_parser.add_parser('txtview', help='view voc.')
+    view_txt_parser.set_defaults(which='data-txtview')
+    view_txt_parser.add_argument('--image_dir', '-i', help='Root path of VOC image.')
+    view_txt_parser.add_argument('--label_dir', '-l', help='Root path of VOC label.')
 
     view_coco_parser = data_sub_parser.add_parser('cocoview', help='view voc.')
     view_coco_parser.set_defaults(which='data-cocoview')
@@ -286,6 +292,10 @@ def main(args=None):
                     img_d = args_dict['image_dir']
                     json_f = args_dict['json']
                     vis_coco(img_d, json_f)
+                elif action == 'txtview':
+                    image_dir = args_dict['image_dir']
+                    label_dir = args_dict['label_dir']
+                    vis_det_txt(img_root=image_dir, label_root=label_dir)
                 elif action == 'voclabel':
                     anno_dir = args_dict['anno_dir']
                     gather_labels(anno_dir)
