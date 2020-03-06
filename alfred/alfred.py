@@ -45,6 +45,7 @@ from .modules.data.eval_voc import eval_voc
 from .modules.cabinet.count_file import count_file
 from .modules.cabinet.split_txt import split_txt_file
 from .modules.cabinet.license import apply_license
+from .modules.cabinet.stack_imgs import stack_imgs
 
 from alfred.utils.log import logger as logging
 
@@ -129,6 +130,11 @@ def arg_parse():
     split_txt_parser.add_argument('--file', '-f', required=True, help='file to split.')
     split_txt_parser.add_argument('--ratios', '-r', help='ratios.')
     split_txt_parser.add_argument('--names', '-n', help='names.')
+
+    stackimgs_parser = cabinet_sub_parser.add_parser('stackimgs', help='stack images into one')
+    stackimgs_parser.set_defaults(which='cab-stackimgs')
+    stackimgs_parser.add_argument('--imgs', '-i', required=True, nargs='+', help='images list.')
+    stackimgs_parser.add_argument('--dim', '-d', help='dims like 2x3.')
 
     apply_license_parser = cabinet_sub_parser.add_parser('license', help='automatically add/update license.')
     apply_license_parser.set_defaults(which='cab-license')
@@ -276,6 +282,11 @@ def main(args=None):
                     n = args_dict['names']
                     logging.info('files: {}, ratios: {}, names: {}'.format(f, r, n))
                     split_txt_file(f, r, n)
+                elif action == 'stackimgs':
+                    f = args_dict['imgs']
+                    r = args_dict['dim']
+                    logging.info('files: {}, dim: {}'.format(f, r))
+                    stack_imgs(f, r)
                 elif action == 'license':
                     owner = args_dict['owner']
                     project_name = args_dict['name']
