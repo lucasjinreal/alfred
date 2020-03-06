@@ -34,6 +34,7 @@ import xml.etree.ElementTree as ET
 import numpy as np
 import cv2
 from alfred.utils.log import logger as logging
+import matplotlib.pyplot as plt
 
 
 MINOVERLAP = 0.5  # default value (defined in the PASCAL VOC2012 challenge)
