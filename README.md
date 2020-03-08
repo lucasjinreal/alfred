@@ -81,6 +81,16 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 
 - 2050-: *to be continue*;
 
+- 2020-03-08：Several new files added in **alfred**:
+
+    ```
+    alfred.utils.file_io: Provide file io utils for common purpose
+    alfred.dl.torch.env: Provide seed or env setup in pytorch (same API as detectron2)
+    alfred.dl.torch.distribute: utils used for distribute training when using pytorch
+    ```
+
+    
+
 - 2020-03-04: We have added some **evaluation tool** to calculate mAP for object detection model performance evaluation, it's useful and can visualize result:
 
     ![](/home/fagangjin/.config/Typora/typora-user-images/1583305054780.png)
