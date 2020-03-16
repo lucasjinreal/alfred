@@ -49,9 +49,9 @@ from .modules.cabinet.stack_imgs import stack_imgs
 
 from alfred.utils.log import logger as logging
 
-__VERSION__ = '2.7.0'
+__VERSION__ = '2.7.1'
 __AUTHOR__ = 'Lucas Jin'
-__DATE__ = '2019.11.11'
+__DATE__ = '20202.10.01, since 2019.11.11'
 __LOC__ = 'Shenzhen, China'
 __git__ = 'http://github.com/jinfagang/alfred'
 

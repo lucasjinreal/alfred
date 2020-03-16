@@ -35,7 +35,7 @@ with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='alfred-py',
-      version='2.7.0',
+      version='2.7.1',
       keywords=['deep learning', 'script helper', 'tools'],
       description='''
       Alfred is a DeepLearning utility library.
@@ -50,6 +50,7 @@ setup(name='alfred-py',
           'alfred.dl.torch',
           'alfred.dl.torch.train',
           'alfred.dl.torch.distribute',
+          'alfred.dl.torch.runner',
           'alfred.dl.torch.nn',
           'alfred.dl.torch.nn.modules',
           'alfred.dl.torch.ops',
