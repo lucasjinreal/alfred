@@ -329,7 +329,7 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.6, is_show=F
 
 
 def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0.6,
-                           is_show=False, background_id=-1, mode='xyxy', style='none'):
+                           is_show=False, background_id=-1, mode='xyxy', style='none', force_color=None, line_thickness=1):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
 
@@ -350,11 +350,13 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
         'certain order.'
     assert isinstance(
         img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
+    if force_color:
+        assert isinstance(force_color, list) or isinstance(force_color, np.ndarray), 'force_color must be list or numpy array'
 
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_scale = 0.36
     font_thickness = 1
-    line_thickness = 1
+    line_thickness = line_thickness
 
     n_boxes = 0
     if isinstance(locs, np.ndarray):
@@ -369,7 +371,10 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
         if cls_id != background_id:
             score = confs[i]
             if score > thresh:
-                unique_color = create_unique_color_uchar(cls_id)
+                if force_color:
+                    unique_color = force_color[cls_id]
+                else:
+                    unique_color = create_unique_color_uchar(cls_id)
                 x1, y1, x2, y2 = 0, 0, 0, 0
                 if mode == 'xyxy':
                     x1 = int(locs[i, 0])
