@@ -50,7 +50,7 @@ A glance of alfred, after you installed above package, you will have `alfred`:
   alfred vision 2video -d images/
   ```
   
-- `-h` to see more:
+- **`-h`** to see more:
 
   ```shell
   usage: alfred [-h] [--version] {vision,text,scrap,cab,data} ...
@@ -89,18 +89,14 @@ A glance of alfred, after you installed above package, you will have `alfred`:
     alfred.dl.torch.distribute: utils used for distribute training when using pytorch
     ```
 
-    
-
 - 2020-03-04: We have added some **evaluation tool** to calculate mAP for object detection model performance evaluation, it's useful and can visualize result:
-
-    ![](/home/fagangjin/.config/Typora/typora-user-images/1583305054780.png)
-
+    ![](https://ae01.alicdn.com/kf/H991e578435fe492d9df966fb18c74b1fT.png)
     ![](https://s2.ax1x.com/2020/03/04/3INr01.png)
 
     this usage is also quite simple:
     
     ```
-alfred data evalvoc -g ground-truth -d detection-results -im images
+    alfred data evalvoc -g ground-truth -d detection-results -im images
     ```
 
     where `-g` is your ground truth dir (contains xmls or txts), `-d` is your detection result files dir, `-im` is your images fodler. You only need save all your detected results into txts, one image one txt, and format like this:
