@@ -35,6 +35,8 @@ import os
 from .common import create_unique_color_uchar
 from .common import draw_rect_with_style
 import warnings
+from collections import Counter, OrderedDict
+from .common import put_txt_with_newline
 
 
 def _draw_round_dot_border(img, pt1, pt2, color, thickness, r=2, d=5):
@@ -191,7 +193,8 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
     return img
 
 
-def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thresh=0.6, suit_color=False, is_show=False, background_id=-1, mode='xyxy'):
+def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thresh=0.6, suit_color=False, is_show=False, background_id=-1, mode='xyxy', line_thickness=1,
+                             font_scale=0.38, counter_on=False, counter_pos=(30, 150)):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
 
@@ -218,10 +221,9 @@ def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thr
             classes), 'cls_colors must be same with classes length if you specific cls_colors.'
 
     font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.36
     font_thickness = 1
-    line_thickness = 1
 
+    cls_counter = []
     for i in range(detections.shape[0]):
         cls_id = int(detections[i, 0])
         if cls_id != background_id:
@@ -245,13 +247,15 @@ def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thr
 
                 cv2.rectangle(img, (x1, y1), (x2, y2),
                               unique_color, line_thickness)
-                text_label = '{} {:.1f}'.format(classes[cls_id], score)
+                text_label = '{} {:.1f}%'.format(classes[cls_id], score*100)
+                if counter_on:
+                    cls_counter.append(classes[cls_id])
 
                 ((txt_w, txt_h), _) = cv2.getTextSize(
                     text_label, font, font_scale, 1)
                 # Place text background.
-                back_tl = x1, y1 - int(1.4 * txt_h)
-                back_br = x1 + txt_w, y1+1
+                back_tl = x1, y1 - int(1.5 * txt_h)
+                back_br = x1 + txt_w, y1+2
                 if suit_color:
                     cv2.rectangle(img, back_tl, back_br, unique_color, -1)
                 else:
@@ -260,6 +264,15 @@ def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thr
                 txt_tl = x1, y1 - int(0.3 * txt_h)
                 cv2.putText(img, text_label, txt_tl, font, font_scale,
                             (255, 255, 255), font_thickness, lineType=cv2.LINE_AA)
+    if counter_on:
+        cc = Counter(cls_counter)
+        cc = OrderedDict(sorted(cc.items()))
+        # drw counter result on image
+        txt = ''
+        for k, v in cc.items():
+            txt += '{}: {}\n'.format(k, v)
+        put_txt_with_newline(img, txt, counter_pos, font, 1.9, (0, 255, 0), 2, cv2.LINE_AA)
+
     if is_show:
         cv2.imshow('image', img)
         cv2.waitKey(0)
@@ -351,7 +364,8 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
     assert isinstance(
         img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
     if force_color:
-        assert isinstance(force_color, list) or isinstance(force_color, np.ndarray), 'force_color must be list or numpy array'
+        assert isinstance(force_color, list) or isinstance(
+            force_color, np.ndarray), 'force_color must be list or numpy array'
 
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_scale = 0.36
@@ -388,10 +402,11 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
                     y2 = y1 + int(locs[i, 3])
 
                 if style in ['dashed', 'dotted']:
-                    draw_rect_with_style(img, (x1, y1), (x2, y2), unique_color, line_thickness, style=style)
+                    draw_rect_with_style(
+                        img, (x1, y1), (x2, y2), unique_color, line_thickness, style=style)
                 else:
                     cv2.rectangle(img, (x1, y1), (x2, y2),
-                              unique_color, line_thickness, cv2.LINE_AA)
+                                  unique_color, line_thickness, cv2.LINE_AA)
                 text_label = '{} {:.2f}'.format(class_names[cls_id], score)
                 (ret_val, _) = cv2.getTextSize(
                     text_label, font, font_scale, font_thickness)
@@ -406,7 +421,6 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
         cv2.imshow('image', img)
         cv2.waitKey(0)
     return img
-
 
 
 def visualize_det_mask_cv2(img, detections, masks, classes=None, is_show=False, background_id=-1, is_video=False):

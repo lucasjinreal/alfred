@@ -99,6 +99,22 @@ def draw_rect_with_style(img, pt1, pt2, color, thickness=1, style='dotted'):
     return img
 
 
+def put_txt_with_newline(image, multi_line_txt, pt, font, font_scale, color, thickness, line_type):
+    text_size, _ = cv2.getTextSize(multi_line_txt, font, font_scale, thickness)
+    line_height = text_size[1] + 5
+    x, y0 = pt
+    for i, line in enumerate(multi_line_txt.split("\n")):
+        y = y0 + i * line_height
+        cv2.putText(image,
+                    line,
+                    (x, y),
+                    font,
+                    font_scale,
+                    color,
+                    thickness,
+                    line_type)
+
+
 if __name__ == '__main__':
     c = create_unique_color_uchar(1)
     print(c)
