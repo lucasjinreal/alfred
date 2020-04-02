@@ -37,7 +37,6 @@ from alfred.utils.log import logger as logging
 import matplotlib.pyplot as plt
 
 
-MINOVERLAP = 0.5  # default value (defined in the PASCAL VOC2012 challenge)
 
 
 def log_average_miss_rate(precision, fp_cumsum, num_images):
@@ -313,9 +312,12 @@ def eval_voc(args):
     GT_PATH = args.gt_dir
     DR_PATH = args.det_dir
     IMG_PATH = args.images_dir
+    MINOVERLAP = args.min_overlap
+
     logging.info('Ground truth dir: {}'.format(GT_PATH))
     logging.info('Detection result dir: {}'.format(DR_PATH))
     logging.info('Images dir: {}'.format(IMG_PATH))
+    logging.info('Min overlap: {}'.format(MINOVERLAP))
 
     if os.path.exists(IMG_PATH):
         for dirpath, dirnames, files in os.walk(IMG_PATH):

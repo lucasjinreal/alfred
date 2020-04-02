@@ -189,6 +189,7 @@ def arg_parse():
     evalvoc_parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true")
     evalvoc_parser.add_argument('-np', '--no-plot', help="no plot is shown.", action="store_true")
     evalvoc_parser.add_argument('-q', '--quiet', help="minimalistic console output.", action="store_true")
+    evalvoc_parser.add_argument('--min_overlap', default=0.5, help="min overlap, default is 0.5")
     evalvoc_parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
     evalvoc_parser.add_argument('--set-class-iou', nargs='+', type=str, help="set IoU for a specific class.")
 
