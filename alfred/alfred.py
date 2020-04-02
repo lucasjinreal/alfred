@@ -29,6 +29,7 @@ import os
 import sys
 import argparse
 from colorama import Fore, Back, Style
+import traceback
 
 from .modules.vision.video_extractor import VideoExtractor
 from .modules.scrap.image_scraper import ImageScraper
@@ -189,7 +190,7 @@ def arg_parse():
     evalvoc_parser.add_argument('-na', '--no-animation', help="no animation is shown.", action="store_true")
     evalvoc_parser.add_argument('-np', '--no-plot', help="no plot is shown.", action="store_true")
     evalvoc_parser.add_argument('-q', '--quiet', help="minimalistic console output.", action="store_true")
-    evalvoc_parser.add_argument('--min_overlap', default=0.5, help="min overlap, default is 0.5")
+    evalvoc_parser.add_argument('--min_overlap', type=float, default=0.5, help="min overlap, default is 0.5")
     evalvoc_parser.add_argument('-i', '--ignore', nargs='+', type=str, help="ignore a list of classes.")
     evalvoc_parser.add_argument('--set-class-iou', nargs='+', type=str, help="set IoU for a specific class.")
 
@@ -325,6 +326,7 @@ def main(args=None):
                     eval_voc(args)
 
         except Exception as e:
+            traceback.print_exc()
             print(Fore.RED, 'parse args error, type -h to see help. msg: {}'.format(e))
 
 
