@@ -28,5 +28,16 @@ this contains code that frequently used while writing torch applications
 
 """
 import torch
+from colorama import Fore, Back, Style
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
+
+def print_tensor(t):
+    if isinstance(t, torch.Tensor):
+        print(Fore.YELLOW + Style.BRIGHT + "tensor: ".format() + Style.RESET_ALL)
+        print('value: {}\nshape: {}\ndtype: {}\n'.format(
+            t, t.shape, t.dtype
+        ))
+    else:
+        print('{} is not a tensor.'.format(t))
