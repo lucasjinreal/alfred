@@ -29,13 +29,18 @@ this contains code that frequently used while writing torch applications
 """
 import torch
 from colorama import Fore, Back, Style
+import inspect
+
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 
-def print_tensor(t):
+def print_tensor(t, label=None):
     if isinstance(t, torch.Tensor):
-        print(Fore.YELLOW + Style.BRIGHT + "tensor: ".format() + Style.RESET_ALL)
+        if label:
+            print(Fore.YELLOW + Style.BRIGHT + "tensor: {}".format(label) + Style.RESET_ALL)
+        else:
+            print(Fore.YELLOW + Style.BRIGHT + "tensor: ".format() + Style.RESET_ALL)
         print('value: {}\nshape: {}\ndtype: {}\n'.format(
             t, t.shape, t.dtype
         ))
