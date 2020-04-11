@@ -33,8 +33,16 @@ from vis.image.common import draw_rect_with_style
 import torch
 from dl.torch.common import print_tensor
 
+from varname import varname
+
+def a_func(num):
+    print(varname() + ': ' + str(num))
+
+
 
 if __name__ == '__main__':
+    v = a_func(1098)
+
     # welcome('')
     # logging.info('hi hiu')
     # logging.error('ops')
