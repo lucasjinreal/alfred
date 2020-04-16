@@ -342,7 +342,8 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.6, is_show=F
 
 
 def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0.6,
-                           is_show=False, background_id=-1, mode='xyxy', style='none', force_color=None, line_thickness=1, waite_t=0):
+                           is_show=False, background_id=-1, mode='xyxy', style='none', 
+                           force_color=None, line_thickness=1, wait_t=0):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
 
