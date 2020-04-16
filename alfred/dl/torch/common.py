@@ -39,7 +39,7 @@ def print_tensor(t, label=None):
         if label:
             print(Fore.YELLOW + Style.BRIGHT + "tensor: {}".format(label) + Style.RESET_ALL)
         else:
-            print(Fore.YELLOW + Style.BRIGHT + "tensor: {}".format() + Style.RESET_ALL)
+            print(Fore.YELLOW + Style.BRIGHT + "tensor: " + Style.RESET_ALL)
         print('value: {}\nshape: {}\ndtype: {}\n'.format(
             t, t.shape, t.dtype
         ))
