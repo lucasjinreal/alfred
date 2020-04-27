@@ -420,7 +420,7 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
                             font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
     if is_show:
         cv2.imshow('image', img)
-        cv2.waitKey(waite_t)
+        cv2.waitKey(wait_t)
     return img
 
 
