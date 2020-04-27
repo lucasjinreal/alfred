@@ -348,7 +348,7 @@ def eval_voc(args):
     logging.info('creating a temp path: {}'.format(os.path.abspath(TEMP_FILES_PATH)))
     if not os.path.exists(TEMP_FILES_PATH):  # if it doesn't exist already
         os.makedirs(TEMP_FILES_PATH)
-    results_files_path = "./results"
+    results_files_path = "./results_{}".format(MINOVERLAP)
     if os.path.exists(results_files_path):  # if it exist already
         # reset the results directory
         shutil.rmtree(results_files_path)
