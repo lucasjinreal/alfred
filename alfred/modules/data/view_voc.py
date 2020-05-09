@@ -59,7 +59,7 @@ def vis_voc(img_root, label_root, label_major=True):
     # auto detection .jpg or .png images
     if label_major:
         logging.info('label major will using xmls to found images... it might cause no image found')
-        xml_files = glob(os.path.join(img_root, '*.xml'))
+        xml_files = glob(os.path.join(label_root, '*.xml'))
         for xml in xml_files:
             if os.path.exists(xml):
                 img_f = os.path.join(img_root, os.path.basename(xml).split('.')[0] + '.jpg')
