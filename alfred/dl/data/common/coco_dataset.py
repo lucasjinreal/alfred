@@ -5,7 +5,7 @@ import os
 import PIL.Image
 import PIL.ImageDraw
 
-from ..meta.sliceable_dataset import GetterDataset
+from ..meta.getter_dataset import GetterDataset
 import cv2
 
 try:
