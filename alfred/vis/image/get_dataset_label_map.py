@@ -115,8 +115,11 @@ coco_label_map = {
     89: 'hair drier',
     90: 'toothbrush'
 }
-
 coco_label_map_list = list(coco_label_map.values())
+
+# map with mostly model prediction which is 0-80
+coco_label_map_continuous = {i: coco_label_map_list[i] for i in range(0, len(coco_label_map_list))}
+
 
 voc_label_map = {
     0: '_background_',
