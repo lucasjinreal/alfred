@@ -39,6 +39,7 @@ from .modules.vision.video_reducer import VideoReducer
 from .modules.data.view_voc import vis_voc
 from .modules.data.view_coco import vis_coco
 from .modules.data.view_txt import vis_det_txt
+from .modules.data.view_yolo import vis_det_yolo
 from .modules.data.gather_voclabels import gather_labels
 from .modules.data.voc2coco import convert
 from .modules.data.eval_voc import eval_voc
@@ -157,6 +158,11 @@ def arg_parse():
 
     view_txt_parser = data_sub_parser.add_parser('txtview', help='view voc.')
     view_txt_parser.set_defaults(which='data-txtview')
+    view_txt_parser.add_argument('--image_dir', '-i', help='Root path of VOC image.')
+    view_txt_parser.add_argument('--label_dir', '-l', help='Root path of VOC label.')
+
+    view_txt_parser = data_sub_parser.add_parser('yoloview', help='view yolo.')
+    view_txt_parser.set_defaults(which='data-yoloview')
     view_txt_parser.add_argument('--image_dir', '-i', help='Root path of VOC image.')
     view_txt_parser.add_argument('--label_dir', '-l', help='Root path of VOC label.')
 
@@ -309,6 +315,10 @@ def main(args=None):
                     image_dir = args_dict['image_dir']
                     label_dir = args_dict['label_dir']
                     vis_det_txt(img_root=image_dir, label_root=label_dir)
+                elif action == 'yoloview':
+                    image_dir = args_dict['image_dir']
+                    label_dir = args_dict['label_dir']
+                    vis_det_yolo(img_root=image_dir, label_root=label_dir)
                 elif action == 'voclabel':
                     anno_dir = args_dict['anno_dir']
                     gather_labels(anno_dir)

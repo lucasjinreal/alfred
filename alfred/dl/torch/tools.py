@@ -77,3 +77,13 @@ def torch_to_np_dtype(ttype):
         torch.uint8: np.dtype(np.uint8),
     }
     return type_map[ttype]
+
+
+def check_tensor_equal(t_a, t_b, epsilon=1e-5):
+    res = torch.isclose(t_a, t_b, epsilon)
+    res2 = torch.all(res)
+    res2 = res2.detach().cpu().numpy()
+    if res2:
+        return res2, None
+    else:
+        return res2, res
