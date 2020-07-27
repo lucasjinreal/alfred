@@ -81,6 +81,20 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 
 - 2050-: *to be continue*;
 
+- 2020-07-27: After a long time past, **alfred** finally get some updates:
+
+    ![image-20200727163938094](https://i.loli.net/2020/07/27/Aih6Hl9cKnSMTda.png)
+
+    Now, you can using alfred draw Chinese charactors on image without xxxx undefined encodes.
+
+    ```python
+    from alfred.utils.cv_wrapper import put_cn_txt_on_img
+    
+    img = put_cn_txt_on_img(img, spt[-1], [points[0][0], points[0][1]-25], 1.0, (255, 255, 255))
+    ```
+
+    
+
 - 2020-03-08：Several new files added in **alfred**:
 
     ```

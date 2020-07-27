@@ -43,6 +43,7 @@ from .modules.data.view_yolo import vis_det_yolo
 from .modules.data.gather_voclabels import gather_labels
 from .modules.data.voc2coco import convert
 from .modules.data.eval_voc import eval_voc
+from .modules.data.mergevoc import merge_voc
 
 from .modules.cabinet.count_file import count_file
 from .modules.cabinet.split_txt import split_txt_file
@@ -187,6 +188,10 @@ def arg_parse():
     voc2coco_parser = data_sub_parser.add_parser('voc2coco', help='convert VOC to coco.')
     voc2coco_parser.set_defaults(which='data-voc2coco')
     voc2coco_parser.add_argument('--xml_dir', '-d', help='Root of xmls dir (Annotations/).')
+
+    mergevoc_parser = data_sub_parser.add_parser('mergevoc', help='merge multiple voc.')
+    mergevoc_parser.set_defaults(which='data-mergevoc')
+    mergevoc_parser.add_argument('--dirs', '-d', nargs='+', help='Root of xmls dir (multiple dirs to merge).')
 
     evalvoc_parser = data_sub_parser.add_parser('evalvoc', help='evaluation on VOC.')
     evalvoc_parser.set_defaults(which='data-evalvoc')
@@ -334,6 +339,10 @@ def main(args=None):
                 elif action == 'evalvoc':
                     logging.info('start eval on VOC dataset..')
                     eval_voc(args)
+                elif action == 'mergevoc':
+                    logging.info('start merge VOC dataset..')
+                    merge_list = args_dict['dirs']
+                    merge_voc(merge_list)
 
         except Exception as e:
             traceback.print_exc()
