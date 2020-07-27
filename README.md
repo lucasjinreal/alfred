@@ -93,7 +93,13 @@ A glance of alfred, after you installed above package, you will have `alfred`:
     img = put_cn_txt_on_img(img, spt[-1], [points[0][0], points[0][1]-25], 1.0, (255, 255, 255))
     ```
 
-    
+    Also, you now can **merge** 2 VOC datasets! This is helpful when you have 2 dataset and you want merge them into a single one.
+
+    ```
+    alfred data mergevoc -h
+    ```
+
+    You can see more promotes.
 
 - 2020-03-08：Several new files added in **alfred**:
 
