@@ -81,18 +81,33 @@ def merge_multiple_voc_labels(n_merge_files, target_save_root):
     print('merged {} xmls and saved into: {}'.format(n, os.path.join(target_save_root, f_name)))
 
 
-def merge_voc(label_root_list, label_major=True):
+def merge_voc(label_root_list, style='intersection', label_major=True):
     """
+    For intersection: only merges their intersection part;
+    For union: will merge all of them
+
     merge VOC with multiple datasets (one of them may have partial object labeled)
     """
     logging.info('labels root: {}'.format(label_root_list))
     # these labels may not perfectly aligned, we get a union of them
     filenames = []
-    for l in label_root_list:
-        xmls = [os.path.basename(i) for i in glob(os.path.join(l, "*.xml"))]
-        logging.info('found {} xmls under: {}'.format(len(xmls), l))
-        # filenames.extend([i for i in xmls if i not in filenames])
-        filenames.extend(xmls)
+    if style == 'union':
+        logging.info('merge with union style.')
+        for l in label_root_list:
+            xmls = [os.path.basename(i) for i in glob(os.path.join(l, "*.xml"))]
+            logging.info('found {} xmls under: {}'.format(len(xmls), l))
+            # filenames.extend([i for i in xmls if i not in filenames])
+            filenames.extend(xmls)
+    else:
+        logging.info('merge with intersection style.')
+        for l in label_root_list:
+            xmls = [os.path.basename(i) for i in glob(os.path.join(l, "*.xml"))]
+            logging.info('found {} xmls under: {}'.format(len(xmls), l))
+            # filenames.extend([i for i in xmls if i not in filenames])
+            if len(filenames) > 0:
+                filenames = set(xmls) & set(filenames)
+            filenames = xmls
+
     filenames = list(set(filenames))
     logging.info('found {} xmls which exist both inside all provided label roots.'.format(len(filenames)))
     target_save_root = './merged_voc_annotations'
