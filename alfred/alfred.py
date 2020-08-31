@@ -181,6 +181,11 @@ def arg_parse():
     split_voc_parser.add_argument('--image_dir', '-i', help='Root path of VOC image.')
     split_voc_parser.add_argument('--label_dir', '-l', help='Root path of VOC label.')
 
+    split_coco_parser = data_sub_parser.add_parser('splitcoco', help='split coco to train and val.')
+    split_coco_parser.set_defaults(which='data-splitcoco')
+    split_coco_parser.add_argument('--image_dir', '-i', help='Root path of coco image. [optional]')
+    split_coco_parser.add_argument('--json_file', '-j', help='coco json file.')
+
     labelone2voc_parser = data_sub_parser.add_parser('labelone2voc', help='convert labelone to VOC.')
     labelone2voc_parser.set_defaults(which='data-labelone2voc')
     labelone2voc_parser.add_argument('--json_dir', '-j', help='Root of labelone json dir.')
@@ -329,6 +334,9 @@ def main(args=None):
                     gather_labels(anno_dir)
                 elif action == 'splitvoc':
                     logging.info('split VOC to train and val not implement yet.')
+                    pass
+                elif action == 'splitcoco':
+                    logging.info('split coco to train and val not implement yet.')
                     pass
                 elif action == 'labelone2voc':
                     logging.info('labelone2voc not implement yet.')
