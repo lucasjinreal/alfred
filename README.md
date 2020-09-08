@@ -99,7 +99,7 @@ A glance of alfred, after you installed above package, you will have `alfred`:
     alfred data yolovview -i images/ -l labels/
     ```
 
-    
+    ![image-20200908164952171](https://i.loli.net/2020/09/08/we3X8Ia1KmGJnHq.png)
 
 - 2020-07-27: After a long time past, **alfred** finally get some updates:
 
