@@ -78,7 +78,7 @@ def coco2yolo(img_r, j_f):
             x2 = int(x1 + b[2])
             y2 = int(y1 + b[3])
             cls_id = ann['category_id']
-            b = [x1, y1, x2, y2]
+            b = [x1, x2, y1, y2]
             bb = convert((w, h), b)
             out_file.write(str(cls_id) + " " +
                     " ".join([str(a) for a in bb]) + '\n')
