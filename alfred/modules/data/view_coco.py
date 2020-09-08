@@ -68,6 +68,9 @@ def vis_coco(coco_img_root, ann_f):
 
         # img['file_name'] may be not basename
         img_f = os.path.join(data_dir, os.path.basename(img['file_name']))
+        if not os.path.exists(img_f):
+            # if not then pull it back to normal mode
+            img_f = os.path.join(data_dir, img['file_name'])
         anno_ids = coco.getAnnIds(imgIds=img['id'])
         annos = coco.loadAnns(anno_ids)
 
