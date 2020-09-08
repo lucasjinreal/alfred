@@ -23,6 +23,8 @@ A glance of alfred, after you installed above package, you will have `alfred`:
   alfred data vocview -i JPEGImages/ -l Annotations/
   # show coco anntations
   alfred data cocoview -j annotations/instance_2017.json -i images/
+  # show yolo annotations
+  alfred data yoloview -i images -l labels
   # show detection label with txt format
   alfred data txtview -i images/ -l txts/
   # show more of data
@@ -80,6 +82,24 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 
 
 - 2050-: *to be continue*;
+
+- 2020-09-08: After a long time past, **alfred** got some updates:
+
+    We providing `coco2yolo` ability inside it. Users can run this command convert your data to yolo format:
+
+    ```
+    alfred data coco2yolo -i images/ -j annotations/val_split_2020.json
+    ```
+
+    Only should provided is your image root path and your json file. And then all result will generated into `yolo` folder under images or in images parent dir.
+
+    After that (you got your yolo folder), then you can visualize the conversion result to see if it correct or not:
+
+    ```
+    alfred data yolovview -i images/ -l labels/
+    ```
+
+    
 
 - 2020-07-27: After a long time past, **alfred** finally get some updates:
 

@@ -110,7 +110,8 @@ def vis_coco(coco_img_root, ann_f):
             I = io.imread(img_f)
             plt.imshow(I)
             plt.axis('off')
-            coco.showAnns(annos)
+            coco.showAnns(annos, True)
             plt.show()
+
 
 
