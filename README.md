@@ -83,6 +83,17 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 
 - 2050-: *to be continue*;
 
+- **2020.09.27**:
+
+    Now, yolo and VOC can convert to each other, so that using Alfred you can:
+
+    - convert yolo2voc;
+    - convert voc2yolo;
+    - convert voc2coco;
+    - convert coco2voc;
+
+    By this, you can convert any labeling format of each other.
+
 - 2020-09-08: After a long time past, **alfred** got some updates:
 
     We providing `coco2yolo` ability inside it. Users can run this command convert your data to yolo format:

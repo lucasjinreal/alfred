@@ -55,7 +55,7 @@ from .modules.cabinet.stack_imgs import stack_imgs
 
 from alfred.utils.log import logger as logging
 
-__VERSION__ = '2.7.1'
+__VERSION__ = '2.8.1'
 __AUTHOR__ = 'Lucas Jin'
 __DATE__ = '2020.10.01, since 2019.11.11'
 __LOC__ = 'Shenzhen, China'
@@ -262,7 +262,7 @@ def arg_parse():
         '--text_dir', '-t', help='Root of text files.')
     yolo2voc_parser.add_argument(
         '--class_file', '-c', help='classes name file.')
-    
+
     voc2yolo_parser = data_sub_parser.add_parser(
         'voc2yolo', help='convert VOC to yolo.')
     voc2yolo_parser.set_defaults(which='data-voc2yolo')
@@ -456,11 +456,13 @@ def main(args=None):
                 elif action == 'yolo2voc':
                     logging.info('start convert yolo to VOC... images root: {}, text root: {}'.format(
                         args_dict['image_dir'], args_dict['text_dir']))
-                    yolo2voc(args_dict['image_dir'], args_dict['text_dir'], args_dict['class_file'])
+                    yolo2voc(
+                        args_dict['image_dir'], args_dict['text_dir'], args_dict['class_file'])
                 elif action == 'voc2yolo':
                     logging.info('start convert VOC to yolo... images root: {}, text root: {}'.format(
                         args_dict['image_dir'], args_dict['xml_dir']))
-                    voc2yolo(args_dict['image_dir'], args_dict['xml_dir'], args_dict['class_file'])
+                    voc2yolo(
+                        args_dict['image_dir'], args_dict['xml_dir'], args_dict['class_file'])
                 elif action == 'evalvoc':
                     logging.info('start eval on VOC dataset..')
                     eval_voc(args)
