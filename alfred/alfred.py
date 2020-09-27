@@ -45,6 +45,8 @@ from .modules.data.voc2coco import convert
 from .modules.data.eval_voc import eval_voc
 from .modules.data.mergevoc import merge_voc
 from .modules.data.coco2yolo import coco2yolo
+from .modules.data.yolo2voc import yolo2voc
+from .modules.data.voc2yolo import voc2yolo
 
 from .modules.cabinet.count_file import count_file
 from .modules.cabinet.split_txt import split_txt_file
@@ -55,7 +57,7 @@ from alfred.utils.log import logger as logging
 
 __VERSION__ = '2.7.1'
 __AUTHOR__ = 'Lucas Jin'
-__DATE__ = '20202.10.01, since 2019.11.11'
+__DATE__ = '2020.10.01, since 2019.11.11'
 __LOC__ = 'Shenzhen, China'
 __git__ = 'http://github.com/jinfagang/alfred'
 
@@ -251,6 +253,26 @@ def arg_parse():
     coco2yolo_parser.add_argument(
         '--json_file', '-j', help='coco json annotation file.')
 
+    yolo2voc_parser = data_sub_parser.add_parser(
+        'yolo2voc', help='convert yolo to VOC.')
+    yolo2voc_parser.set_defaults(which='data-yolo2voc')
+    yolo2voc_parser.add_argument(
+        '--image_dir', '-i', help='Root of images dir (images/).')
+    yolo2voc_parser.add_argument(
+        '--text_dir', '-t', help='Root of text files.')
+    yolo2voc_parser.add_argument(
+        '--class_file', '-c', help='classes name file.')
+    
+    voc2yolo_parser = data_sub_parser.add_parser(
+        'voc2yolo', help='convert VOC to yolo.')
+    voc2yolo_parser.set_defaults(which='data-voc2yolo')
+    voc2yolo_parser.add_argument(
+        '--image_dir', '-i', help='Root of images dir (images/).')
+    voc2yolo_parser.add_argument(
+        '--xml_dir', '-x', help='Root of XML files.')
+    voc2yolo_parser.add_argument(
+        '--class_file', '-c', help='classes name file.')
+
     mergevoc_parser = data_sub_parser.add_parser(
         'mergevoc', help='merge multiple voc.')
     mergevoc_parser.set_defaults(which='data-mergevoc')
@@ -431,6 +453,14 @@ def main(args=None):
                     logging.info('start convert COCO to yolo... images root: {}, json file: {}'.format(
                         args_dict['image_dir'], args_dict['json_file']))
                     coco2yolo(args_dict['image_dir'], args_dict['json_file'])
+                elif action == 'yolo2voc':
+                    logging.info('start convert yolo to VOC... images root: {}, text root: {}'.format(
+                        args_dict['image_dir'], args_dict['text_dir']))
+                    yolo2voc(args_dict['image_dir'], args_dict['text_dir'], args_dict['class_file'])
+                elif action == 'voc2yolo':
+                    logging.info('start convert VOC to yolo... images root: {}, text root: {}'.format(
+                        args_dict['image_dir'], args_dict['xml_dir']))
+                    voc2yolo(args_dict['image_dir'], args_dict['xml_dir'], args_dict['class_file'])
                 elif action == 'evalvoc':
                     logging.info('start eval on VOC dataset..')
                     eval_voc(args)
