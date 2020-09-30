@@ -2,24 +2,55 @@ from collections import OrderedDict
 
 RGB_TO_COLOR_NAMES = {
     (0, 0, 0): ['Black'],
-    (255, 255, 0): ['Yellow'],
+
+    (0, 237, 233): ['LightSeaGreen'],
+
+
+    (70, 130, 180): ['SteelBlue'],
+
     (255, 99, 71): ['Tomato'],
+    (255, 0, 255): ['Magenta', 'Fuchsia'],
+    (255, 20, 147): ['DeepPink'],
+
+    (255, 255, 0): ['Yellow'],
+    (173, 216, 230): ['LightBlue'],
+
+    (255, 222, 173): ['NavajoWhite'],
+    (255, 228, 181): ['Moccasin'],
+    (123, 104, 238): ['MediumSlateBlue'],
+    (255, 69, 0): ['OrangeRed'],
+
+    (255, 245, 238): ['Seashell'],
     (255, 105, 180): ['HotPink'],
     (255, 127, 80): ['Coral'],
-    (70, 130, 180): ['SteelBlue'],
+    (0, 139, 139): ['DarkCyan'],
+
+    (105, 105, 105): ['DimGray', 'DimGrey'],
+    (106, 90, 205): ['SlateBlue'],
+    (107, 142, 35): ['OliveDrab'],
+    (112, 128, 144): ['SlateGray', 'SlateGrey'],
+    (119, 136, 153): ['LightSlateGray', 'LightSlateGrey'],
+
+    (124, 252, 0): ['LawnGreen'],
+    (127, 255, 0): ['Chartreuse'],
+    (127, 255, 212): ['Aquamarine'],
+    (128, 0, 0): ['Maroon'],
+    (128, 0, 128): ['Purple'],
     (72, 61, 139): ['DarkSlateBlue'],
     (72, 209, 204): ['MediumTurquoise'],
-    (75, 0, 130): ['Indigo'],
+
     (85, 107, 47): ['DarkOliveGreen'],
     (95, 158, 160): ['CadetBlue'],
     (255, 140, 0): ['DarkOrange'],
     (189, 183, 107): ['DarkKhaki'],
+    (255, 182, 193): ['LightPink'],
+    (255, 192, 203): ['Pink'],
     (255, 228, 196): ['Bisque'],
     (255, 228, 225): ['MistyRose'],
     (255, 235, 205): ['BlanchedAlmond'],
     (255, 239, 213): ['PapayaWhip'],
     (255, 240, 245): ['LavenderBlush'],
-    (255, 245, 238): ['Seashell'],
+    (34, 139, 34): ['ForestGreen'],
     (255, 248, 220): ['Cornsilk'],
     (255, 250, 205): ['LemonChiffon'],
     (255, 250, 240): ['FloralWhite'],
@@ -27,17 +58,16 @@ RGB_TO_COLOR_NAMES = {
 
     (255, 160, 122): ['LightSalmon'],
     (255, 165, 0): ['Orange'],
-    (255, 182, 193): ['LightPink'],
-    (255, 192, 203): ['Pink'],
+
     (255, 215, 0): ['Gold'],
     (255, 218, 185): ['PeachPuff'],
     (0, 0, 128): ['Navy', 'NavyBlue'],
     (0, 0, 139): ['DarkBlue'],
+    (75, 0, 130): ['Indigo'],
     (0, 0, 205): ['MediumBlue'],
     (0, 0, 255): ['Blue'],
     (0, 100, 0): ['DarkGreen'],
     (0, 128, 0): ['Green'],
-    (0, 139, 139): ['DarkCyan'],
     (0, 191, 255): ['DeepSkyBlue'],
     (0, 206, 209): ['DarkTurquoise'],
     (0, 250, 154): ['MediumSpringGreen'],
@@ -46,9 +76,7 @@ RGB_TO_COLOR_NAMES = {
     (0, 255, 255): ['Cyan', 'Aqua'],
     (25, 25, 112): ['MidnightBlue'],
     (30, 144, 255): ['DodgerBlue'],
-    (32, 178, 170): ['LightSeaGreen'],
-    (34, 139, 34): ['ForestGreen'],
-    (46, 139, 87): ['SeaGreen'],
+
     (47, 79, 79): ['DarkSlateGray', 'DarkSlateGrey'],
     (50, 205, 50): ['LimeGreen'],
     (60, 179, 113): ['MediumSeaGreen'],
@@ -57,17 +85,7 @@ RGB_TO_COLOR_NAMES = {
 
     (100, 149, 237): ['CornflowerBlue'],
     (102, 205, 170): ['MediumAquamarine'],
-    (105, 105, 105): ['DimGray', 'DimGrey'],
-    (106, 90, 205): ['SlateBlue'],
-    (107, 142, 35): ['OliveDrab'],
-    (112, 128, 144): ['SlateGray', 'SlateGrey'],
-    (119, 136, 153): ['LightSlateGray', 'LightSlateGrey'],
-    (123, 104, 238): ['MediumSlateBlue'],
-    (124, 252, 0): ['LawnGreen'],
-    (127, 255, 0): ['Chartreuse'],
-    (127, 255, 212): ['Aquamarine'],
-    (128, 0, 0): ['Maroon'],
-    (128, 0, 128): ['Purple'],
+
     (128, 128, 0): ['Olive'],
     (128, 128, 128): ['Gray', 'Grey'],
     (132, 112, 255): ['LightSlateBlue'],
@@ -87,7 +105,7 @@ RGB_TO_COLOR_NAMES = {
     (160, 82, 45): ['Sienna'],
     (165, 42, 42): ['Brown'],
     (169, 169, 169): ['DarkGray', 'DarkGrey'],
-    (173, 216, 230): ['LightBlue'],
+
     (173, 255, 47): ['GreenYellow'],
     (175, 238, 238): ['PaleTurquoise'],
     (176, 196, 222): ['LightSteelBlue'],
@@ -137,12 +155,6 @@ RGB_TO_COLOR_NAMES = {
     (250, 250, 210): ['LightGoldenrodYellow'],
     (253, 245, 230): ['OldLace'],
     (255, 0, 0): ['Red'],
-    (255, 0, 255): ['Magenta', 'Fuchsia'],
-    (255, 20, 147): ['DeepPink'],
-    (255, 69, 0): ['OrangeRed'],
-
-    (255, 222, 173): ['NavajoWhite'],
-    (255, 228, 181): ['Moccasin'],
 
     (255, 255, 240): ['Ivory'],
     (255, 255, 255): ['White']
@@ -151,5 +163,5 @@ RGB_TO_COLOR_NAMES = OrderedDict(RGB_TO_COLOR_NAMES)
 
 dark_colors = [k for k, v in RGB_TO_COLOR_NAMES.items()
                if 'Dark' in ''.join(v)]
-light_colors = [k for k, v in RGB_TO_COLOR_NAMES.items()
+light_colors = [(k[2], k[1], k[0]) for k, v in RGB_TO_COLOR_NAMES.items()
                 if 'Dark' not in ''.join(v)]
