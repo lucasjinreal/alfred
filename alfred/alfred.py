@@ -56,7 +56,7 @@ from .modules.cabinet.stack_imgs import stack_imgs
 
 from alfred.utils.log import logger as logging
 
-__VERSION__ = '2.8.2'
+__VERSION__ = '👍   2.8.2'
 __AUTHOR__ = '😀    Lucas Jin'
 __CONTACT__ = '😍   wechat: jintianiloveu'
 __DATE__ = '👉  2020.11.01, since 2019.11.11'
@@ -314,12 +314,18 @@ def print_welcome_msg():
     print('-'*70)
     print(Fore.BLUE + Style.BRIGHT + '              Alfred ' + Style.RESET_ALL +
           Fore.WHITE + '- Valet of Artificial Intelligence.' + Style.RESET_ALL)
-    print('         Author: ' + Fore.CYAN + Style.BRIGHT + __AUTHOR__ + Style.RESET_ALL)
-    print('         Contact: ' + Fore.BLUE + Style.BRIGHT + __CONTACT__ + Style.RESET_ALL)
-    print('         At    : ' + Fore.LIGHTGREEN_EX + Style.BRIGHT + __DATE__ + Style.RESET_ALL)
-    print('         Loc   : ' + Fore.LIGHTMAGENTA_EX + Style.BRIGHT + __LOC__ + Style.RESET_ALL)
-    print('         Star  : ' + Fore.MAGENTA + Style.BRIGHT + __git__ + Style.RESET_ALL)
-    print('         Ver.  : ' + Fore.GREEN + Style.BRIGHT + __VERSION__ + Style.RESET_ALL)
+    print('         Author : ' + Fore.CYAN +
+          Style.BRIGHT + __AUTHOR__ + Style.RESET_ALL)
+    print('         Contact: ' + Fore.BLUE +
+          Style.BRIGHT + __CONTACT__ + Style.RESET_ALL)
+    print('         At     : ' + Fore.LIGHTGREEN_EX +
+          Style.BRIGHT + __DATE__ + Style.RESET_ALL)
+    print('         Loc    : ' + Fore.LIGHTMAGENTA_EX +
+          Style.BRIGHT + __LOC__ + Style.RESET_ALL)
+    print('         Star   : ' + Fore.MAGENTA +
+          Style.BRIGHT + __git__ + Style.RESET_ALL)
+    print('         Ver.   : ' + Fore.GREEN +
+          Style.BRIGHT + __VERSION__ + Style.RESET_ALL)
     print('-'*70)
     print('\n')
 
