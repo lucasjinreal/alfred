@@ -47,6 +47,7 @@ from .modules.data.mergevoc import merge_voc
 from .modules.data.coco2yolo import coco2yolo
 from .modules.data.yolo2voc import yolo2voc
 from .modules.data.voc2yolo import voc2yolo
+from .modules.data.split_coco import split_coco
 
 from .modules.cabinet.count_file import count_file
 from .modules.cabinet.split_txt import split_txt_file
@@ -55,11 +56,12 @@ from .modules.cabinet.stack_imgs import stack_imgs
 
 from alfred.utils.log import logger as logging
 
-__VERSION__ = '2.8.1'
-__AUTHOR__ = 'Lucas Jin'
-__DATE__ = '2020.10.01, since 2019.11.11'
-__LOC__ = 'Shenzhen, China'
-__git__ = 'http://github.com/jinfagang/alfred'
+__VERSION__ = '2.8.2'
+__AUTHOR__ = '😀    Lucas Jin'
+__CONTACT__ = '😍   wechat: jintianiloveu'
+__DATE__ = '👉  2020.11.01, since 2019.11.11'
+__LOC__ = '👉   Shenzhen, China'
+__git__ = '👍   http://github.com/jinfagang/alfred'
 
 
 def arg_parse():
@@ -232,6 +234,8 @@ def arg_parse():
     split_coco_parser.add_argument(
         '--image_dir', '-i', help='Root path of coco image. [optional]')
     split_coco_parser.add_argument('--json_file', '-j', help='coco json file.')
+    split_coco_parser.add_argument(
+        '--split', '-s', default=0.8, help='coco json file split.')
 
     labelone2voc_parser = data_sub_parser.add_parser(
         'labelone2voc', help='convert labelone to VOC.')
@@ -244,6 +248,8 @@ def arg_parse():
     voc2coco_parser.set_defaults(which='data-voc2coco')
     voc2coco_parser.add_argument(
         '--xml_dir', '-d', help='Root of xmls dir (Annotations/).')
+    voc2coco_parser.add_argument(
+        '--index_1', default=False, help='if index with 1 or not.')
 
     coco2yolo_parser = data_sub_parser.add_parser(
         'coco2yolo', help='convert COCO to yolo.')
@@ -305,13 +311,17 @@ def arg_parse():
 
 
 def print_welcome_msg():
-    print(Fore.BLUE + Style.BRIGHT + 'Alfred ' + Style.RESET_ALL +
+    print('-'*70)
+    print(Fore.BLUE + Style.BRIGHT + '              Alfred ' + Style.RESET_ALL +
           Fore.WHITE + '- Valet of Artificial Intelligence.' + Style.RESET_ALL)
-    print('Author: ' + Fore.RED + Style.BRIGHT + __AUTHOR__ + Style.RESET_ALL)
-    print('At    : ' + Fore.RED + Style.BRIGHT + __DATE__ + Style.RESET_ALL)
-    print('Loc   : ' + Fore.RED + Style.BRIGHT + __LOC__ + Style.RESET_ALL)
-    print('Star  : ' + Fore.RED + Style.BRIGHT + __git__ + Style.RESET_ALL)
-    print('Ver.  : ' + Fore.RED + Style.BRIGHT + __VERSION__ + Style.RESET_ALL)
+    print('         Author: ' + Fore.CYAN + Style.BRIGHT + __AUTHOR__ + Style.RESET_ALL)
+    print('         Contact: ' + Fore.BLUE + Style.BRIGHT + __CONTACT__ + Style.RESET_ALL)
+    print('         At    : ' + Fore.LIGHTGREEN_EX + Style.BRIGHT + __DATE__ + Style.RESET_ALL)
+    print('         Loc   : ' + Fore.LIGHTMAGENTA_EX + Style.BRIGHT + __LOC__ + Style.RESET_ALL)
+    print('         Star  : ' + Fore.MAGENTA + Style.BRIGHT + __git__ + Style.RESET_ALL)
+    print('         Ver.  : ' + Fore.GREEN + Style.BRIGHT + __VERSION__ + Style.RESET_ALL)
+    print('-'*70)
+    print('\n')
 
 
 def main(args=None):
@@ -439,16 +449,16 @@ def main(args=None):
                         'split VOC to train and val not implement yet.')
                     pass
                 elif action == 'splitcoco':
-                    logging.info(
-                        'split coco to train and val not implement yet.')
-                    pass
+                    json_f = args_dict['json_file']
+                    s = args_dict['split']
+                    split_coco(ann_f=json_f, split=s)
                 elif action == 'labelone2voc':
                     logging.info('labelone2voc not implement yet.')
                     pass
                 elif action == 'voc2coco':
                     logging.info('start convert VOC to coco... Annotations root: {}'.format(
                         args_dict['xml_dir']))
-                    convert(args_dict['xml_dir'])
+                    convert(args_dict['xml_dir'], index_1=args_dict['index_1'])
                 elif action == 'coco2yolo':
                     logging.info('start convert COCO to yolo... images root: {}, json file: {}'.format(
                         args_dict['image_dir'], args_dict['json_file']))
