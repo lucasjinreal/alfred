@@ -54,14 +54,16 @@ from .modules.cabinet.split_txt import split_txt_file
 from .modules.cabinet.license import apply_license
 from .modules.cabinet.stack_imgs import stack_imgs
 
+from .modules.dltool.cal_anchors import KmeansYolo
+
 from alfred.utils.log import logger as logging
 
-__VERSION__ = '👍   2.8.2'
+__VERSION__ = '👍    2.8.2'
 __AUTHOR__ = '😀    Lucas Jin'
-__CONTACT__ = '😍   wechat: jintianiloveu'
-__DATE__ = '👉  2020.11.01, since 2019.11.11'
-__LOC__ = '👉   Shenzhen, China'
-__git__ = '👍   http://github.com/jinfagang/alfred'
+__CONTACT__ = '😍    wechat: jintianiloveu'
+__DATE__ = '👉    2020.11.01, since 2019.11.11'
+__LOC__ = '👉    Shenzhen, China'
+__git__ = '👍    http://github.com/jinfagang/alfred'
 
 
 def arg_parse():
@@ -180,6 +182,21 @@ def arg_parse():
         '--dir', '-d', default='./', help='to apply license dir.')
     apply_license_parser.add_argument(
         '--except', '-e', help='except extensions: xml,cc,h')
+
+    # =============== dl tools part =============
+    dltool_parser = main_sub_parser.add_parser(
+        'dltool', help='dltool related commands.')
+    dltool_sub_parser = dltool_parser.add_subparsers()
+
+    anchor_parser = dltool_sub_parser.add_parser('anchor', help='calculate anchors for you.')
+    anchor_parser.set_defaults(which='dltool-anchor')
+    anchor_parser.add_argument(
+        '--annotation_dir', '-a', help='VOC xml dir or yolo lables dir.')
+    anchor_parser.add_argument(
+        '--cluster_num', '-c', default=9, help='how many clusters to kmeans.')
+    anchor_parser.add_argument(
+        '--format', '-f', default='voc', help='Your annotation format: voc | yolo.')
+
 
     # =============== data part ================
     data_parser = main_sub_parser.add_parser(
@@ -430,6 +447,15 @@ def main(args=None):
                     url = args_dict['url']
                     d = args_dict['dir']
                     apply_license(owner, project_name, year, url, d)
+            elif module == 'dltool':
+                if action == 'anchor':
+                    ann_dir = args_dict['annotation_dir']
+                    n = args_dict['cluster_num']
+                    form = args_dict['format']
+                    kmeans = KmeansYolo(ann_dir, n, form)
+                    kmeans.txt2clusters()
+                else:
+                    ValueError('unsupported action: {}'.format(action))
             elif module == 'data':
                 if action == 'vocview':
                     image_dir = args_dict['image_dir']
