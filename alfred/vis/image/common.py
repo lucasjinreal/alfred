@@ -27,6 +27,9 @@ common functionality in visualization kit
 import numpy as np
 import cv2
 import colorsys
+from itertools import cycle
+
+from .constants import light_colors, dark_colors
 
 
 def create_unique_color_float(tag, hue_step=0.41, alpha=0.7):
@@ -49,6 +52,15 @@ def get_unique_color_by_id(idx, alpha=0.7):
     :return:
     """
     return create_unique_color_uchar(idx, alpha)
+
+
+def get_unique_color_by_id2(idx, dark=False):
+    if dark:
+        idx = idx % len(dark_colors)
+        return dark_colors[idx]
+    else:
+        idx = idx % len(light_colors)
+        return light_colors[idx]
 
 
 """

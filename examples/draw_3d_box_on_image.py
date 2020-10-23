@@ -85,6 +85,7 @@ for p in res:
 
     hwl = np.array([p[3: 6]])
     r_y = [p[6]]
+    print('xyz: {}, whl: {}, r_y: {}'.format(xyz, hwl, r_y))
     pts3d = compute_3d_box_lidar_coords(xyz, hwl, angles=r_y, origin=(0.5, 0.5, 0.5), axis=2)
 
     pts2d = []

@@ -23,6 +23,8 @@ A glance of alfred, after you installed above package, you will have `alfred`:
   alfred data vocview -i JPEGImages/ -l Annotations/
   # show coco anntations
   alfred data cocoview -j annotations/instance_2017.json -i images/
+  # show yolo annotations
+  alfred data yoloview -i images -l labels
   # show detection label with txt format
   alfred data txtview -i images/ -l txts/
   # show more of data
@@ -80,6 +82,55 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 
 
 - 2050-: *to be continue*;
+
+- **2020.09.27**:
+
+    Now, yolo and VOC can convert to each other, so that using Alfred you can:
+
+    - convert yolo2voc;
+    - convert voc2yolo;
+    - convert voc2coco;
+    - convert coco2voc;
+
+    By this, you can convert any labeling format of each other.
+
+- 2020-09-08: After a long time past, **alfred** got some updates:
+
+    We providing `coco2yolo` ability inside it. Users can run this command convert your data to yolo format:
+
+    ```
+    alfred data coco2yolo -i images/ -j annotations/val_split_2020.json
+    ```
+
+    Only should provided is your image root path and your json file. And then all result will generated into `yolo` folder under images or in images parent dir.
+
+    After that (you got your yolo folder), then you can visualize the conversion result to see if it correct or not:
+
+    ```
+    alfred data yolovview -i images/ -l labels/
+    ```
+
+    ![image-20200908164952171](https://i.loli.net/2020/09/08/we3X8Ia1KmGJnHq.png)
+
+- 2020-07-27: After a long time past, **alfred** finally get some updates:
+
+    ![image-20200727163938094](https://i.loli.net/2020/07/27/Aih6Hl9cKnSMTda.png)
+
+    Now, you can using alfred draw Chinese charactors on image without xxxx undefined encodes.
+
+    ```python
+    from alfred.utils.cv_wrapper import put_cn_txt_on_img
+    
+    img = put_cn_txt_on_img(img, spt[-1], [points[0][0], points[0][1]-25], 1.0, (255, 255, 255))
+    ```
+
+    Also, you now can **merge** 2 VOC datasets! This is helpful when you have 2 dataset and you want merge them into a single one.
+
+    ```
+    alfred data mergevoc -h
+    ```
+
+    You can see more promotes.
 
 - 2020-03-08：Several new files added in **alfred**:
 
