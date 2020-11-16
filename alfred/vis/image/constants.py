@@ -1,19 +1,18 @@
 from collections import OrderedDict
 
 RGB_TO_COLOR_NAMES = {
-    (0, 0, 0): ['Black'],
+    (255, 127, 80): ['Coral'],
+    (173, 216, 230): ['LightBlue'],
 
+    (255, 228, 225): ['MistyRose'],
+    (128, 0, 128): ['Purple'],
     (0, 237, 233): ['LightSeaGreen'],
-
-
     (70, 130, 180): ['SteelBlue'],
-
     (255, 99, 71): ['Tomato'],
     (255, 0, 255): ['Magenta', 'Fuchsia'],
     (255, 20, 147): ['DeepPink'],
 
     (255, 255, 0): ['Yellow'],
-    (173, 216, 230): ['LightBlue'],
 
     (255, 222, 173): ['NavajoWhite'],
     (255, 228, 181): ['Moccasin'],
@@ -22,11 +21,13 @@ RGB_TO_COLOR_NAMES = {
 
     (255, 245, 238): ['Seashell'],
     (255, 105, 180): ['HotPink'],
-    (255, 127, 80): ['Coral'],
-    (0, 139, 139): ['DarkCyan'],
+
 
     (105, 105, 105): ['DimGray', 'DimGrey'],
     (106, 90, 205): ['SlateBlue'],
+    (255, 235, 205): ['BlanchedAlmond'],
+    (255, 239, 213): ['PapayaWhip'],
+    (255, 240, 245): ['LavenderBlush'],
     (107, 142, 35): ['OliveDrab'],
     (112, 128, 144): ['SlateGray', 'SlateGrey'],
     (119, 136, 153): ['LightSlateGray', 'LightSlateGrey'],
@@ -34,11 +35,11 @@ RGB_TO_COLOR_NAMES = {
     (124, 252, 0): ['LawnGreen'],
     (127, 255, 0): ['Chartreuse'],
     (127, 255, 212): ['Aquamarine'],
+    (0, 139, 139): ['DarkCyan'],
+    (0, 0, 0): ['Black'],
     (128, 0, 0): ['Maroon'],
-    (128, 0, 128): ['Purple'],
-    (72, 61, 139): ['DarkSlateBlue'],
     (72, 209, 204): ['MediumTurquoise'],
-
+    (72, 61, 139): ['DarkSlateBlue'],
     (85, 107, 47): ['DarkOliveGreen'],
     (95, 158, 160): ['CadetBlue'],
     (255, 140, 0): ['DarkOrange'],
@@ -46,10 +47,7 @@ RGB_TO_COLOR_NAMES = {
     (255, 182, 193): ['LightPink'],
     (255, 192, 203): ['Pink'],
     (255, 228, 196): ['Bisque'],
-    (255, 228, 225): ['MistyRose'],
-    (255, 235, 205): ['BlanchedAlmond'],
-    (255, 239, 213): ['PapayaWhip'],
-    (255, 240, 245): ['LavenderBlush'],
+
     (34, 139, 34): ['ForestGreen'],
     (255, 248, 220): ['Cornsilk'],
     (255, 250, 205): ['LemonChiffon'],

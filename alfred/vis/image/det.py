@@ -193,7 +193,7 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
     return img
 
 
-def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thresh=0.3, suit_color=True, is_show=False, background_id=-1, mode='xyxy', line_thickness=2,
+def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thresh=0.3, suit_color=True, is_show=False, background_id=-1, mode='xyxy', line_thickness=1,
                              font_scale=0.48, counter_on=False, text_bk=False, counter_pos=(30, 150)):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
