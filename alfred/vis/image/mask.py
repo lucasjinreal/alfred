@@ -30,7 +30,7 @@ also this will give options to draw detection or not
 """
 import cv2
 import numpy as np
-from .common import get_unique_color_by_id
+from .common import get_unique_color_by_id, get_unique_color_by_id2
 from .det import draw_one_bbox
 from PIL import Image
 
@@ -188,3 +188,16 @@ def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list
 
 
 # more fast mask drawing here
+
+# helper functions
+def label2color_mask(cls_id_mask, max_classes=90):
+    """
+    cls_id_mask is your segmentation output
+    """
+    colors = np.array([get_unique_color_by_id2(i) for i in range(max_classes)])
+    s = cls_id_mask.shape
+    if len(s) > 1:
+        cls_id_mask = cls_id_mask.flatten()
+    mask = colors[cls_id_mask]
+    mask = np.reshape(mask, (*s, 3)).astype(np.uint8)
+    return mask
