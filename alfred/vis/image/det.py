@@ -193,7 +193,8 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
     return img
 
 
-def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thresh=0.3, suit_color=True, is_show=False, background_id=-1, mode='xyxy', line_thickness=1,
+def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thresh=0.3, suit_color=True, blend=False,
+                             is_show=False, background_id=-1, mode='xyxy', line_thickness=1,
                              font_scale=0.48, counter_on=False, text_bk=False, counter_pos=(30, 150)):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
@@ -220,6 +221,10 @@ def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thr
 
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_thickness = 1
+
+    if blend:
+        raw_img = img.copy()
+        img = np.zeros_like(img)
 
     cls_counter = []
     for i in range(detections.shape[0]):
@@ -256,19 +261,23 @@ def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thr
                 ((txt_w, txt_h), _) = cv2.getTextSize(
                     text_label, font, font_scale, 1)
                 # Place text background.
-                back_tl = x1, y1 - int(1.5 * txt_h)
-                back_br = x1 + txt_w, y1+2
+                back_tl = x1, y1 - int(1.5*txt_h) - 4
+                back_br = x1 + 8 + txt_w, y1
                 if text_bk:
                     if suit_color:
                         cv2.rectangle(img, back_tl, back_br, unique_color, -1)
                     else:
                         cv2.rectangle(img, back_tl, back_br, (0, 0, 0), -1)
-
-                    txt_tl = x1, y1 - int(0.5 * txt_h)
+                    # 2 pixel offset from left
+                    txt_tl = x1+4, y1 - int(0.5 * txt_h)
                 else:
                     txt_tl = x1-txt_w//2 + (x2-x1)//2, y1 - int(0.5 * txt_h)
-                cv2.putText(img, text_label, txt_tl, font, font_scale,
-                            (255, 255, 255), font_thickness, cv2.LINE_AA)
+                if text_bk:
+                    cv2.putText(img, text_label, txt_tl, font, font_scale,
+                                (0, 0, 0), font_thickness, cv2.LINE_AA)
+                else:
+                    cv2.putText(img, text_label, txt_tl, font, font_scale,
+                                unique_color, font_thickness, cv2.LINE_AA)
     if counter_on:
         cc = Counter(cls_counter)
         cc = OrderedDict(sorted(cc.items()))
@@ -278,6 +287,9 @@ def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thr
             txt += '{}: {}\n'.format(k, v)
         put_txt_with_newline(img, txt, counter_pos, font,
                              1.9, (0, 255, 0), 2, cv2.LINE_AA)
+
+    if blend:
+        img = cv2.addWeighted(raw_img, 1.0, img, 0.9, 0.6)
 
     if is_show:
         cv2.imshow('image', img)

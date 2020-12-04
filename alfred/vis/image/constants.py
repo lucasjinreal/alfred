@@ -3,43 +3,55 @@ from collections import OrderedDict
 RGB_TO_COLOR_NAMES = {
     (255, 127, 80): ['Coral'],
     (173, 216, 230): ['LightBlue'],
+    (255, 105, 180): ['HotPink'],
 
-    (255, 228, 225): ['MistyRose'],
     (128, 0, 128): ['Purple'],
     (0, 237, 233): ['LightSeaGreen'],
     (70, 130, 180): ['SteelBlue'],
     (255, 99, 71): ['Tomato'],
-    (255, 0, 255): ['Magenta', 'Fuchsia'],
     (255, 20, 147): ['DeepPink'],
+        (176, 196, 222): ['LightSteelBlue'],
 
     (255, 255, 0): ['Yellow'],
+    (173, 255, 47): ['GreenYellow'],
+    (175, 238, 238): ['PaleTurquoise'],
+    (176, 224, 230): ['PowderBlue'],
+    (255, 0, 255): ['Magenta', 'Fuchsia'],
 
+    (255, 239, 213): ['PapayaWhip'],
+    (127, 255, 0): ['Chartreuse'],
+    (127, 255, 212): ['Aquamarine'],
     (255, 222, 173): ['NavajoWhite'],
     (255, 228, 181): ['Moccasin'],
+    (255, 235, 205): ['BlanchedAlmond'],
+
     (123, 104, 238): ['MediumSlateBlue'],
     (255, 69, 0): ['OrangeRed'],
 
     (255, 245, 238): ['Seashell'],
-    (255, 105, 180): ['HotPink'],
 
+    (0, 128, 0): ['Green'],
 
     (105, 105, 105): ['DimGray', 'DimGrey'],
     (106, 90, 205): ['SlateBlue'],
-    (255, 235, 205): ['BlanchedAlmond'],
-    (255, 239, 213): ['PapayaWhip'],
+
     (255, 240, 245): ['LavenderBlush'],
     (107, 142, 35): ['OliveDrab'],
     (112, 128, 144): ['SlateGray', 'SlateGrey'],
     (119, 136, 153): ['LightSlateGray', 'LightSlateGrey'],
 
     (124, 252, 0): ['LawnGreen'],
-    (127, 255, 0): ['Chartreuse'],
-    (127, 255, 212): ['Aquamarine'],
+
     (0, 139, 139): ['DarkCyan'],
+    (255, 228, 225): ['MistyRose'],
+
     (0, 0, 0): ['Black'],
     (128, 0, 0): ['Maroon'],
     (72, 209, 204): ['MediumTurquoise'],
     (72, 61, 139): ['DarkSlateBlue'],
+    (128, 128, 0): ['Olive'],
+    (128, 128, 128): ['Gray', 'Grey'],
+    (132, 112, 255): ['LightSlateBlue'],
     (85, 107, 47): ['DarkOliveGreen'],
     (95, 158, 160): ['CadetBlue'],
     (255, 140, 0): ['DarkOrange'],
@@ -65,7 +77,6 @@ RGB_TO_COLOR_NAMES = {
     (0, 0, 205): ['MediumBlue'],
     (0, 0, 255): ['Blue'],
     (0, 100, 0): ['DarkGreen'],
-    (0, 128, 0): ['Green'],
     (0, 191, 255): ['DeepSkyBlue'],
     (0, 206, 209): ['DarkTurquoise'],
     (0, 250, 154): ['MediumSpringGreen'],
@@ -84,9 +95,7 @@ RGB_TO_COLOR_NAMES = {
     (100, 149, 237): ['CornflowerBlue'],
     (102, 205, 170): ['MediumAquamarine'],
 
-    (128, 128, 0): ['Olive'],
-    (128, 128, 128): ['Gray', 'Grey'],
-    (132, 112, 255): ['LightSlateBlue'],
+
     (135, 206, 235): ['SkyBlue'],
     (135, 206, 250): ['LightSkyBlue'],
     (138, 43, 226): ['BlueViolet'],
@@ -104,10 +113,7 @@ RGB_TO_COLOR_NAMES = {
     (165, 42, 42): ['Brown'],
     (169, 169, 169): ['DarkGray', 'DarkGrey'],
 
-    (173, 255, 47): ['GreenYellow'],
-    (175, 238, 238): ['PaleTurquoise'],
-    (176, 196, 222): ['LightSteelBlue'],
-    (176, 224, 230): ['PowderBlue'],
+
     (178, 34, 34): ['Firebrick'],
     (184, 134, 11): ['DarkGoldenrod'],
     (186, 85, 211): ['MediumOrchid'],

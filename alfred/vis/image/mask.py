@@ -30,9 +30,10 @@ also this will give options to draw detection or not
 """
 import cv2
 import numpy as np
-from .common import get_unique_color_by_id, get_unique_color_by_id2
+from .common import get_unique_color_by_id, get_unique_color_by_id2, get_unique_color_by_id_with_dataset
 from .det import draw_one_bbox
 from PIL import Image
+from .get_dataset_color_map import create_cityscapes_label_colormap
 
 
 def draw_masks_maskrcnn(image, boxes, scores, labels, masks, human_label_list=None,
@@ -95,7 +96,8 @@ def draw_masks_maskrcnn(image, boxes, scores, labels, masks, human_label_list=No
                     line_thickness = 1
 
                     txt = '{} {:.2f}'.format(human_label_list[label], score)
-                    cv2.putText(image, txt, (x1, y1), font, font_scale, cls_color, font_thickness)
+                    cv2.putText(image, txt, (x1, y1), font,
+                                font_scale, cls_color, font_thickness)
 
             # colorize mask
             m_w = int(x2-x1)
@@ -119,7 +121,7 @@ def draw_masks_maskrcnn(image, boxes, scores, labels, masks, human_label_list=No
 
 
 def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list=None,
-                        score_thresh=0.6, draw_box=True):
+                           score_thresh=0.6, draw_box=True):
     """
     We change way to draw masks on image
 
@@ -167,7 +169,8 @@ def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list
                     line_thickness = 1
 
                     txt = '{} {:.2f}'.format(human_label_list[label], score)
-                    cv2.putText(image, txt, (x1, y1), font, font_scale, cls_color, font_thickness)
+                    cv2.putText(image, txt, (x1, y1), font,
+                                font_scale, cls_color, font_thickness)
 
             # colorize mask
             m_w = int(x2-x1)
@@ -190,11 +193,18 @@ def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list
 # more fast mask drawing here
 
 # helper functions
-def label2color_mask(cls_id_mask, max_classes=90):
+def label2color_mask(cls_id_mask, max_classes=90, override_id_clr_map=None):
     """
     cls_id_mask is your segmentation output
+    override_id_clr_map: {2: [0, 0, 0]} used to override color
     """
-    colors = np.array([get_unique_color_by_id2(i) for i in range(max_classes)])
+    colors = create_cityscapes_label_colormap()
+    if override_id_clr_map != None:
+        colors = np.array([get_unique_color_by_id_with_dataset(i) if i not in override_id_clr_map.keys(
+        ) else override_id_clr_map[i] for i in range(max_classes)])
+    else:
+        colors = np.array([get_unique_color_by_id_with_dataset(i)
+                           for i in range(max_classes)])
     s = cls_id_mask.shape
     if len(s) > 1:
         cls_id_mask = cls_id_mask.flatten()

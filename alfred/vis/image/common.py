@@ -30,6 +30,7 @@ import colorsys
 from itertools import cycle
 
 from .constants import light_colors, dark_colors
+from .get_dataset_color_map import create_cityscapes_label_colormap
 
 
 def create_unique_color_float(tag, hue_step=0.41, alpha=0.7):
@@ -61,6 +62,12 @@ def get_unique_color_by_id2(idx, dark=False):
     else:
         idx = idx % len(light_colors)
         return light_colors[idx]
+
+
+def get_unique_color_by_id_with_dataset(idx):
+    colors = create_cityscapes_label_colormap()
+    idx = idx % len(colors)
+    return colors[idx]
 
 
 """
