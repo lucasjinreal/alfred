@@ -28,6 +28,7 @@ also this will give options to draw detection or not
 
 
 """
+import torch
 import cv2
 import numpy as np
 from .common import get_unique_color_by_id, get_unique_color_by_id2, get_unique_color_by_id_with_dataset
@@ -199,6 +200,42 @@ def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list
 
 
 # more fast mask drawing here
+def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=1):
+    """
+    visualize bitmasks on image
+    """
+    if isinstance(bitmasks, torch.Tensor):
+        bitmasks = bitmasks.cpu().numpy()
+
+    res_m = np.zeros_like(img)
+    assert isinstance(bitmasks, np.ndarray), 'bitmasks must be numpy array'
+    bitmasks = bitmasks.astype(np.uint8)
+    for i, m in enumerate(bitmasks):
+        cts, _ = cv2.findContours(m, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        # inssue this is a unique color
+        c = get_unique_color_by_id2(i)
+        if return_combined:
+            if fill_mask:
+                cv2.drawContours(res_m, cts, -1,  color=c,
+                                 thickness=-1, lineType=cv2.LINE_AA)
+                cv2.drawContours(img, cts, -1,  color=c,
+                                 thickness=1, lineType=cv2.LINE_AA)
+            else:
+                cv2.drawContours(res_m, cts, -1,  color=c,
+                                 thickness=thickness, lineType=cv2.LINE_AA)
+        else:
+            if fill_mask:
+                cv2.drawContours(img, cts, -1,  color=c,
+                                 thickness=-1, lineType=cv2.LINE_AA)
+            else:
+                cv2.drawContours(img, cts, -1,  color=c,
+                                 thickness=thickness, lineType=cv2.LINE_AA)
+    if return_combined:
+        img = cv2.addWeighted(img, 0.9, res_m, 0.6, 0.8)
+        return img
+    else:
+        return img
+
 
 # helper functions
 def label2color_mask(cls_id_mask, max_classes=90, override_id_clr_map=None, color_suit='cityscapes'):
@@ -206,14 +243,17 @@ def label2color_mask(cls_id_mask, max_classes=90, override_id_clr_map=None, colo
     cls_id_mask is your segmentation output
     override_id_clr_map: {2: [0, 0, 0]} used to override color
     """
-    assert color_suit in ALL_COLORS_MAP.keys(), 'avaiable keys: {}'.format(ALL_COLORS_MAP.keys())
+    assert color_suit in ALL_COLORS_MAP.keys(
+    ), 'avaiable keys: {}'.format(ALL_COLORS_MAP.keys())
     colors = ALL_COLORS_MAP[color_suit]
     if override_id_clr_map != None:
-        colors = np.array([get_unique_color_by_id_with_dataset(i) if i not in override_id_clr_map.keys(
-        ) else override_id_clr_map[i] for i in range(max_classes)])
-    else:
-        colors = np.array([get_unique_color_by_id_with_dataset(i)
-                           for i in range(max_classes)])
+        if isinstance(override_id_clr_map, dict):
+            colors = np.array([get_unique_color_by_id_with_dataset(i) if i not in override_id_clr_map.keys(
+            ) else override_id_clr_map[i] for i in range(max_classes)])
+        else:
+            colors = np.array([override_id_clr_map[i % len(
+                override_id_clr_map)] for i in range(max_classes)])
+
     s = cls_id_mask.shape
     if len(s) > 1:
         cls_id_mask = cls_id_mask.flatten()

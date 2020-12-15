@@ -359,7 +359,7 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.6, is_show=F
     return img
 
 
-def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0.6,
+def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh=0.2,
                            is_show=False, background_id=-1, mode='xyxy', style='none',
                            force_color=None, line_thickness=1, wait_t=0):
     """
@@ -378,8 +378,6 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
     :param mode:
     :return:
     """
-    assert class_names, 'from visualize_det_cv2, classes must be provided, each class in a list with' \
-        'certain order.'
     assert isinstance(
         img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
     if force_color:
@@ -392,17 +390,17 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
     line_thickness = line_thickness
 
     n_boxes = 0
-    if isinstance(locs, np.ndarray):
-        n_boxes = locs.shape[0]
-    elif isinstance(locs, list):
-        n_boxes = len(locs)
+    if isinstance(boxes, np.ndarray):
+        n_boxes = boxes.shape[0]
+    elif isinstance(boxes, list):
+        n_boxes = len(boxes)
     else:
-        print('locs with unsupported type, boxes must be ndarray or list.')
+        print('boxes with unsupported type, boxes must be ndarray or list.')
 
     for i in range(n_boxes):
         cls_id = int(cls_ids[i])
         if cls_id != background_id:
-            score = confs[i]
+            score = scores[i]
             if score > thresh:
                 if force_color:
                     unique_color = force_color[cls_id]
@@ -410,15 +408,15 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
                     unique_color = create_unique_color_uchar(cls_id)
                 x1, y1, x2, y2 = 0, 0, 0, 0
                 if mode == 'xyxy':
-                    x1 = int(locs[i, 0])
-                    y1 = int(locs[i, 1])
-                    x2 = int(locs[i, 2])
-                    y2 = int(locs[i, 3])
+                    x1 = int(boxes[i, 0])
+                    y1 = int(boxes[i, 1])
+                    x2 = int(boxes[i, 2])
+                    y2 = int(boxes[i, 3])
                 else:
-                    x1 = int(locs[i, 0])
-                    y1 = int(locs[i, 1])
-                    x2 = x1 + int(locs[i, 2])
-                    y2 = y1 + int(locs[i, 3])
+                    x1 = int(boxes[i, 0])
+                    y1 = int(boxes[i, 1])
+                    x2 = x1 + int(boxes[i, 2])
+                    y2 = y1 + int(boxes[i, 3])
 
                 if style in ['dashed', 'dotted']:
                     draw_rect_with_style(
@@ -426,7 +424,11 @@ def visualize_det_cv2_part(img, confs, cls_ids, locs, class_names=None, thresh=0
                 else:
                     cv2.rectangle(img, (x1, y1), (x2, y2),
                                   unique_color, line_thickness, cv2.LINE_AA)
-                text_label = '{} {:.2f}'.format(class_names[cls_id], score)
+
+                if class_names:
+                    text_label = '{} {:.2f}'.format(class_names[cls_id], score)
+                else:
+                    text_label = '{} {:.2f}'.format(cls_id, score)
                 (ret_val, _) = cv2.getTextSize(
                     text_label, font, font_scale, font_thickness)
                 txt_bottom_left = (x1+4, y1-4)
