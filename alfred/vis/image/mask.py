@@ -33,7 +33,15 @@ import numpy as np
 from .common import get_unique_color_by_id, get_unique_color_by_id2, get_unique_color_by_id_with_dataset
 from .det import draw_one_bbox
 from PIL import Image
-from .get_dataset_color_map import create_cityscapes_label_colormap
+from .get_dataset_color_map import create_cityscapes_label_colormap, create_ade20k_label_colormap, create_mapillary_vistas_label_colormap, create_pascal_label_colormap
+
+
+ALL_COLORS_MAP = {
+    "cityscapes": create_cityscapes_label_colormap(),
+    "mapillary": create_mapillary_vistas_label_colormap(),
+    "ade20k": create_ade20k_label_colormap(),
+    "voc": create_pascal_label_colormap(),
+}
 
 
 def draw_masks_maskrcnn(image, boxes, scores, labels, masks, human_label_list=None,
@@ -193,12 +201,13 @@ def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list
 # more fast mask drawing here
 
 # helper functions
-def label2color_mask(cls_id_mask, max_classes=90, override_id_clr_map=None):
+def label2color_mask(cls_id_mask, max_classes=90, override_id_clr_map=None, color_suit='cityscapes'):
     """
     cls_id_mask is your segmentation output
     override_id_clr_map: {2: [0, 0, 0]} used to override color
     """
-    colors = create_cityscapes_label_colormap()
+    assert color_suit in ALL_COLORS_MAP.keys(), 'avaiable keys: {}'.format(ALL_COLORS_MAP.keys())
+    colors = ALL_COLORS_MAP[color_suit]
     if override_id_clr_map != None:
         colors = np.array([get_unique_color_by_id_with_dataset(i) if i not in override_id_clr_map.keys(
         ) else override_id_clr_map[i] for i in range(max_classes)])
