@@ -204,6 +204,7 @@ def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=
     """
     visualize bitmasks on image
     """
+    # need check if img and bitmask with same W,H
     if isinstance(bitmasks, torch.Tensor):
         bitmasks = bitmasks.cpu().numpy()
 
@@ -211,7 +212,9 @@ def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=
     assert isinstance(bitmasks, np.ndarray), 'bitmasks must be numpy array'
     bitmasks = bitmasks.astype(np.uint8)
     for i, m in enumerate(bitmasks):
-        cts, _ = cv2.findContours(m, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        if m.shape != img.shape:
+            m = cv2.resize(m, (img.shape[1], img.shape[0]))
+        cts, _ = cv2.findContours(m, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         # inssue this is a unique color
         c = get_unique_color_by_id2(i)
         if return_combined:
