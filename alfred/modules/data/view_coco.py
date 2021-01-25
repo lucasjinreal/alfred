@@ -47,9 +47,88 @@ from alfred.utils.log import logger as logging
 import cv2
 from alfred.vis.image.det import visualize_det_cv2_part
 from alfred.vis.image.common import get_unique_color_by_id
+import numpy as np
 
 
 # USED_CATEGORIES_IDS = [i for i in range(1, 16)]
+
+def showAnns(ori_img, anns, draw_bbox=False):
+    h, w, c = ori_img.shape
+    if len(anns) == 0:
+        return ori_img
+    if 'segmentation' in anns[0] or 'keypoints' in anns[0]:
+        datasetType = 'instances'
+    elif 'caption' in anns[0]:
+        datasetType = 'captions'
+    else:
+        raise Exception('datasetType not supported')
+    if datasetType == 'instances':
+        mask = np.zeros_like(ori_img).astype(np.uint8)
+
+        for ann in anns:
+            c = np.array((np.random.random((1, 3)) * 0.6 +
+                          0.4)[0]*255).astype(int).tolist()
+            if 'segmentation' in ann:
+                if type(ann['segmentation']) == list:
+                    # polygon
+                    for seg in ann['segmentation']:
+                        poly = np.array(seg).reshape(
+                            (int(len(seg) / 2), 2))
+                        pts = poly.reshape((-1, 1, 2))
+                        cv2.polylines(
+                            ori_img, [pts], True, c, thickness=1, lineType=cv2.LINE_AA)
+                        cv2.drawContours(mask, [pts], -1, c, -1)
+                        
+                        if cv2.contourArea(pts) > 1:
+                            M = cv2.moments(pts)
+                            cX = int(M["m10"] / M["m00"])
+                            cY = int(M["m01"] / M["m00"])
+                            cv2.putText(ori_img, 'CAT:{}'.format(
+                                ann['category_id']), (cX, cY), cv2.FONT_HERSHEY_PLAIN, 0.8, (255, 255, 255), 1, cv2.LINE_AA)
+                else:
+                    # mask
+                    if type(ann['segmentation']['counts']) == list:
+                        rle = maskUtils.frPyObjects([ann['segmentation']],
+                                                    h, w)
+                    else:
+                        rle = [ann['segmentation']]
+                    m = maskUtils.decode(rle)
+                    img = np.ones((m.shape[0], m.shape[1], 3))
+                    if ann['iscrowd'] == 1:
+                        color_mask = np.array([2.0, 166.0, 101.0])
+                    if ann['iscrowd'] == 0:
+                        color_mask = np.random.random((1, 3)).tolist()[0]
+                    for i in range(3):
+                        img[:, :, i] = color_mask[i]
+                    ori_img = cv2.addWeighted(img, 0.6, m, 0.6, 0.6)
+            if draw_bbox:
+                if 'bbox' in ann.keys():
+                    [bbox_x, bbox_y, bbox_w, bbox_h] = ann['bbox']
+                    pt1 = (int(bbox_x), int(bbox_y))
+                    pt2 = (int(bbox_x+bbox_w), int(bbox_y+bbox_h))
+                    cv2.rectangle(ori_img, pt1, pt2, color=c,
+                                  thickness=1, lineType=cv2.LINE_AA)
+
+            if 'keypoints' in ann and type(ann['keypoints']) == list:
+                # turn skeleton into zero-based index
+                # sks = np.array(
+                #     self.loadCats(ann['category_id'])[0]['skeleton']) - 1
+                kp = np.array(ann['keypoints'])
+                x = kp[0::3]
+                y = kp[1::3]
+                v = kp[2::3]
+                # for sk in sks:
+                #     if np.all(v[sk] > 0):
+                #         cv2.line(ori_img, x[sk], y[sk], color=c)
+                print(kp)
+                print('keypoint vis not supported')
+
+        if type(ann['segmentation']) == list:
+            ori_img = cv2.addWeighted(ori_img, 0.7, mask, 0.6, 0.7)
+    elif datasetType == 'captions':
+        for ann in anns:
+            print(ann['caption'])
+    return ori_img
 
 
 def vis_coco(coco_img_root, ann_f):
@@ -67,10 +146,13 @@ def vis_coco(coco_img_root, ann_f):
         print('checking img: {}, id: {}'.format(img, img_id))
 
         # img['file_name'] may be not basename
-        img_f = os.path.join(data_dir, os.path.basename(img['file_name']))
-        if not os.path.exists(img_f):
-            # if not then pull it back to normal mode
-            img_f = os.path.join(data_dir, img['file_name'])
+        if 'file_name' in img.keys():
+            img_f = os.path.join(data_dir, os.path.basename(img['file_name']))
+        elif 'filename' in img.keys():
+            img_f = os.path.join(data_dir, os.path.basename(img['filename']))
+        else:
+            print(
+                'does not foud a file_name or filename in feild. check your annotation style: ', img)
         anno_ids = coco.getAnnIds(imgIds=img['id'])
         annos = coco.loadAnns(anno_ids)
 
@@ -107,11 +189,18 @@ def vis_coco(coco_img_root, ann_f):
             cv2.imshow('rr', img)
             cv2.waitKey(0)
         else:
-            I = io.imread(img_f)
-            plt.imshow(I)
-            plt.axis('off')
-            coco.showAnns(annos, True)
-            plt.show()
-
-
-
+            im = cv2.imread(img_f)
+            # plt.imshow(I)
+            # plt.axis('off')
+            # coco.showAnns(annos, True)
+            # plt.show()
+            ori_im = showAnns(im, annos, True)
+            if ori_im is not None:
+                cv2.imshow('aa', ori_im)
+                cv2.waitKey(0)
+            else:
+                I = Image.open(img_f)
+                plt.imshow(I)
+                plt.axis('off')
+                coco.showAnns(annos, True)
+                plt.show()

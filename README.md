@@ -1,5 +1,7 @@
 # Alfred
 
+![alfred vis segmentation annotation in coco format](https://i.loli.net/2021/01/25/skmrYNo1g4zMCiT.png)
+
 *Alfred* is command line tool for deep-learning usage. if you want split an video into image frames or combine frames into a single video, then **alfred** is what you want.
 
 
@@ -82,6 +84,14 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 
 
 - 2050-: *to be continue*;
+
+- **2021.01.25**:
+
+    **alfred** now support self-defined visualization on coco format annotation (not using pycoco tools):
+
+    ![image-20210125194313093](https://i.loli.net/2021/01/25/skmrYNo1g4zMCiT.png)
+
+    If your dataset in coco format but visualize wrongly pls fire a issue to me, thank u!
 
 - **2020.09.27**:
 
