@@ -186,7 +186,7 @@ def arg_parse():
 
     webcam_parser = cabinet_sub_parser.add_parser(
         'webcam', help='Test your webcam.')
-    webcam_parser.set_defaults(which='webcam-file')
+    webcam_parser.set_defaults(which='cab-webcam')
     webcam_parser.add_argument(
         '--file', '-f', help='Also can set file.')
 

@@ -27,13 +27,13 @@
 showing webcam if you have USB camera
 this is using for test your USB usable or not
 """
-import cv2
+import cv2 as cv
 import os
 from colorama import Fore, Back, Style
 
 
 def webcam_test(vf):
-    if os.path.isfile(vf):
+    if vf is not None and os.path.isfile(vf):
         print(Fore.CYAN + 'webcam on: ',
               Style.RESET_ALL, vf, ' press q to quit.')
         cap = cv.VideoCapture(vf)
@@ -55,7 +55,7 @@ def webcam_test(vf):
     else:
         print(Fore.CYAN + 'test webcam, press q to quit.', Style.RESET_ALL)
         cap = cv.VideoCapture(0)
-        while cap.isOpend():
+        while cap.isOpened():
             ret, frame = cap.read()
 
             if not ret:
