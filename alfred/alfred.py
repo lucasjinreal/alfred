@@ -53,6 +53,7 @@ from .modules.cabinet.count_file import count_file
 from .modules.cabinet.split_txt import split_txt_file
 from .modules.cabinet.license import apply_license
 from .modules.cabinet.stack_imgs import stack_imgs
+from .modules.cabinet.webcam import webcam_test
 
 from .modules.dltool.cal_anchors import KmeansYolo
 
@@ -183,12 +184,19 @@ def arg_parse():
     apply_license_parser.add_argument(
         '--except', '-e', help='except extensions: xml,cc,h')
 
+    webcam_parser = cabinet_sub_parser.add_parser(
+        'webcam', help='Test your webcam.')
+    webcam_parser.set_defaults(which='webcam-file')
+    webcam_parser.add_argument(
+        '--file', '-f', help='Also can set file.')
+
     # =============== dl tools part =============
     dltool_parser = main_sub_parser.add_parser(
         'dltool', help='dltool related commands.')
     dltool_sub_parser = dltool_parser.add_subparsers()
 
-    anchor_parser = dltool_sub_parser.add_parser('anchor', help='calculate anchors for you.')
+    anchor_parser = dltool_sub_parser.add_parser(
+        'anchor', help='calculate anchors for you.')
     anchor_parser.set_defaults(which='dltool-anchor')
     anchor_parser.add_argument(
         '--annotation_dir', '-a', help='VOC xml dir or yolo lables dir.')
@@ -196,7 +204,6 @@ def arg_parse():
         '--cluster_num', '-c', default=9, help='how many clusters to kmeans.')
     anchor_parser.add_argument(
         '--format', '-f', default='voc', help='Your annotation format: voc | yolo.')
-
 
     # =============== data part ================
     data_parser = main_sub_parser.add_parser(
@@ -447,6 +454,9 @@ def main(args=None):
                     url = args_dict['url']
                     d = args_dict['dir']
                     apply_license(owner, project_name, year, url, d)
+                elif action == 'webcam':
+                    f = args_dict['file']
+                    webcam_test(f)
             elif module == 'dltool':
                 if action == 'anchor':
                     ann_dir = args_dict['annotation_dir']
