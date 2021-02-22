@@ -8,3 +8,5 @@ build/
 vendor/
 
 *.pyc
+
+__pycache__/
