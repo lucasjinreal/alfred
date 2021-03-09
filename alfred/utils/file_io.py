@@ -4,22 +4,19 @@
 import errno
 import logging
 import os
+import glob
 import shutil
 from collections import OrderedDict
 from typing import IO, Any, Dict, List, MutableMapping, Optional
 from urllib.parse import urlparse
 import portalocker
 import logging
-import os
 import shutil
 from typing import Callable, Optional
 from urllib import request
 
 
-
 __all__ = ["PathManager", "get_cache_dir", "file_lock"]
-
-
 
 
 def download(
@@ -55,6 +52,7 @@ def download(
         logger.info("Downloading from {} ...".format(url))
         if progress:
             import tqdm
+
             def hook(t: tqdm.tqdm) -> Callable[[int, int, Optional[int]], None]:
                 last_b = [0]
 
@@ -308,7 +306,8 @@ class NativePathHandler(PathHandler):
         """
         if os.path.exists(dst_path) and not overwrite:
             logger = logging.getLogger(__name__)
-            logger.error("Destination file {} already exists.".format(dst_path))
+            logger.error(
+                "Destination file {} already exists.".format(dst_path))
             return False
 
         try:
@@ -565,3 +564,41 @@ class PathManager:
 
 
 PathManager.register_handler(HTTPURLHandler())
+
+
+class SourceIter:
+
+    def __init__(self, src):
+        self.src = src
+        self.srcs = []
+        self._index = 0
+
+    def __len__(self):
+        return len(self.src)
+
+    def __next__(self):
+        if self._index < len(self.srcs):
+            self._index += 1
+            return self.srcs[self._index]
+        else:
+            raise StopIteration
+
+
+class ImageSourceIter(SourceIter):
+
+    def __init__(self, src):
+        super(ImageSourceIter, self).__init__(src)
+        self._index_sources()
+        assert len(self.srcs) > 0, 'srcs indexed empty: {}'.format(self.srcs)
+
+    def _index_sources(self):
+        if os.path.isfile(self.src) and str(self.src).endswith('.mp4'):
+            print('video inter not support now.  it will return future.')
+        elif os.path.isfile(self.src):
+            self.srcs = [self.src]
+        elif os.path.isdir(self.src):
+            for ext in ('*.bmp', '*.png', '*.jpg'):
+                self.srcs.extend(glob.glob(os.path.join(self.src, ext)))
+            # print(self.srcs)
+        else:
+            TypeError('{} must be dir or file'.format(self.src))
