@@ -87,3 +87,18 @@ def check_tensor_equal(t_a, t_b, epsilon=1e-5):
         return res2, None
     else:
         return res2, res
+
+
+def torch_load_state_dict_without_module(ckp_file):
+    """
+    this function using for load a model without module
+    """
+    checkpoint = torch.load(ckp_file)
+    state_dict =checkpoint['state_dict']
+
+    new_state_dict = OrderedDict()
+    for k, v in state_dict.items():
+        if 'module.' in k:
+            k = k[7:] # remove 'module.' of dataparallel
+        new_state_dict[k]=v
+    return new_state_dict

@@ -95,14 +95,18 @@ A glance of alfred, after you installed above package, you will have `alfred`:
     from alfred.utils.file_io import ImageSourceIter
     
     # data_f can be image_file or image_folder or video
-    iter = ImageSourceIter(data_f)
+    iter = ImageSourceIter(ops.test_path)
     while True:
         itm = next(iter)
-        inp = prepare_input(itm)
-        inp = torch.tensor(inp).permute(2, 0, 1).unsqueeze(0)
-        print(inp.shape)
-        o = pred_model(net, inp)
-        print(o)
+        if isinstance(itm, str):
+            itm = cv2.imread(itm)
+        # cv2.imshow('raw', itm)
+        res = detect_for_pose(itm, det_model)
+        cv2.imshow('res', itm)
+        if iter.video_mode:
+            cv2.waitKey(1)
+        else:
+            cv2.waitKey(0)
     
     ```
 

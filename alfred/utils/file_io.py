@@ -14,6 +14,7 @@ import logging
 import shutil
 from typing import Callable, Optional
 from urllib import request
+import cv2 as cv
 
 
 __all__ = ["PathManager", "get_cache_dir", "file_lock"]
@@ -572,28 +573,46 @@ class SourceIter:
         self.src = src
         self.srcs = []
         self._index = 0
+        self.video_mode = False
+        self.cap = None
 
     def __len__(self):
         return len(self.src)
 
     def __next__(self):
-        if self._index < len(self.srcs):
-            self._index += 1
-            return self.srcs[self._index]
+        if self.video_mode:
+            assert self.cap is not None, 'video mode on but cap is None. video open failed.'
+            ret, frame = self.cap.read()
+            if not ret:
+                raise StopIteration
+            return frame
         else:
-            raise StopIteration
+            if self._index < len(self.srcs):
+                self._index += 1
+                return self.srcs[self._index]
+            else:
+                raise StopIteration
 
 
 class ImageSourceIter(SourceIter):
 
     def __init__(self, src):
         super(ImageSourceIter, self).__init__(src)
+        
         self._index_sources()
         assert len(self.srcs) > 0, 'srcs indexed empty: {}'.format(self.srcs)
+    
+    def _is_video(self, p):
+        if str(p).endswith('.mp4') or str(p).endswith('.avi'):
+            return True
+        else:
+            return False
 
     def _index_sources(self):
-        if os.path.isfile(self.src) and str(self.src).endswith('.mp4'):
-            print('video inter not support now.  it will return future.')
+        if os.path.isfile(self.src) and self._is_video(self.src):
+            self.video_mode = True
+            self.cap = cv.VideoCapture(self.src)
+            self.srcs = [self.src]
         elif os.path.isfile(self.src):
             self.srcs = [self.src]
         elif os.path.isdir(self.src):
