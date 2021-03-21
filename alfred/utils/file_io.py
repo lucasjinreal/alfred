@@ -588,8 +588,9 @@ class SourceIter:
             return frame
         else:
             if self._index < len(self.srcs):
+                p = self.srcs[self._index]
                 self._index += 1
-                return self.srcs[self._index]
+                return p
             else:
                 raise StopIteration
 
