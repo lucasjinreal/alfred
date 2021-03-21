@@ -48,9 +48,14 @@ import cv2
 from alfred.vis.image.det import visualize_det_cv2_part
 from alfred.vis.image.common import get_unique_color_by_id
 import numpy as np
+from pprint import pprint
 
 
 # USED_CATEGORIES_IDS = [i for i in range(1, 16)]
+
+def get_random_color():
+    return list(np.array(np.random.random(size=3) * 256).astype(np.uint8))
+
 
 def showAnns(ori_img, anns, draw_bbox=False):
     h, w, c = ori_img.shape
@@ -78,7 +83,7 @@ def showAnns(ori_img, anns, draw_bbox=False):
                         cv2.polylines(
                             ori_img, [pts], True, c, thickness=1, lineType=cv2.LINE_AA)
                         cv2.drawContours(mask, [pts], -1, c, -1)
-                        
+
                         if cv2.contourArea(pts) > 1:
                             M = cv2.moments(pts)
                             cX = int(M["m10"] / M["m00"])
@@ -93,14 +98,14 @@ def showAnns(ori_img, anns, draw_bbox=False):
                     else:
                         rle = [ann['segmentation']]
                     m = maskUtils.decode(rle)
-                    img = np.ones((m.shape[0], m.shape[1], 3))
+                    img = np.ones((m.shape[0], m.shape[1], 3)).astype(np.uint8)
                     if ann['iscrowd'] == 1:
                         color_mask = np.array([2.0, 166.0, 101.0])
                     if ann['iscrowd'] == 0:
                         color_mask = np.random.random((1, 3)).tolist()[0]
-                    for i in range(3):
-                        img[:, :, i] = color_mask[i]
-                    ori_img = cv2.addWeighted(img, 0.6, m, 0.6, 0.6)
+                    img *= get_random_color()
+                    img = cv2.bitwise_or(img, img, mask=m)
+                    mask += img
             if draw_bbox:
                 if 'bbox' in ann.keys():
                     [bbox_x, bbox_y, bbox_w, bbox_h] = ann['bbox']
@@ -125,6 +130,9 @@ def showAnns(ori_img, anns, draw_bbox=False):
 
         if type(ann['segmentation']) == list:
             ori_img = cv2.addWeighted(ori_img, 0.7, mask, 0.6, 0.7)
+        else:
+            print('[WARN] you are using RLE mask encode format.')
+            ori_img = cv2.addWeighted(ori_img, 0.7, mask, 0.6, 0.7)
     elif datasetType == 'captions':
         for ann in anns:
             print(ann['caption'])
@@ -137,6 +145,12 @@ def vis_coco(coco_img_root, ann_f):
 
     cats = coco.loadCats(coco.getCatIds())
     logging.info('cats: {}'.format(cats))
+    cats_new = dict()
+    for c in cats:
+        cats_new[c['id']] = c['name']
+    pprint(cats_new)
+    pprint([i['name'] for i in cats])
+    print('All {} classes.'.format(len(cats_new)))
     img_ids = coco.getImgIds()
     logging.info('all images we got: {}'.format(len(img_ids)))
 
@@ -153,10 +167,12 @@ def vis_coco(coco_img_root, ann_f):
         else:
             print(
                 'does not foud a file_name or filename in feild. check your annotation style: ', img)
+        assert(os.path.exists(
+            img_f)), '{} not found, maybe your filename pattern not right? Pls fire an issue to alfred github repo!'.format(img_f)
         anno_ids = coco.getAnnIds(imgIds=img['id'])
         annos = coco.loadAnns(anno_ids)
 
-        logging.info('showing anno: {}'.format(annos))
+        logging.info('showing anno: {} objects. '.format(len(annos)))
         if len(annos[0]['segmentation']) == 0:
             logging.info('no segmentation found, using opencv vis.')
             img = cv2.imread(img_f)

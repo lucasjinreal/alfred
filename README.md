@@ -87,6 +87,31 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 
 - 2050-: *to be continue*;
 
+- **2021.03.10**:
+
+    New added `ImageSourceIter` class, when you want write a demo of your project which need to handle any input such as image file / folder / video file etc. You can using `ImageSourceIter`:
+
+    ```python
+    from alfred.utils.file_io import ImageSourceIter
+    
+    # data_f can be image_file or image_folder or video
+    iter = ImageSourceIter(ops.test_path)
+    while True:
+        itm = next(iter)
+        if isinstance(itm, str):
+            itm = cv2.imread(itm)
+        # cv2.imshow('raw', itm)
+        res = detect_for_pose(itm, det_model)
+        cv2.imshow('res', itm)
+        if iter.video_mode:
+            cv2.waitKey(1)
+        else:
+            cv2.waitKey(0)
+    
+    ```
+
+    And then you can avoid write anything else of deal with file glob or reading video in cv. *note that itm return can be a cv array or a file path*.
+
 - **2021.01.25**:
 
     **alfred** now support self-defined visualization on coco format annotation (not using pycoco tools):

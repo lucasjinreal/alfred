@@ -59,10 +59,10 @@ from .modules.dltool.cal_anchors import KmeansYolo
 
 from alfred.utils.log import logger as logging
 
-__VERSION__ = '👍    2.8.2'
+__VERSION__ = '👍    2.8.5'
 __AUTHOR__ = '😀    Lucas Jin'
 __CONTACT__ = '😍    wechat: jintianiloveu'
-__DATE__ = '👉    2020.11.01, since 2019.11.11'
+__DATE__ = '👉    2021.05.01, since 2019.11.11'
 __LOC__ = '👉    Shenzhen, China'
 __git__ = '👍    http://github.com/jinfagang/alfred'
 
