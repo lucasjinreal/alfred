@@ -102,12 +102,14 @@ def read_file(file_path, des_dir, img_dir, classes_names):
                 voc.append(data[0])
             bbox_width = float(data[3]) * w
             bbox_height = float(data[4]) * h
-            center_x = float(data[1]) * w
-            center_y = float(data[2]) * h
-            voc.append(center_x - (bbox_width / 2))
-            voc.append(center_y - (bbox_height / 2))
-            voc.append(center_x + (bbox_width / 2))
-            voc.append(center_y + (bbox_height / 2))
+            cx = float(data[1]) * w
+            cy = float(data[2]) * h
+            x = cx - bbox_width/2
+            y = cy - bbox_height/2
+            voc.append(x)
+            voc.append(y)
+            voc.append(x + (bbox_width))
+            voc.append(y + (bbox_height))
             voc_labels.append(voc)
         create_file(file_prefix, w, h, voc_labels, des_dir)
     print("Processing complete for file: {}".format(file_path))
