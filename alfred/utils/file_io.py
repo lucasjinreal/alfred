@@ -584,7 +584,8 @@ class SourceIter:
             assert self.cap is not None, 'video mode on but cap is None. video open failed.'
             ret, frame = self.cap.read()
             if not ret:
-                raise StopIteration
+                print('Seems iteration done. bye~')
+                exit(0)
             return frame
         else:
             if self._index < len(self.srcs):
