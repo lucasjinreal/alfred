@@ -592,7 +592,9 @@ class SourceIter:
                 self._index += 1
                 return p
             else:
-                raise StopIteration
+                print('Seems iteration done. bye~')
+                exit(0)
+                # raise StopIteration
 
 
 class ImageSourceIter(SourceIter):
