@@ -240,6 +240,47 @@ def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=
         return img
 
 
+def vis_bitmasks_with_classes(img, classes, bitmasks, fill_mask=True, return_combined=True, thickness=1):
+    """
+    visualize bitmasks on image
+    """
+    # need check if img and bitmask with same W,H
+    if isinstance(bitmasks, torch.Tensor):
+        bitmasks = bitmasks.cpu().numpy()
+
+    res_m = np.zeros_like(img)
+    assert isinstance(bitmasks, np.ndarray), 'bitmasks must be numpy array'
+    bitmasks = bitmasks.astype(np.uint8)
+    for i, m in enumerate(bitmasks):
+        if m.shape != img.shape:
+            m = cv2.resize(m, (img.shape[1], img.shape[0]))
+        cts, _ = cv2.findContours(m, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        # inssue this is a unique color
+        cid = classes[i]
+        c = get_unique_color_by_id2(cid)
+        if return_combined:
+            if fill_mask:
+                cv2.drawContours(res_m, cts, -1,  color=c,
+                                 thickness=-1, lineType=cv2.LINE_AA)
+                cv2.drawContours(img, cts, -1,  color=c,
+                                 thickness=1, lineType=cv2.LINE_AA)
+            else:
+                cv2.drawContours(res_m, cts, -1,  color=c,
+                                 thickness=thickness, lineType=cv2.LINE_AA)
+        else:
+            if fill_mask:
+                cv2.drawContours(img, cts, -1,  color=c,
+                                 thickness=-1, lineType=cv2.LINE_AA)
+            else:
+                cv2.drawContours(img, cts, -1,  color=c,
+                                 thickness=thickness, lineType=cv2.LINE_AA)
+    if return_combined:
+        img = cv2.addWeighted(img, 0.9, res_m, 0.6, 0.8)
+        return img
+    else:
+        return img
+
+
 # helper functions
 def label2color_mask(cls_id_mask, max_classes=90, override_id_clr_map=None, color_suit='cityscapes'):
     """
