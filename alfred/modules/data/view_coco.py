@@ -81,11 +81,11 @@ def showAnns(ori_img, anns, draw_bbox=False):
                             (int(len(seg) / 2), 2))
                         pts = poly.reshape((-1, 1, 2))
                         cv2.polylines(
-                            ori_img, [pts], True, c, thickness=1, lineType=cv2.LINE_AA)
-                        cv2.drawContours(mask, [pts], -1, c, -1)
+                            ori_img, np.int32([pts]), True, c, thickness=1, lineType=cv2.LINE_AA)
+                        cv2.drawContours(mask, np.int32([pts]), -1, c, -1)
 
-                        if cv2.contourArea(pts) > 1:
-                            M = cv2.moments(pts)
+                        if cv2.contourArea(np.int32(pts)) > 1:
+                            M = cv2.moments(np.int32(pts))
                             cX = int(M["m10"] / M["m00"])
                             cY = int(M["m01"] / M["m00"])
                             cv2.putText(ori_img, 'CAT:{}'.format(
