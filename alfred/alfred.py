@@ -54,6 +54,7 @@ from .modules.cabinet.split_txt import split_txt_file
 from .modules.cabinet.license import apply_license
 from .modules.cabinet.stack_imgs import stack_imgs
 from .modules.cabinet.webcam import webcam_test
+from .modules.cabinet.markdown_tool import download_images_from_md
 
 from .modules.dltool.cal_anchors import KmeansYolo
 
@@ -188,6 +189,12 @@ def arg_parse():
         'webcam', help='Test your webcam.')
     webcam_parser.set_defaults(which='cab-webcam')
     webcam_parser.add_argument(
+        '--file', '-f', help='Also can set file.')
+
+    downmd_parser = cabinet_sub_parser.add_parser(
+        'downmd', help='Download all images to local from a markdown file.')
+    downmd_parser.set_defaults(which='cab-downmd')
+    downmd_parser.add_argument(
         '--file', '-f', help='Also can set file.')
 
     # =============== dl tools part =============
@@ -457,6 +464,9 @@ def main(args=None):
                 elif action == 'webcam':
                     f = args_dict['file']
                     webcam_test(f)
+                elif action == 'downmd':
+                    f = args_dict['file']
+                    download_images_from_md(f)
             elif module == 'dltool':
                 if action == 'anchor':
                     ann_dir = args_dict['annotation_dir']

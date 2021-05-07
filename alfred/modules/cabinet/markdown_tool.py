@@ -26,6 +26,36 @@ FORMATTERS = [SimpleFormatter, HTMLFormatter, PDFFormatter]
 del types_map['.jpe']
 
 
+def download_images_from_md(md_f):
+    article_link = md_f
+    if is_url(article_link):
+        response = download_from_url(
+            article_link, timeout=-1)
+        article_path = get_filename_from_url(response)
+
+        with open(article_path, 'wb') as article_file:
+            article_file.write(response.content)
+            article_file.close()
+    else:
+        article_path = os.path.expanduser(article_link)
+
+    img_dir_name = os.path.basename(article_path).split('.')[0]
+    os.makedirs(os.path.join('images', img_dir_name), exist_ok=True)
+
+    img_downloader = ImageDownloader(
+        article_path=article_path,
+        skip_list=[],
+        skip_all_errors=True,
+        img_dir_name=img_dir_name,
+        img_public_path='',
+        downloading_timeout=-1,
+        deduplication=False
+    )
+
+    result = ArticleTransformer(article_path, img_downloader).run()
+    print('Done.')
+
+
 def main(arguments):
     """
     Entrypoint.
