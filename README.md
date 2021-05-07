@@ -87,6 +87,16 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 `alfred-py`　has been updating for 3 years, and it will keep going!
 
 - **2050-xxx**: *to be continue*;
+- **2021.05.07**: Upgrade Open3D instructions:
+  Open3D>0.9.0 no longer compatible with previous alfred-py. Please upgrade Open3D, you can build Open3D from source:
+  ```
+    git clone --recursive https://github.com/intel-isl/Open3D.git
+    cd Open3D && mkdir build && cd build
+    sudo apt install libc++abi-8-dev
+    sudo apt install libc++-8-dev
+    cmake .. -DPYTHON_EXECUTABLE=/usr/bin/python3
+  ```
+  **Ubuntu 16.04 blow I tried all faild to build from source**. So, please using open3d==0.9.0 for alfred-py.
 - **2021.04.01**: A unified evaluator had added. As all we know, for many users, writting Evaluation might coupled deeply with your project. But with Alfred's help, you can do evaluation in any project by simply writting 8 lines of codes, for example, if your dataset format is Yolo, then do this:
   ```python
     def infer_func(img_f):
