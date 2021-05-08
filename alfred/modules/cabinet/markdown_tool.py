@@ -40,7 +40,8 @@ def download_images_from_md(md_f):
         article_path = os.path.expanduser(article_link)
 
     img_dir_name = os.path.basename(article_path).split('.')[0]
-    os.makedirs(os.path.join('images', img_dir_name), exist_ok=True)
+    img_dir_name = os.path.join('images', img_dir_name)
+    os.makedirs(img_dir_name, exist_ok=True)
 
     img_downloader = ImageDownloader(
         article_path=article_path,
