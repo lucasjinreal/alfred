@@ -30,19 +30,18 @@ if result is right or not
 """
 try:
     from pycocotools.coco import COCO
+    from pycocotools import mask as maskUtils
 except ImportError as e:
     print('Got import error: {}'.format(e))
-    print('you are not either install pycocotools or its dependencies. pls install first.')
-    exit(-1)
+    print('[WARN] you are not either install pycocotools or its dependencies. pls install first.')
+    # exit(-1)
 import os
 import sys
 import cv2
-from pycocotools import mask as maskUtils
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Polygon
-import skimage.io as io
 from alfred.utils.log import logger as logging
 import cv2
 from alfred.vis.image.det import visualize_det_cv2_part

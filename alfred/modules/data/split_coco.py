@@ -12,8 +12,6 @@ from sklearn.model_selection import train_test_split
 import os
 
 
-
-
 def save_coco(file, info, licenses, images, annotations, categories):
     with open(file, 'wt', encoding='UTF-8') as coco:
         json.dump({'info': info, 'licenses': licenses, 'images': images,
@@ -26,8 +24,10 @@ def filter_annotations(annotations, images):
 
 
 def split_coco(ann_f, split=0.8, remove_empty=False):
-    train_f = os.path.join(os.path.dirname(ann_f), os.path.basename(ann_f).replace('.json', '_train.json'))
-    val_f = os.path.join(os.path.dirname(ann_f), os.path.basename(ann_f).replace('.json', '_val.json'))
+    train_f = os.path.join(os.path.dirname(ann_f), os.path.basename(
+        ann_f).replace('.json', '_train.json'))
+    val_f = os.path.join(os.path.dirname(ann_f), os.path.basename(
+        ann_f).replace('.json', '_val.json'))
     with open(ann_f, 'rt', encoding='UTF-8') as annotations:
         coco = json.load(annotations)
         info = ''
@@ -45,10 +45,10 @@ def split_coco(ann_f, split=0.8, remove_empty=False):
         if remove_empty:
             images_with_annotations = funcy.lmap(
                 lambda a: int(a['image_id']), annotations)
-            
+
             # filter out images without annotations
             images = funcy.lremove(
-                    lambda i: i['id'] not in images_with_annotations, images)
+                lambda i: i['id'] not in images_with_annotations, images)
             print('removed {} images without annotations, all images: {}, now: {}'.format(
                 number_of_images-len(images), number_of_images, len(images)
             ))
@@ -64,5 +64,3 @@ def split_coco(ann_f, split=0.8, remove_empty=False):
 
         print("Saved {} entries in {} and {} in {}.".format(
             len(x), train_f, len(y), val_f))
-
-

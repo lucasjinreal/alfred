@@ -8,13 +8,17 @@ to yolo
 
 import os
 import sys
-from pycocotools import mask as maskUtils
-from pycocotools.coco import COCO
+try:
+    from pycocotools.coco import COCO
+    from pycocotools import mask as maskUtils
+except ImportError as e:
+    print('Got import error: {}'.format(e))
+    print('[WARN] you are not either install pycocotools or its dependencies. pls install first.')
+    # exit(-1)
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Polygon
-import skimage.io as io
 from alfred.utils.log import logger as logging
 import cv2
 from alfred.vis.image.det import visualize_det_cv2_part
