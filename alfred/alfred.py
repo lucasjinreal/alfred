@@ -55,6 +55,7 @@ from .modules.cabinet.license import apply_license
 from .modules.cabinet.stack_imgs import stack_imgs
 from .modules.cabinet.webcam import webcam_test
 from .modules.cabinet.markdown_tool import download_images_from_md
+from .modules.cabinet.changesource import change_pypi_source
 
 from .modules.dltool.cal_anchors import KmeansYolo
 
@@ -190,6 +191,12 @@ def arg_parse():
     webcam_parser.set_defaults(which='cab-webcam')
     webcam_parser.add_argument(
         '--file', '-f', help='Also can set file.')
+
+    changesource_parser = cabinet_sub_parser.add_parser(
+        'changesource', help='Test your changesource_parser.')
+    changesource_parser.set_defaults(which='cab-changesource')
+    changesource_parser.add_argument(
+        '--source', '-s', help='aliyun or tsinghua or douban.')
 
     downmd_parser = cabinet_sub_parser.add_parser(
         'downmd', help='Download all images to local from a markdown file.')
@@ -467,6 +474,8 @@ def main(args=None):
                 elif action == 'downmd':
                     f = args_dict['file']
                     download_images_from_md(f)
+                elif action == 'changesource':
+                    change_pypi_source()
             elif module == 'dltool':
                 if action == 'anchor':
                     ann_dir = args_dict['annotation_dir']
