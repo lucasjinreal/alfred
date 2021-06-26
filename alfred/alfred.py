@@ -61,9 +61,9 @@ from .modules.dltool.cal_anchors import KmeansYolo
 
 from alfred.utils.log import logger as logging
 
-__VERSION__ = '👍    2.8.12'
+__VERSION__ = '👍    2.8.13'
 __AUTHOR__ = '😀    Lucas Jin'
-__CONTACT__ = '😍    wechat: jintianiloveu'
+__CONTACT__ = '😍    telegram: lucasjin'
 __DATE__ = '👉    2021.05.01, since 2019.11.11'
 __LOC__ = '👉    Shenzhen, China'
 __git__ = '👍    http://github.com/jinfagang/alfred'
@@ -286,6 +286,8 @@ def arg_parse():
     voc2coco_parser.set_defaults(which='data-voc2coco')
     voc2coco_parser.add_argument(
         '--xml_dir', '-d', help='Root of xmls dir (Annotations/).')
+    voc2coco_parser.add_argument(
+        '--img_dir', '-i', help='Root of xmls dir (JPEGImages/).')
     voc2coco_parser.add_argument(
         '--index_1', default=False, help='if index with 1 or not.')
 
@@ -519,7 +521,7 @@ def main(args=None):
                 elif action == 'voc2coco':
                     logging.info('start convert VOC to coco... Annotations root: {}'.format(
                         args_dict['xml_dir']))
-                    convert(args_dict['xml_dir'], index_1=args_dict['index_1'])
+                    convert(args_dict['xml_dir'], args_dict['img_dir'], index_1=args_dict['index_1'])
                 elif action == 'coco2yolo':
                     logging.info('start convert COCO to yolo... images root: {}, json file: {}'.format(
                         args_dict['image_dir'], args_dict['json_file']))

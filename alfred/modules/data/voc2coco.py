@@ -30,6 +30,8 @@ import os
 import json
 import xml.etree.ElementTree as ET
 from alfred.utils.log import logger as logging
+import glob
+import cv2
 
 
 START_BOUNDING_BOX_ID = 1
@@ -73,13 +75,13 @@ xml_list is optional, we at least need xml_dir and json_file
 """
 
 
-def convert(xml_dir, json_file=None, xml_list=None, index_1=False):
+def convert(xml_dir, img_dir, json_file=None, xml_list=None, index_1=False):
     if index_1:
         print('Annotations save with index start from 1.')
     if xml_list:
         list_fp = open(xml_list, 'r')
     else:
-        list_fp = os.listdir(xml_dir)
+        list_fp = glob.glob(os.path.join(xml_dir, '*.xml'))
     logging.info('we got all xml files: {}'.format(len(list_fp)))
     json_dict = {"images": [], "type": "instances", "annotations": [],
                  "categories": []}
@@ -91,7 +93,10 @@ def convert(xml_dir, json_file=None, xml_list=None, index_1=False):
         line = line.strip()
         if i % 1000 == 0:
             print("Processing %s" % (line))
-        xml_f = os.path.join(xml_dir, line)
+        # line could be relative path
+        xml_f = line
+        if not os.path.exists(line):
+            xml_f = os.path.join(xml_dir, line)
         tree = ET.parse(xml_f)
         root = tree.getroot()
         path = get(root, 'path')
@@ -114,14 +119,27 @@ def convert(xml_dir, json_file=None, xml_list=None, index_1=False):
                 logging.info(
                     'revise filename wrong, try change sufix (but also could be wrong, check your VOC format pls.)')
                 filename = filename.split('.')[0] + '.jpg'
+        
+        # filename to jpg name
+        img_filename = filename.split('.')[0] + '.jpg'
+        if not os.path.exists(os.path.join(img_dir, img_filename)):
+            img_filename = filename.split('.')[0] + '.png'
+        # don't support other format
 
         # The filename must be a number
         # image_id = get_filename_as_int(filename)
         image_id = i
-        size = get_and_check(root, 'size', 1)
-        width = int(get_and_check(size, 'width', 1).text)
-        height = int(get_and_check(size, 'height', 1).text)
-        image = {'file_name': filename, 'height': height, 'width': width,
+        try:
+            size = get_and_check(root, 'size', 1)
+            width = int(get_and_check(size, 'width', 1).text)
+            height = int(get_and_check(size, 'height', 1).text)
+        except Exception as e:
+            # if size not found, we infer from image
+            logging.info(
+                '{} xml format not fully right, force image height, width, this might not be right, but most cases not effect.'.format(xml_f))
+            height, width, _ = cv2.imread(os.path.join(img_dir, img_filename)).shape
+
+        image = {'file_name': img_filename, 'height': height, 'width': width,
                  'id': image_id}
         json_dict['images'].append(image)
         # Cruuently we do not support segmentation
