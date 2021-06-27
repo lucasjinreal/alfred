@@ -138,6 +138,11 @@ def convert(xml_dir, img_dir, json_file=None, xml_list=None, index_1=False):
             logging.info(
                 '{} xml format not fully right, force image height, width, this might not be right, but most cases not effect.'.format(xml_f))
             height, width, _ = cv2.imread(os.path.join(img_dir, img_filename)).shape
+        
+        # check if height or width is normal
+        if width <= 0 or height <= 0:
+            # we just override width and height stores at xml
+            height, width, _ = cv2.imread(os.path.join(img_dir, img_filename)).shape
 
         image = {'file_name': img_filename, 'height': height, 'width': width,
                  'id': image_id}
