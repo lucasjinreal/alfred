@@ -146,7 +146,7 @@ def diou_loss(pred, target, eps=1e-7):
 
 
 @weighted_loss
-def ciou_loss(pred, target, eps=1e-7):
+def ciou_loss(pred, target, xyxy=True, eps=1e-7):
     r"""`Implementation of paper `Enhancing Geometric Factors into
     Model Learning and Inference for Object Detection and Instance
     Segmentation <https://arxiv.org/abs/2005.03572>`_.
@@ -161,6 +161,14 @@ def ciou_loss(pred, target, eps=1e-7):
     Return:
         Tensor: Loss tensor.
     """
+    # if xyxy is false, make to xyxy
+    if not xyxy:
+        # cxcywh -> xyxy
+        pred[:, :2] = pred[:, :2] - pred[:, 2:]/2
+        pred[:, 2:] = pred[:, :2] + pred[:, 2:]
+
+        target[:, :2] = target[:, :2] - target[:, 2:]/2
+        target[:, 2:] = target[:, :2] + target[:, 2:]
     # overlap
     lt = torch.max(pred[:, :2], target[:, :2])
     rb = torch.min(pred[:, 2:], target[:, 2:])
