@@ -121,7 +121,8 @@ def convert(xml_dir, img_dir, json_file=None, xml_list=None, index_1=False):
                 filename = filename.split('.')[0] + '.jpg'
         
         # filename to jpg name
-        img_filename = filename.split('.')[0] + '.jpg'
+        # img_filename = filename.split('.')[0] + '.jpg'
+        img_filename = os.path.splitext(filename)[0] + '.jpg'
         if not os.path.exists(os.path.join(img_dir, img_filename)):
             img_filename = filename.split('.')[0] + '.png'
         # don't support other format
@@ -161,8 +162,8 @@ def convert(xml_dir, img_dir, json_file=None, xml_list=None, index_1=False):
             ymin = float(get_and_check(bndbox, 'ymin', 1).text)
             xmax = float(get_and_check(bndbox, 'xmax', 1).text)
             ymax = float(get_and_check(bndbox, 'ymax', 1).text)
-            assert(xmax > xmin)
-            assert(ymax > ymin)
+            assert xmax >= xmin, 'xmax: {} xmin: {} check failed.'.format(xmax, xmin)
+            assert ymax >= ymin, 'ymax: {} ymin: {} check failed.'.format(ymax, ymin)
             o_width = abs(xmax - xmin)
             o_height = abs(ymax - ymin)
             ann = {'area': o_width*o_height, 'iscrowd': 0, 'image_id':
