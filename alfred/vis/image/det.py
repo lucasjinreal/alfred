@@ -215,7 +215,7 @@ def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thr
     """
     assert isinstance(
         img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
-    if cls_colors:
+    if cls_colors and classes:
         assert len(cls_colors) == len(
             classes), 'cls_colors must be same with classes length if you specific cls_colors.'
 
@@ -314,8 +314,6 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.2, is_show=F
     :param mode:
     :return:
     """
-    assert classes, 'from visualize_det_cv2, classes must be provided, each class in a list with' \
-                    'certain order.'
     assert isinstance(
         img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
 
@@ -345,9 +343,16 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.2, is_show=F
                     x2 = x1 + int(detections[i, 4])
                     y2 = y1 + int(detections[i, 5])
 
+                if classes:
+                    text_label = '{} {:.1f}%'.format(
+                        classes[cls_id], score*100)
+                    if counter_on:
+                        cls_counter.append(classes[cls_id])
+                else:
+                    text_label = '{} {:.1f}%'.format(cls_id, score*100)
+
                 _draw_round_dot_border(
                     img, (x1, y1), (x2, y2), unique_color, line_thickness, r, d)
-                text_label = '{} {:.2f}'.format(classes[cls_id], score)
                 (txt_size, line_h) = cv2.getTextSize(
                     text_label, font, font_scale, font_thickness)
                 txt_org = (int((x1+x2)/2 - txt_size[0]/2), int(y1+line_h+2))
