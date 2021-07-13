@@ -31,7 +31,7 @@ also include draw 3d box on image
 import numpy as np
 import cv2
 import os
-
+import random
 from .common import create_unique_color_uchar, get_unique_color_by_id2, colors
 from .common import draw_rect_with_style
 import warnings
@@ -365,7 +365,7 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.2, is_show=F
 
 
 def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh=0.2,
-                           is_show=False, random=True, background_id=-1, mode='xyxy', style='none',
+                           is_show=False, random=False, background_id=-1, mode='xyxy', style='none',
                            force_color=None, line_thickness=2, wait_t=0):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
@@ -390,7 +390,7 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
             force_color, np.ndarray), 'force_color must be list or numpy array'
 
     font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.42
+    font_scale = 0.52
     font_thickness = 1
     line_thickness = line_thickness
 
@@ -414,6 +414,7 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                         unique_color = force_color[cls_id]
                 else:
                     unique_color = colors(cls_id, True)
+                    # unique_color = colors[cls_id]
                 x1, y1, x2, y2 = 0, 0, 0, 0
                 if mode == 'xyxy':
                     x1 = int(boxes[i, 0])
