@@ -270,7 +270,8 @@ def bboxes_iou(boxes1, boxes2, x1y1x2y2=True, GIoU=False, DIoU=False, CIoU=False
     res = torch.zeros([n, boxes2.shape[0]])
     for i in range(n):
         box1 = boxes1[i]
-        a = bbox_iou(box1, boxes2, x1y1x2y2=x1y1x2y2, GIoU=GIoU, DIoU=DIoU, CIoU=CIoU, eps=eps)
+        # print(box1, boxes2)
+        a = bbox_iou(box1, boxes2, x1y1x2y2=x1y1x2y2,
+                     GIoU=GIoU, DIoU=DIoU, CIoU=CIoU, eps=eps)
         res[i, :] = a
     return res
-
