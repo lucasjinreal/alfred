@@ -214,7 +214,7 @@ def ciou_loss(pred, target, xyxy=True, eps=1e-7):
     return loss
 
 
-def ciou(bboxes1, bboxes2):
+def ciou(bboxes1, bboxes2, sum=True):
     """
     original ciou: https://github.com/Zzh-tju/CIoU/blob/master/layers/modules/multibox_loss.py
     bboxes1: xywh, bboxes2: xywh
@@ -270,7 +270,10 @@ def ciou(bboxes1, bboxes2):
     cious = torch.clamp(cious, min=-1.0, max=1.0)
     if exchange:
         cious = cious.T
-    return torch.sum(1-cious)
+    if sum:
+        return torch.sum(1-cious)
+    else:
+        return 1-cious
 
 
 def bbox_iou(box1, box2, x1y1x2y2=True, GIoU=False, DIoU=False, CIoU=False, eps=1e-7):
