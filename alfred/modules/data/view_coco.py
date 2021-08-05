@@ -172,7 +172,7 @@ def vis_coco(coco_img_root, ann_f):
         annos = coco.loadAnns(anno_ids)
 
         logging.info('showing anno: {} objects. '.format(len(annos)))
-        if len(annos[0]['segmentation']) == 0:
+        if len(annos) > 0 and len(annos[0]['segmentation']) == 0:
             logging.info('no segmentation found, using opencv vis.')
             img = cv2.imread(img_f)
 
@@ -191,7 +191,9 @@ def vis_coco(coco_img_root, ann_f):
                 unique_color = get_unique_color_by_id(cls_id)
                 cv2.rectangle(img, (x1, y1), (x2, y2),
                               unique_color, line_thickness, cv2.LINE_AA)
-                text_label = '{}'.format(cls_id)
+                if cls_id > len(cats_new):
+                    print('WARN: seems your category id not same with your meta info!!')
+                text_label = '{}:{}'.format(cls_id, cats_new[cls_id])
                 (ret_val, _) = cv2.getTextSize(
                     text_label, font, font_scale, font_thickness)
                 txt_bottom_left = (x1+4, y1-4)
