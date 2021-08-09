@@ -434,9 +434,9 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                                   unique_color, line_thickness, cv2.LINE_AA)
 
                 if class_names:
-                    text_label = '{} {:.2f}'.format(class_names[cls_id], score)
+                    text_label = '{} {:.2f}'.format(class_names[cls_id], scores[i])
                 else:
-                    text_label = '{} {:.2f}'.format(cls_id, score)
+                    text_label = '{} {:.2f}'.format(cls_id, scores[i])
 
                 (ret_val, _) = cv2.getTextSize(
                     text_label, font, font_scale, font_thickness)
