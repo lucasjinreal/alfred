@@ -87,6 +87,11 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 `alfred-py`　has been updating for 3 years, and it will keep going!
 
 - **2050-xxx**: *to be continue*;
+- **2021.06.24**: Add a useful commandline tool, **change your pypi source easily!!**:
+  ```
+  alfred cab changesource
+  ```
+  And then your pypi will using aliyun by default!
 - **2021.05.07**: Upgrade Open3D instructions:
   Open3D>0.9.0 no longer compatible with previous alfred-py. Please upgrade Open3D, you can build Open3D from source:
   ```

@@ -55,14 +55,15 @@ from .modules.cabinet.license import apply_license
 from .modules.cabinet.stack_imgs import stack_imgs
 from .modules.cabinet.webcam import webcam_test
 from .modules.cabinet.markdown_tool import download_images_from_md
+from .modules.cabinet.changesource import change_pypi_source
 
 from .modules.dltool.cal_anchors import KmeansYolo
 
 from alfred.utils.log import logger as logging
 
-__VERSION__ = '👍    2.8.12'
+__VERSION__ = '👍    2.8.13'
 __AUTHOR__ = '😀    Lucas Jin'
-__CONTACT__ = '😍    wechat: jintianiloveu'
+__CONTACT__ = '😍    telegram: lucasjin'
 __DATE__ = '👉    2021.05.01, since 2019.11.11'
 __LOC__ = '👉    Shenzhen, China'
 __git__ = '👍    http://github.com/jinfagang/alfred'
@@ -191,6 +192,12 @@ def arg_parse():
     webcam_parser.add_argument(
         '--file', '-f', help='Also can set file.')
 
+    changesource_parser = cabinet_sub_parser.add_parser(
+        'changesource', help='Test your changesource_parser.')
+    changesource_parser.set_defaults(which='cab-changesource')
+    changesource_parser.add_argument(
+        '--source', '-s', help='aliyun or tsinghua or douban.')
+
     downmd_parser = cabinet_sub_parser.add_parser(
         'downmd', help='Download all images to local from a markdown file.')
     downmd_parser.set_defaults(which='cab-downmd')
@@ -279,6 +286,8 @@ def arg_parse():
     voc2coco_parser.set_defaults(which='data-voc2coco')
     voc2coco_parser.add_argument(
         '--xml_dir', '-d', help='Root of xmls dir (Annotations/).')
+    voc2coco_parser.add_argument(
+        '--img_dir', '-i', help='Root of xmls dir (JPEGImages/).')
     voc2coco_parser.add_argument(
         '--index_1', default=False, help='if index with 1 or not.')
 
@@ -467,6 +476,8 @@ def main(args=None):
                 elif action == 'downmd':
                     f = args_dict['file']
                     download_images_from_md(f)
+                elif action == 'changesource':
+                    change_pypi_source()
             elif module == 'dltool':
                 if action == 'anchor':
                     ann_dir = args_dict['annotation_dir']
@@ -510,7 +521,7 @@ def main(args=None):
                 elif action == 'voc2coco':
                     logging.info('start convert VOC to coco... Annotations root: {}'.format(
                         args_dict['xml_dir']))
-                    convert(args_dict['xml_dir'], index_1=args_dict['index_1'])
+                    convert(args_dict['xml_dir'], args_dict['img_dir'], index_1=args_dict['index_1'])
                 elif action == 'coco2yolo':
                     logging.info('start convert COCO to yolo... images root: {}, json file: {}'.format(
                         args_dict['image_dir'], args_dict['json_file']))

@@ -31,8 +31,8 @@ also include draw 3d box on image
 import numpy as np
 import cv2
 import os
-
-from .common import create_unique_color_uchar, get_unique_color_by_id2
+import random
+from .common import create_unique_color_uchar, get_unique_color_by_id2, colors
 from .common import draw_rect_with_style
 import warnings
 from collections import Counter, OrderedDict
@@ -215,7 +215,7 @@ def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thr
     """
     assert isinstance(
         img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
-    if cls_colors:
+    if cls_colors and classes:
         assert len(cls_colors) == len(
             classes), 'cls_colors must be same with classes length if you specific cls_colors.'
 
@@ -297,7 +297,7 @@ def visualize_det_cv2_style0(img, detections, classes=None, cls_colors=None, thr
     return img
 
 
-def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.6, is_show=False, background_id=-1, mode='xyxy', r=4, d=6):
+def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.2, is_show=False, background_id=-1, mode='xyxy', r=4, d=6):
     """
     visualize detections with a more fancy way
 
@@ -314,8 +314,6 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.6, is_show=F
     :param mode:
     :return:
     """
-    assert classes, 'from visualize_det_cv2, classes must be provided, each class in a list with' \
-                    'certain order.'
     assert isinstance(
         img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
 
@@ -345,9 +343,16 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.6, is_show=F
                     x2 = x1 + int(detections[i, 4])
                     y2 = y1 + int(detections[i, 5])
 
+                if classes:
+                    text_label = '{} {:.1f}%'.format(
+                        classes[cls_id], score*100)
+                    if counter_on:
+                        cls_counter.append(classes[cls_id])
+                else:
+                    text_label = '{} {:.1f}%'.format(cls_id, score*100)
+
                 _draw_round_dot_border(
                     img, (x1, y1), (x2, y2), unique_color, line_thickness, r, d)
-                text_label = '{} {:.2f}'.format(classes[cls_id], score)
                 (txt_size, line_h) = cv2.getTextSize(
                     text_label, font, font_scale, font_thickness)
                 txt_org = (int((x1+x2)/2 - txt_size[0]/2), int(y1+line_h+2))
@@ -360,8 +365,8 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.6, is_show=F
 
 
 def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh=0.2,
-                           is_show=False, background_id=-1, mode='xyxy', style='none',
-                           force_color=None, line_thickness=1, wait_t=0):
+                           is_show=False, random=False, background_id=-1, mode='xyxy', style='none',
+                           force_color=None, line_thickness=2, wait_t=0):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
 
@@ -385,7 +390,7 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
             force_color, np.ndarray), 'force_color must be list or numpy array'
 
     font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.36
+    font_scale = 0.52
     font_thickness = 1
     line_thickness = line_thickness
 
@@ -400,12 +405,15 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
     for i in range(n_boxes):
         cls_id = int(cls_ids[i])
         if cls_id != background_id:
-            score = scores[i]
-            if score > thresh:
+            if scores is not None and scores[i] > thresh:
                 if force_color:
-                    unique_color = force_color[cls_id]
+                    if random:
+                        unique_color = force_color[np.random.randint(100)]
+                    else:
+                        unique_color = force_color[cls_id]
                 else:
-                    unique_color = create_unique_color_uchar(cls_id)
+                    unique_color = colors(cls_id, True)
+                    # unique_color = colors[cls_id]
                 x1, y1, x2, y2 = 0, 0, 0, 0
                 if mode == 'xyxy':
                     x1 = int(boxes[i, 0])
@@ -426,16 +434,59 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                                   unique_color, line_thickness, cv2.LINE_AA)
 
                 if class_names:
-                    text_label = '{} {:.2f}'.format(class_names[cls_id], score)
+                    text_label = '{} {:.2f}'.format(class_names[cls_id], scores[i])
                 else:
-                    text_label = '{} {:.2f}'.format(cls_id, score)
+                    text_label = '{} {:.2f}'.format(cls_id, scores[i])
+
                 (ret_val, _) = cv2.getTextSize(
                     text_label, font, font_scale, font_thickness)
                 txt_bottom_left = (x1+4, y1-4)
                 cv2.rectangle(img, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
                               (txt_bottom_left[0] + ret_val[0] +
                                2, txt_bottom_left[1]+4),
-                              (0, 0, 0), -1)
+                              unique_color, -1, cv2.LINE_AA)
+                cv2.putText(img, text_label, txt_bottom_left, font,
+                            font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
+            else:
+                if force_color:
+                    if random:
+                        unique_color = force_color[np.random.randint(100)]
+                    else:
+                        unique_color = force_color[cls_id]
+                else:
+                    unique_color = colors(cls_id, True)
+                    # unique_color = colors[cls_id]
+                x1, y1, x2, y2 = 0, 0, 0, 0
+                if mode == 'xyxy':
+                    x1 = int(boxes[i, 0])
+                    y1 = int(boxes[i, 1])
+                    x2 = int(boxes[i, 2])
+                    y2 = int(boxes[i, 3])
+                else:
+                    x1 = int(boxes[i, 0])
+                    y1 = int(boxes[i, 1])
+                    x2 = x1 + int(boxes[i, 2])
+                    y2 = y1 + int(boxes[i, 3])
+
+                if style in ['dashed', 'dotted']:
+                    draw_rect_with_style(
+                        img, (x1, y1), (x2, y2), unique_color, line_thickness, style=style)
+                else:
+                    cv2.rectangle(img, (x1, y1), (x2, y2),
+                                  unique_color, line_thickness, cv2.LINE_AA)
+
+                if class_names:
+                    text_label = '{}'.format(class_names[cls_id])
+                else:
+                    text_label = '{}'.format(cls_id)
+
+                (ret_val, _) = cv2.getTextSize(
+                    text_label, font, font_scale, font_thickness)
+                txt_bottom_left = (x1+4, y1-4)
+                cv2.rectangle(img, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
+                              (txt_bottom_left[0] + ret_val[0] +
+                               2, txt_bottom_left[1]+4),
+                              unique_color, -1, cv2.LINE_AA)
                 cv2.putText(img, text_label, txt_bottom_left, font,
                             font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
     if is_show:

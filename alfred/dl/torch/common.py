@@ -34,14 +34,18 @@ from colorama import Fore, Back, Style
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 
-def print_tensor(t, label=None):
+def print_tensor(t, label=None, ignore_value=True):
     if isinstance(t, torch.Tensor):
         if label:
             print(Fore.YELLOW + Style.BRIGHT + "tensor: {}".format(label) + Style.RESET_ALL)
         else:
             print(Fore.YELLOW + Style.BRIGHT + "tensor: " + Style.RESET_ALL)
-        print('value: {}\nshape: {}\ndtype: {}\n'.format(
+        if ignore_value:
+            print('shape: {}\ndtype: {}\n'.format(t.shape, t.dtype))
+        else:
+            print('value: {}\nshape: {}\ndtype: {}\n'.format(
             t, t.shape, t.dtype
         ))
+    
     else:
         print('{} is not a tensor.'.format(t))
