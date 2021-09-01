@@ -208,7 +208,7 @@ def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=
     if isinstance(bitmasks, torch.Tensor):
         bitmasks = bitmasks.cpu().numpy()
 
-    res_m = np.zeros_like(img)
+    res_m = np.zeros_like(img).astype(np.uint8)
     assert isinstance(bitmasks, np.ndarray), 'bitmasks must be numpy array'
     bitmasks = bitmasks.astype(np.uint8)
     for i, m in enumerate(bitmasks):
