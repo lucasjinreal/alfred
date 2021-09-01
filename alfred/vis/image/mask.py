@@ -240,7 +240,7 @@ def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=
         return img
 
 
-def vis_bitmasks_with_classes(img, classes, bitmasks, fill_mask=True, return_combined=True, thickness=1):
+def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, mask_border_color=None, alpha=0.85, fill_mask=True, return_combined=True, thickness=1):
     """
     visualize bitmasks on image
     """
@@ -256,14 +256,17 @@ def vis_bitmasks_with_classes(img, classes, bitmasks, fill_mask=True, return_com
             m = cv2.resize(m, (img.shape[1], img.shape[0]))
         cts, _ = cv2.findContours(m, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         # inssue this is a unique color
-        cid = classes[i]
-        c = get_unique_color_by_id2(cid)
+        cid = int(classes[i])
+        if force_colors:
+            c = force_colors[cid]
+        else:
+            c = get_unique_color_by_id2(cid)
         if return_combined:
             if fill_mask:
                 cv2.drawContours(res_m, cts, -1,  color=c,
                                  thickness=-1, lineType=cv2.LINE_AA)
-                cv2.drawContours(img, cts, -1,  color=c,
-                                 thickness=1, lineType=cv2.LINE_AA)
+                cv2.drawContours(img, cts, -1,  color=mask_border_color if mask_border_color else c,
+                                 thickness=thickness, lineType=cv2.LINE_8)
             else:
                 cv2.drawContours(res_m, cts, -1,  color=c,
                                  thickness=thickness, lineType=cv2.LINE_AA)
@@ -275,7 +278,7 @@ def vis_bitmasks_with_classes(img, classes, bitmasks, fill_mask=True, return_com
                 cv2.drawContours(img, cts, -1,  color=c,
                                  thickness=thickness, lineType=cv2.LINE_AA)
     if return_combined:
-        img = cv2.addWeighted(img, 0.9, res_m, 0.6, 0.8)
+        img = cv2.addWeighted(img, 0.9, res_m, alpha, 0.5)
         return img
     else:
         return img
