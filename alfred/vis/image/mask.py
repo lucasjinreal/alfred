@@ -222,7 +222,7 @@ def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=
                 cv2.drawContours(res_m, cts, -1,  color=c,
                                  thickness=-1, lineType=cv2.LINE_AA)
                 cv2.drawContours(img, cts, -1,  color=c,
-                                 thickness=1, lineType=cv2.LINE_AA)
+                                 thickness=thickness, lineType=cv2.LINE_AA)
             else:
                 cv2.drawContours(res_m, cts, -1,  color=c,
                                  thickness=thickness, lineType=cv2.LINE_AA)
