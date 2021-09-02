@@ -34,14 +34,14 @@ import numpy as np
 from .common import get_unique_color_by_id, get_unique_color_by_id2, get_unique_color_by_id_with_dataset
 from .det import draw_one_bbox
 from PIL import Image
-from .get_dataset_color_map import create_cityscapes_label_colormap, create_ade20k_label_colormap, create_mapillary_vistas_label_colormap, create_pascal_label_colormap
-
+from .get_dataset_color_map import *
 
 ALL_COLORS_MAP = {
     "cityscapes": create_cityscapes_label_colormap(),
     "mapillary": create_mapillary_vistas_label_colormap(),
     "ade20k": create_ade20k_label_colormap(),
     "voc": create_pascal_label_colormap(),
+    "coco": create_coco_stuff_colormap(),
 }
 
 
@@ -301,7 +301,7 @@ def label2color_mask(cls_id_mask, max_classes=90, override_id_clr_map=None, colo
             colors = np.array([override_id_clr_map[i % len(
                 override_id_clr_map)] for i in range(max_classes)])
     if len(colors) < max_classes:
-        colors.extend(ALL_COLORS_MAP['ade20k'][:max_classes-len(colors)])
+        colors = np.append(colors, ALL_COLORS_MAP['cityscapes'][:max_classes-len(colors)], axis=0)
 
     s = cls_id_mask.shape
     if len(s) > 1:
