@@ -300,6 +300,8 @@ def label2color_mask(cls_id_mask, max_classes=90, override_id_clr_map=None, colo
         else:
             colors = np.array([override_id_clr_map[i % len(
                 override_id_clr_map)] for i in range(max_classes)])
+    if len(colors) < max_classes:
+        colors.extend(ALL_COLORS_MAP['ade20k'][:max_classes-len(colors)])
 
     s = cls_id_mask.shape
     if len(s) > 1:
