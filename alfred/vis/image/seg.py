@@ -42,7 +42,7 @@ def vis_semantic_seg(img, seg, alpha=0.7, override_colormap=None, color_suite='c
         # resize mask to img shape
         mask_color = cv2.resize(mask_color, (img.shape[1], img.shape[0]))
 
-    res = cv2.addWeighted(img, 0.8, mask_color, alpha, 0.7)
+    res = cv2.addWeighted(img, 0.5, mask_color, alpha, 0.4)
     if is_show:
         cv2.imshow('result', res)
         cv2.waitKey(0)

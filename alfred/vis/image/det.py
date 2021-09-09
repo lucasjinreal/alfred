@@ -37,6 +37,7 @@ from .common import draw_rect_with_style
 import warnings
 from collections import Counter, OrderedDict
 from .common import put_txt_with_newline
+from .get_dataset_label_map import coco_label_map_list
 
 
 def _draw_round_dot_border(img, pt1, pt2, color, thickness, r=2, d=5):
@@ -400,6 +401,10 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
         n_boxes = len(boxes)
     else:
         print('boxes with unsupported type, boxes must be ndarray or list.')
+    
+    if class_names is None:
+        # not using background
+        class_names = coco_label_map_list[1:]
 
     for i in range(n_boxes):
         cls_id = int(cls_ids[i])

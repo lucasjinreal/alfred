@@ -200,7 +200,7 @@ def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list
 
 
 # more fast mask drawing here
-def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=1):
+def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=1, draw_contours=True):
     """
     visualize bitmasks on image
     """
@@ -221,7 +221,8 @@ def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=
             if fill_mask:
                 cv2.drawContours(res_m, cts, -1,  color=c,
                                  thickness=-1, lineType=cv2.LINE_AA)
-                cv2.drawContours(img, cts, -1,  color=c,
+                if draw_contours:
+                    cv2.drawContours(img, cts, -1,  color=c,
                                  thickness=thickness, lineType=cv2.LINE_AA)
             else:
                 cv2.drawContours(res_m, cts, -1,  color=c,
