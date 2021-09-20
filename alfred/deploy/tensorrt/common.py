@@ -112,7 +112,8 @@ def do_inference_v2(context, bindings, inputs, outputs, stream, input_tensor):
 # The onnx path is used for Pytorch models.
 
 
-def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False, dynamic_input=False, batch_size=1):
+def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False,
+                      dynamic_input=False, batch_size=1, chw_shape=None):
 
     def get_engine():
         EXPLICIT_BATCH = 1 << (int)(
@@ -120,7 +121,7 @@ def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False, dynami
         # with trt.Builder(TRT_LOGGER) as builder, builder.create_network(EXPLICIT_BATCH) as network,builder.create_builder_config() as config, trt.OnnxParser(network,TRT_LOGGER) as parser:
         with trt.Builder(TRT_LOGGER) as builder, builder.create_network(EXPLICIT_BATCH) as network, builder.create_builder_config() as config,\
                 trt.OnnxParser(network, TRT_LOGGER) as parser:
-            
+
             trt_version = int(trt.__version__[0])
             # Workspace size is the maximum amount of memory available to the builder while building an engine.
 
@@ -142,7 +143,9 @@ def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False, dynami
                 for error in range(parser.num_errors):
                     print(parser.get_error(error))
 
-            network.get_input(0).shape = [batch_size, 3, 800, 800]
+            # network.get_input(0).shape = [batch_size, 3, 800, 800]
+            if chw_shape:
+                network.get_input(0).shape = [batch_size, *chw_shape]
 
             if dynamic_input:
                 profile = builder.create_optimization_profile()
@@ -219,7 +222,7 @@ def build_engine_onnx_v2(onnx_file_path="", engine_file_path="", fp16_mode=False
                     calibration_stream, calibration_table_path)
                 # builder.int8_calibrator  = Calibrator(calibration_stream, calibration_table_path)
                 print('[INFO] Int8 mode enabled')
-            
+
             engine = None
             if trt_version == TRT8:
                 engine = builder.build_engine(network, trt_config)
