@@ -12,6 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+<<<<<<< HEAD
+=======
+#
+#                ~~~Medcare AI Lab~~~
+#    该部分代码参考了TensorRT官方示例完成，对相关方法进行修改
+#
+>>>>>>> d532d486489ab1f372ca8e7714197470c544189a
 
 
 import pycuda.driver as cuda
@@ -21,12 +28,21 @@ import numpy as np
 import tensorrt as trt
 from .calibrator import Calibrator
 
+<<<<<<< HEAD
 from alfred.utils.log import logger
 
+=======
+>>>>>>> d532d486489ab1f372ca8e7714197470c544189a
 import sys
 import os
 import time
 
+<<<<<<< HEAD
+=======
+TRT8 = 8
+TRT7 = 7
+
+>>>>>>> d532d486489ab1f372ca8e7714197470c544189a
 # TRT_LOGGER = trt.Logger(trt.Logger.VERBOSE)
 # TRT_LOGGER = trt.Logger(trt.Logger.INFO)
 TRT_LOGGER = trt.Logger()
@@ -104,24 +120,32 @@ def do_inference_v2(context, bindings, inputs, outputs, stream, input_tensor):
     # Return only the host outputs.
     return [out.host for out in outputs]
 
-
 # The onnx path is used for Pytorch models.
-def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False, dynamic_input=False, batch_size=1):
+
+
+def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False,
+                      dynamic_input=False, batch_size=1, chw_shape=None):
+
     def get_engine():
         EXPLICIT_BATCH = 1 << (int)(
             trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
         # with trt.Builder(TRT_LOGGER) as builder, builder.create_network(EXPLICIT_BATCH) as network,builder.create_builder_config() as config, trt.OnnxParser(network,TRT_LOGGER) as parser:
         with trt.Builder(TRT_LOGGER) as builder, builder.create_network(EXPLICIT_BATCH) as network, builder.create_builder_config() as config,\
                 trt.OnnxParser(network, TRT_LOGGER) as parser:
-            # Workspace size is the maximum amount of memory available to the builder while building an engine.
-            builder.max_workspace_size = 6 << 30  # 6G
-            builder.max_batch_size = batch_size
-            # config.max_batch_size = 2
 
-            if FP16:
-                logger.info("[INFO] Open FP16 Mode!")
-                # config.set_flag(tensorrt.BuilderFlag.FP16)
-                builder.fp16_mode = True
+            trt_version = int(trt.__version__[0])
+            # Workspace size is the maximum amount of memory available to the builder while building an engine.
+
+            if trt_version == TRT8:
+                config.max_workspace_size = 6 << 30  # 2GB
+            else:
+                builder.max_workspace_size = 6 << 30  # 2GB
+
+            if trt_version == TRT8:
+                if FP16:
+                    config.set_flag(trt.BuilderFlag.FP16)
+            else:
+                builder.fp16_mode = FP16
 
             with open(model_file, 'rb') as model:
                 parser.parse(model.read())
@@ -130,8 +154,9 @@ def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False, dynami
                 for error in range(parser.num_errors):
                     logger.info(parser.get_error(error))
 
-            # logger.info(network)
-            # network.get_input(0).shape = [ batch_size, 3, 800, 800 ]
+            # network.get_input(0).shape = [batch_size, 3, 800, 800]
+            if chw_shape:
+                network.get_input(0).shape = [batch_size, *chw_shape]
 
             if dynamic_input:
                 profile = builder.create_optimization_profile()
@@ -140,7 +165,12 @@ def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False, dynami
                 config.add_optimization_profile(profile)
 
             # builder engine
-            engine = builder.build_cuda_engine(network)
+            engine = None
+            if trt_version == TRT8:
+                engine = builder.build_engine(network, config)
+            else:
+                engine.builder.build_cuda_engine(network)
+
             logger.info("[INFO] Completed creating Engine!")
             with open(engine_file, "wb") as f:
                 f.write(engine.serialize())
@@ -162,8 +192,9 @@ def build_engine_onnx_v2(onnx_file_path="", engine_file_path="", fp16_mode=False
     def build_engine(max_batch_size, save_engine):
         """Takes an ONNX file and creates a TensorRT engine to run inference with"""
         with trt.Builder(TRT_LOGGER) as builder, builder.create_network(1) as network,\
-                builder.create_builder_config() as config, trt.OnnxParser(network, TRT_LOGGER) as parser:
+                builder.create_builder_config() as config, trt.OnnxParser(network, TRT_LOGGER) as parser, builder.create_builder_config() as trt_config:
 
+            trt_version = int(trt.__version__[0])
             # parse onnx model file
             if not os.path.exists(onnx_file_path):
                 quit(f'[Error]ONNX file {onnx_file_path} not found')
@@ -179,18 +210,36 @@ def build_engine_onnx_v2(onnx_file_path="", engine_file_path="", fp16_mode=False
 
             # build trt engine
             builder.max_batch_size = max_batch_size
-            # config.max_workspace_size = 2 << 30 # 2GB
-            builder.max_workspace_size = 2 << 30  # 2GB
-            builder.fp16_mode = fp16_mode
+
+            if trt_version == TRT8:
+                trt_config.max_workspace_size = 2 << 30  # 2GB
+            else:
+                builder.max_workspace_size = 2 << 30  # 2GB
+
+            if trt_version == TRT8:
+                if fp16_mode:
+                    trt_config.set_flag(trt.BuilderFlag.FP16)
+            else:
+                builder.fp16_mode = fp16_mode
+
             if int8_mode:
-                builder.int8_mode = int8_mode
-                # config.set_flag(trt.BuilderFlag.INT8)
+                if trt_version == TRT8:
+                    trt_config.set_flag(trt.BuilderFlag.INT8)
+                else:
+                    builder.fp16_mode = fp16_mode
+
                 assert calibration_stream, '[Error] a calibration_stream should be provided for int8 mode'
                 config.int8_calibrator = Calibrator(
                     calibration_stream, calibration_table_path)
                 # builder.int8_calibrator  = Calibrator(calibration_stream, calibration_table_path)
                 logger.info('[INFO] Int8 mode enabled')
-            engine = builder.build_cuda_engine(network)
+
+            engine = None
+            if trt_version == TRT8:
+                engine = builder.build_engine(network, trt_config)
+            else:
+                engine.builder.build_cuda_engine(network)
+
             if engine is None:
                 logger.info('[INFO] Failed to create the engine')
                 return None
