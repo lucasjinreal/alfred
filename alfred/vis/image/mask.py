@@ -235,7 +235,7 @@ def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=
                 cv2.drawContours(img, cts, -1,  color=c,
                                  thickness=thickness, lineType=cv2.LINE_AA)
     if return_combined:
-        img = cv2.addWeighted(img, 0.9, res_m, 0.6, 0.8)
+        img = cv2.addWeighted(img, 0.6, res_m, 0.7, 0.8)
         return img
     else:
         return img

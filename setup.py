@@ -78,7 +78,8 @@ setup(name='alfred-py',
           'alfred.vis.image',
           'alfred.vis.pointcloud',
           'alfred.utils',
-          'alfred.protos'
+          'alfred.protos',
+          'alfred.deploy.tensorrt'
       ],
       # package_dir={'alfred': 'alfred'},
       entry_points={
