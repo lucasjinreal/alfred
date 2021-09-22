@@ -12,13 +12,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-<<<<<<< HEAD
-=======
-#
-#                ~~~Medcare AI Lab~~~
-#    该部分代码参考了TensorRT官方示例完成，对相关方法进行修改
-#
->>>>>>> d532d486489ab1f372ca8e7714197470c544189a
 
 
 import pycuda.driver as cuda
@@ -28,21 +21,15 @@ import numpy as np
 import tensorrt as trt
 from .calibrator import Calibrator
 
-<<<<<<< HEAD
 from alfred.utils.log import logger
 
-=======
->>>>>>> d532d486489ab1f372ca8e7714197470c544189a
 import sys
 import os
 import time
 
-<<<<<<< HEAD
-=======
 TRT8 = 8
 TRT7 = 7
 
->>>>>>> d532d486489ab1f372ca8e7714197470c544189a
 # TRT_LOGGER = trt.Logger(trt.Logger.VERBOSE)
 # TRT_LOGGER = trt.Logger(trt.Logger.INFO)
 TRT_LOGGER = trt.Logger()
