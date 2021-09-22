@@ -156,11 +156,14 @@ def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False,
             if trt_version == TRT8:
                 engine = builder.build_engine(network, config)
             else:
-                engine.builder.build_cuda_engine(network)
+                engine = builder.build_cuda_engine(network)
 
-            logger.info("[INFO] Completed creating Engine!")
-            with open(engine_file, "wb") as f:
-                f.write(engine.serialize())
+            if engine is not None:
+                logger.info("[INFO] Completed creating Engine!")
+                with open(engine_file, "wb") as f:
+                    f.write(engine.serialize())
+            else:
+                logger.error("Create engine failed!")
             return engine
 
     if os.path.exists(engine_file):
@@ -225,7 +228,7 @@ def build_engine_onnx_v2(onnx_file_path="", engine_file_path="", fp16_mode=False
             if trt_version == TRT8:
                 engine = builder.build_engine(network, trt_config)
             else:
-                engine.builder.build_cuda_engine(network)
+                engine = builder.build_cuda_engine(network)
 
             if engine is None:
                 logger.info('[INFO] Failed to create the engine')
