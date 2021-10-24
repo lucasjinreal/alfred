@@ -52,6 +52,7 @@ class VideoExtractor(object):
     def extract(self, video_f):
         if os.path.exists(video_f) and os.path.isfile(video_f):
             cap = cv2.VideoCapture(video_f)
+            f_n = os.path.basename(video_f).split('.')[0]
 
             save_dir = os.path.join(os.path.dirname(video_f), os.path.basename(video_f).split('.')[0])
             if not os.path.exists(save_dir):
@@ -63,7 +64,7 @@ class VideoExtractor(object):
                 self.current_frame += 1
                 if self.current_frame % self.jump_frames == 0:
                     print('Read frame: {} jump frames: {}'.format(self.current_frame, self.jump_frames))
-                    cv2.imwrite(os.path.join(save_dir, self.save_format % self.current_save_frame), image)
+                    cv2.imwrite(os.path.join(save_dir, f_n + '_' + self.save_format % self.current_save_frame), image)
                     self.current_save_frame += 1
 
             print(Fore.GREEN + Style.BRIGHT)
