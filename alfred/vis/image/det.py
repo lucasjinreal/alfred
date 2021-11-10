@@ -37,6 +37,7 @@ from .common import draw_rect_with_style
 import warnings
 from collections import Counter, OrderedDict
 from .common import put_txt_with_newline
+from .get_dataset_label_map import coco_label_map_list
 
 
 def _draw_round_dot_border(img, pt1, pt2, color, thickness, r=2, d=5):
@@ -366,7 +367,7 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.2, is_show=F
 
 def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh=0.2,
                            is_show=False, random=False, background_id=-1, mode='xyxy', style='none',
-                           force_color=None, line_thickness=2, wait_t=0):
+                           force_color=None, line_thickness=2, font_scale=0.2, wait_t=0):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
 
@@ -390,7 +391,6 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
             force_color, np.ndarray), 'force_color must be list or numpy array'
 
     font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.52
     font_thickness = 1
     line_thickness = line_thickness
 
@@ -401,6 +401,10 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
         n_boxes = len(boxes)
     else:
         print('boxes with unsupported type, boxes must be ndarray or list.')
+    
+    if class_names is None:
+        # not using background
+        class_names = coco_label_map_list[1:]
 
     for i in range(n_boxes):
         cls_id = int(cls_ids[i])
@@ -473,7 +477,7 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                         img, (x1, y1), (x2, y2), unique_color, line_thickness, style=style)
                 else:
                     cv2.rectangle(img, (x1, y1), (x2, y2),
-                                  unique_color, line_thickness, cv2.LINE_AA)
+                                  unique_color, line_thickness, cv2.LINE_8)
 
                 if class_names:
                     text_label = '{}'.format(class_names[cls_id])

@@ -8,5 +8,5 @@ build/
 vendor/
 
 *.pyc
-
+a.py
 __pycache__/

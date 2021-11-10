@@ -74,6 +74,13 @@ def get_filename_as_int(filename):
 xml_list is optional, we at least need xml_dir and json_file
 """
 
+def get_pure_file_name(file_name):
+    file_name = os.path.basename(file_name)
+    return os.path.splitext(file_name)[0]
+    
+def get_file_name_ext(file_name):
+    file_name = os.path.basename(file_name)
+    return os.path.splitext(file_name)[1]
 
 def convert(xml_dir, img_dir, json_file=None, xml_list=None, index_1=False):
     if index_1:
@@ -108,23 +115,23 @@ def convert(xml_dir, img_dir, json_file=None, xml_list=None, index_1=False):
             raise NotImplementedError(
                 '%d paths found in %s' % (len(path), line))
         # compare filename with xml filename
-        if os.path.basename(xml_f).split('.')[0] != filename.split('.')[0]:
+        if get_pure_file_name(xml_f) != get_pure_file_name(filename):
             # if not equal, we replace filename with xml file name
             # print('{} != {}'.format(os.path.basename(xml_f).split('.')[0], filename.split('.')[0]))
-            filename = os.path.basename(xml_f).split(
-                '.')[0] + '.' + filename.split('.')[-1]
+
+            filename = get_pure_file_name(xml_f) + get_file_name_ext(filename)
+
             # filename could be wrong sufix
             print('revise filename to: {}'.format(filename))
             if not os.path.exists(os.path.join(os.path.dirname(xml_f), filename)):
                 logging.info(
                     'revise filename wrong, try change sufix (but also could be wrong, check your VOC format pls.)')
-                filename = filename.split('.')[0] + '.jpg'
+                filename = get_pure_file_name(filename) + '.jpg'
         
         # filename to jpg name
-        # img_filename = filename.split('.')[0] + '.jpg'
-        img_filename = os.path.splitext(filename)[0] + '.jpg'
+        img_filename = get_pure_file_name(filename) + '.jpg'
         if not os.path.exists(os.path.join(img_dir, img_filename)):
-            img_filename = filename.split('.')[0] + '.png'
+            img_filename = get_pure_file_name(filename) + '.png'
         # don't support other format
 
         # The filename must be a number

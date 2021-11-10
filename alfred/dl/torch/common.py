@@ -37,11 +37,11 @@ device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cp
 def print_tensor(t, label=None, ignore_value=True):
     if isinstance(t, torch.Tensor):
         if label:
-            print(Fore.YELLOW + Style.BRIGHT + "tensor: {}".format(label) + Style.RESET_ALL)
+            print(Fore.YELLOW + Style.BRIGHT + "-> {}".format(label) + Style.RESET_ALL)
         else:
             print(Fore.YELLOW + Style.BRIGHT + "tensor: " + Style.RESET_ALL)
         if ignore_value:
-            print('shape: {}\ndtype: {}\n'.format(t.shape, t.dtype))
+            print('shape: {}\ndtype: {} {}\n'.format(t.shape, t.dtype, t.device))
         else:
             print('value: {}\nshape: {}\ndtype: {}\n'.format(
             t, t.shape, t.dtype
