@@ -6,6 +6,8 @@ contains all models used in Siren chatbot API
 
 """
 import json
+import jsons
+from dataclasses import dataclass
 
 
 class MessageType:
@@ -85,6 +87,7 @@ class ChatMessage(BaseMessage):
         self.latitude = None
 
 
+@dataclass
 class Invitation:
 
     def __init__(self) -> None:
@@ -112,17 +115,21 @@ class RoomMembership:
         self.role = None
 
 
+@dataclass
 class InvitationMessage:
 
     def __init__(self) -> None:
-        self.invitation = None
+        self.id = None
         self.type: MessageType = MessageType.EventInvitationRequest
+        self.invitation_type: InvitationMessageType = InvitationMessageType.INFO
         self.text = None
         self.send_time = None
+        self.from_id = None
         self.from_name = None
         self.from_avatar = None
 
 
+@dataclass
 class ContactChat:
 
     def __init__(self) -> None:
@@ -139,6 +146,7 @@ class ContactChat:
                           sort_keys=True, indent=4)
 
 
+@dataclass
 class User:
 
     def __init__(self) -> None:
@@ -146,9 +154,3 @@ class User:
         self.user_acc = None
         self.user_sign = None
         self.user_nick_name = None
-    
-    def from_json(self, data):
-        self.user_acc = data['user_acc']
-        self.user_addr = data['user_addr']
-        self.user_sign = data['user_sign']
-        self.user_nick_name = data['user_nick_name']

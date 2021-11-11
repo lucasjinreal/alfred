@@ -1,14 +1,16 @@
 import json
 from functools import wraps
 from logging import log
+from loguru import Message
 from paho import mqtt
 from paho.mqtt import client as mqtt_client
 import random
 import platform
 import uuid
-from alfred.siren.topicgen import get_archives_messages_topic, get_archives_myid_topic, get_archives_rooms_topic, get_chatting_topic, get_events_topic, get_presence_topic
+from alfred.siren.topicgen import get_archives_messages_topic, get_archives_myid_topic, get_archives_rooms_topic, get_chatting_topic, get_events_topic, get_personal_events_topic, get_presence_topic
 from alfred.utils.log import logger
-from alfred.siren.models import ContactChat, User
+from alfred.siren.models import ChatMessage, ContactChat, Invitation, InvitationMessage, InvitationMessageType, User, MessageType
+import jsons
 
 MQTT_URL = "manaai.cn"
 PORT = 1883
@@ -21,6 +23,7 @@ class SirenClient:
         self.user_password = user_password
 
         self.client_id = f'{platform.system()}_{uuid.uuid4()}'
+        self.user = None
         self._connect()
 
     def _connect(self):
@@ -29,6 +32,8 @@ class SirenClient:
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.client.connect(MQTT_URL, PORT)
+    
+    def loop(self):
         self.client.loop_forever()
 
     def on_connect(self, client, userdata, flags, rc):
@@ -50,6 +55,9 @@ class SirenClient:
     def join_contact_presence(self, contact_id):
         self.client.subscribe(get_presence_topic(contact_id))
 
+    def join_my_events(self, myid):
+        self.client.subscribe(get_personal_events_topic(myid))
+
     def on_message(self, client, userdata, msg):
         j = json.loads(msg.payload.decode('utf-8'))
         logger.info(
@@ -63,20 +71,52 @@ class SirenClient:
                     self.join_contact_presence(c.id)
         elif msg.topic.startswith("archivesmyid/"):
             # get my id
-            u = User()
-            u.from_json(j)
-            logger.info(f'Welcome: {u.user_nick_name}')
-        elif msg.topic.startwith('personalevents'):
-            # invitation auto solove
-            pass
+            self.user = jsons.load(j, User)
+            self.join_my_events(self.user.user_addr)
+            logger.info(f'Welcome: {self.user.user_nick_name}')
+        elif msg.topic.startswith('personalevents/'):
+            # invitation auto agree
+            invit = jsons.load(j, InvitationMessage)
+            print(invit)
+            logger.info(f'Received invitation: {invit.from_name}')
+            self.response_to_invitation(invit.id, invit.from_id)
+            self.on_received_invitation(invit)
+        elif msg.topic.startswith('messages/'):
+            m = jsons.load(j, ChatMessage)
+            logger.info(f'Received ChatMessage: {m.type} {m.text} {m.from_name} {m.room_id}')
+            self.publish_txt_msg('I got your message', m.room_id)
+            self.on_received_chat_message(m)
+        else:
+            logger.info('unsupported msg.')
 
-    def on_msg_arrived(self, func):
+    def response_to_invitation(self, invi_id, sender_id):
+        invit = InvitationMessage()
+        invit.id = invi_id
+        invit.from_id = sender_id
+        invit.type = MessageType.EventInvitationResponseAccept
+        invit.invitation_type = InvitationMessageType.REQUEST_RESPONSE
+        j = jsons.dump(invit)
+        self.client.publish(get_personal_events_topic(sender_id), j)
+
+    def on_received_invitation(self, func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             # we receive msg from mqtt conn, then convert it into ChatMessage
-
             return func(*args, **kwargs)
         return wrapper
 
-    def publish_msg(self, msg):
-        pass
+    def on_received_chat_message(self, func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # we receive msg from mqtt conn, then convert it into ChatMessage
+            return func(*args, **kwargs)
+        return wrapper
+
+    def publish_txt_msg(self, txt, room_id):
+        msg = ChatMessage()
+        msg.room_id = room_id
+        msg.text = txt
+        msg.type = MessageType.ChatText
+        j = jsons.dump(msg)
+        t = get_chatting_topic(room_id)
+        self.client.publish(t, j)

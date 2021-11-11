@@ -94,5 +94,5 @@ setup(name='alfred-py',
       url='https://github.com/jinfagang/alfred',
       platforms='any',
       install_requires=['colorama', 'requests', 'regex', 'funcy', 'pascal-voc-writer',
-                        'future', 'deprecated', 'loguru', 'pyquaternion', 'lxml']
+                        'future', 'deprecated', 'loguru', 'pyquaternion', 'lxml', 'jsons']
       )
