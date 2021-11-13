@@ -27,6 +27,7 @@ class SirenClient:
         self._connect()
         self.on_received_msg_func = None
         self.on_received_invitation_func = None
+        self.contacts = None
 
         if log_level == 'info':
             logger.remove(handler_id=None)
@@ -70,8 +71,8 @@ class SirenClient:
         if msg.topic.startswith('archivesrooms/'):
             # join room
             if j != None:
-                contacts = [jsons.load(i, ContactChat) for i in j]
-                for c in contacts:
+                self.contacts = [jsons.load(i, ContactChat) for i in j]
+                for c in self.contacts:
                     self.join_room(c.roomId)
                     self.join_contact_presence(c.id)
         elif msg.topic.startswith("archivesmyid/"):
@@ -131,3 +132,40 @@ class SirenClient:
         t = get_chatting_topic(room_id)
         logger.info(f'publishing: {j}, -> {t}')
         self.client.publish(t, j)
+
+    def publish_img_msg(self, img_url, room_id):
+        msg = ChatMessage()
+        msg.id = uuid.uuid4()
+        msg.roomId = room_id
+        msg.fromId = self.user.user_addr
+        msg.fromName = self.user.user_nick_name
+        msg.text = txt
+        msg.sendTime = int(round(time.time() * 1000))
+        msg.type = MessageType.ChatImage
+        msg.attachment = img_url
+        msg.mime = 'jpg'
+        j = jsons.dumps(msg)
+        t = get_chatting_topic(room_id)
+        logger.info(f'publishing: {j}, -> {t}')
+        self.client.publish(t, j)
+
+    """
+    For compatible with Uranus old API
+    
+    """
+
+    def send_txt_msg(self, target_addr, txt):
+        contact = [c for c in self.contacts if c.id == target_addr]
+        if len(contact) < 1:
+            logger.error(
+                f'can not send to target since {target_addr} not in contacts.')
+        else:
+            self.publish_txt_msg(txt, contact[0].roomId)
+
+    def send_img_msg(self, target_addr, img_url):
+        contact = [c for c in self.contacts if c.id == target_addr]
+        if len(contact) < 1:
+            logger.error(
+                f'can not send to target since {target_addr} not in contacts.')
+        else:
+            self.publish_img_msg(img_url, contact[0].roomId)
