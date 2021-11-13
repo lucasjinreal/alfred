@@ -87,6 +87,32 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 `alfred-py`　has been updating for 3 years, and it will keep going!
 
 - **2050-xxx**: *to be continue*;
+- **2021.11.13**: Now I add Siren SDK support!
+  ```
+  from functools import wraps
+  from alfred.siren.handler import SirenClient
+  from alfred.siren.models import ChatMessage, InvitationMessage
+
+  siren = SirenClient('daybreak_account', 'password')
+
+
+  @siren.on_received_invitation
+  def on_received_invitation(msg: InvitationMessage):
+      print('received invitation: ', msg.invitation)
+      # directly agree this invitation for robots
+
+
+  @siren.on_received_chat_message
+  def on_received_chat_msg(msg: ChatMessage):
+      print('got new msg: ', msg.text)
+      siren.publish_txt_msg('I got your message O(∩_∩)O哈哈~', msg.roomId)
+
+
+  if __name__ == '__main__':
+      siren.loop()
+  ```
+  Using this, you can easily setup a Chatbot. By using Siren client.
+
 - **2021.06.24**: Add a useful commandline tool, **change your pypi source easily!!**:
   ```
   alfred cab changesource
