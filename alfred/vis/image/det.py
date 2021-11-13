@@ -401,7 +401,7 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
         n_boxes = len(boxes)
     else:
         print('boxes with unsupported type, boxes must be ndarray or list.')
-    
+
     if class_names is None:
         # not using background
         class_names = coco_label_map_list[1:]
@@ -414,7 +414,11 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                     if random:
                         unique_color = force_color[np.random.randint(100)]
                     else:
-                        unique_color = force_color[cls_id]
+                        if cls_id > len(force_color)-1:
+                            unique_color = force_color[min(
+                                cls_id, len(force_color)-1)]
+                        else:
+                            unique_color = force_color[cls_id]
                 else:
                     unique_color = colors(cls_id, True)
                     # unique_color = colors[cls_id]
@@ -438,7 +442,11 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                                   unique_color, line_thickness, cv2.LINE_AA)
 
                 if class_names:
-                    text_label = '{} {:.2f}'.format(class_names[cls_id], scores[i])
+                    if cls_id > len(class_names) - 1:
+                        n = class_names[min(cls_id, len(force_color)-1)]
+                    else:
+                        n = class_names[cls_id]
+                    text_label = '{} {:.2f}'.format(n, scores[i])
                 else:
                     text_label = '{} {:.2f}'.format(cls_id, scores[i])
 

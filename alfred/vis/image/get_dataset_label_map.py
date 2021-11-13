@@ -115,10 +115,14 @@ coco_label_map = {
     89: 'hair drier',
     90: 'toothbrush'
 }
+coco_stuff_list = ['things', 'banner', 'blanket', 'bridge', 'cardboard', 'counter', 'curtain', 'door-stuff', 'floor-wood', 'flower', 'fruit', 'gravel', 'house', 'light', 'mirror-stuff', 'net', 'pillow', 'platform', 'playingfield', 'railroad', 'river', 'road', 'roof', 'sand', 'sea',
+                   'shelf', 'snow', 'stairs', 'tent', 'towel', 'wall-brick', 'wall-stone', 'wall-tile', 'wall-wood', 'water', 'window-blind', 'window', 'tree', 'fence', 'ceiling', 'sky', 'cabinet', 'table', 'floor', 'pavement', 'mountain', 'grass', 'dirt', 'paper', 'food', 'building', 'rock', 'wall', 'rug']
 coco_label_map_list = list(coco_label_map.values())
+coco_label_map_list.append(coco_stuff_list)
 
 # map with mostly model prediction which is 0-80
-coco_label_map_continuous = {i: coco_label_map_list[i] for i in range(0, len(coco_label_map_list))}
+coco_label_map_continuous = {
+    i: coco_label_map_list[i] for i in range(0, len(coco_label_map_list))}
 
 
 voc_label_map = {
