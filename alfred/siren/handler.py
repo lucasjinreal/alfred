@@ -139,7 +139,7 @@ class SirenClient:
         msg.roomId = room_id
         msg.fromId = self.user.user_addr
         msg.fromName = self.user.user_nick_name
-        msg.text = txt
+        msg.text = img_url
         msg.sendTime = int(round(time.time() * 1000))
         msg.type = MessageType.ChatImage
         msg.attachment = img_url
