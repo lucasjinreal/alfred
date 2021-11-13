@@ -62,27 +62,34 @@ class BaseMessage:
     def __init__(self) -> None:
         self.id = None
         self.type: MessageType = MessageType.ChatText
-        self.from_id = None
-        self.from_name = None
+        self.fromId = None
+        self.fromName = None
 
+
+class PresenceMessage(BaseMessage):
+
+    def __init__(self) -> None:
+        super().__init__()
+
+        self.presenceType: PresenceType = PresenceType.Available
 
 class ChatMessage(BaseMessage):
 
     def __init__(self) -> None:
         super().__init__()
 
-        self.to_id = None
-        self.to_name = None
+        self.toId = None
+        self.toName = None
         self.text = None
         self.attachment = None
         self.thumbnail = None
-        self.original_id = None
-        self.original_message = None
-        self.room_id = None
+        self.originalId = None
+        self.originalMessage = None
+        self.roomId = None
         self.originality: MessageOriginality = MessageOriginality.Original
         self.size = 0
         self.mime = None
-        self.send_time = None
+        self.sendTime = None
         self.longitude = None
         self.latitude = None
 
@@ -121,25 +128,26 @@ class InvitationMessage:
     def __init__(self) -> None:
         self.id = None
         self.type: MessageType = MessageType.EventInvitationRequest
-        self.invitation_type: InvitationMessageType = InvitationMessageType.INFO
+        self.invitationMessageType: InvitationMessageType = InvitationMessageType.INFO
         self.text = None
-        self.send_time = None
-        self.from_id = None
-        self.from_name = None
-        self.from_avatar = None
+        self.sendTime = None
+        self.fromId = None
+        self.toId = None
+        self.fromName = None
+        self.fromAvatar = None
 
 
 @dataclass
 class ContactChat:
 
     def __init__(self) -> None:
-        self.first_name = None
-        self.last_name = None
+        self.firstName = None
+        self.lastName = None
         self.id = None
         self.avatar = None
-        self.room_id = None
+        self.roomId = None
         self.presence: PresenceType = PresenceType.Available
-        self.is_group = None
+        self.isGroup = None
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__,
