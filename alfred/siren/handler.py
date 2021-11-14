@@ -169,3 +169,7 @@ class SirenClient:
                 f'can not send to target since {target_addr} not in contacts.')
         else:
             self.publish_img_msg(img_url, contact[0].roomId)
+    
+    def send_msg_to_subscribers(self, txt):
+        for c in self.contacts:
+            self.publish_txt_msg(txt, c.roomId)
