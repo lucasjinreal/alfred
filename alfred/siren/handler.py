@@ -24,11 +24,14 @@ class SirenClient:
 
         self.client_id = f'{platform.system()}_{uuid.uuid4()}'
         self.user = None
+        self.contacts = None
+        self.connected = False
+        self.client_ready = False
+
         self._connect()
         self.on_received_msg_func = None
         self.on_received_invitation_func = None
-        self.contacts = None
-
+       
         if log_level == 'info':
             logger.remove(handler_id=None)
 
@@ -38,13 +41,27 @@ class SirenClient:
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
         self.client.connect(MQTT_URL, PORT)
+        logger.info('loop start...')
+        self.client.loop_start()
+        time.sleep(4)
+        while True:
+            if not self.connected or not self.client_ready:
+                logger.info('still not client ready? wait more 1 seconds.')
+                time.sleep(1)
+                continue
+            else:
+                logger.info('Seems connected and client_ready, close loop thread')
+                self.client.loop_stop()
+                break
 
-    def loop(self):
+    def loop_forever(self):
         self.client.loop_forever()
 
     def on_connect(self, client, userdata, flags, rc):
-        print('connected.. status: ', rc)
+        logger.info('connected.. status: ', rc)
         self.subscribe_topics(client)
+        if rc == 0:
+            self.connected = True
 
     def on_disconnected(self, client, userdata, flags, rc=0):
         print('disconnected...')
@@ -75,6 +92,8 @@ class SirenClient:
                 for c in self.contacts:
                     self.join_room(c.roomId)
                     self.join_contact_presence(c.id)
+                logger.info(f'[Synced all contacts] {len(self.contacts)}')
+                self.client_ready = True
         elif msg.topic.startswith("archivesmyid/"):
             # get my id
             self.user = jsons.load(j, User)
@@ -169,7 +188,11 @@ class SirenClient:
                 f'can not send to target since {target_addr} not in contacts.')
         else:
             self.publish_img_msg(img_url, contact[0].roomId)
-    
+
     def send_msg_to_subscribers(self, txt):
-        for c in self.contacts:
-            self.publish_txt_msg(txt, c.roomId)
+        print(f'----- start broadcast msg to subscribers... {self.client_ready} {self.contacts}')
+        if self.client_ready and self.contacts is not None:
+            logger.info(
+                f'send msg to subscribers, {len(self.contacts)} to go.')
+            for c in self.contacts:
+                self.publish_txt_msg(txt, c.roomId)
