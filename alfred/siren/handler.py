@@ -196,3 +196,11 @@ class SirenClient:
                 f'send msg to subscribers, {len(self.contacts)} to go.')
             for c in self.contacts:
                 self.publish_txt_msg(txt, c.roomId)
+    
+    def send_img_msg_to_subscribers(self, img_url):
+        print(f'----- start broadcast msg to subscribers... {self.client_ready} {self.contacts}')
+        if self.client_ready and self.contacts is not None:
+            logger.info(
+                f'send msg to subscribers, {len(self.contacts)} to go.')
+            for c in self.contacts:
+                self.publish_img_msg(img_url, c.roomId)
