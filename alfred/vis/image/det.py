@@ -402,7 +402,7 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
     else:
         print('boxes with unsupported type, boxes must be ndarray or list.')
 
-    if class_names is None:
+    if class_names is None or len(class_names) == 0:
         # not using background
         class_names = coco_label_map_list[1:]
 
