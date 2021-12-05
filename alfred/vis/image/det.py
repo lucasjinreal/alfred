@@ -401,56 +401,65 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
         n_boxes = len(boxes)
     else:
         print('boxes with unsupported type, boxes must be ndarray or list.')
-    
-    if class_names is None:
+
+    if class_names is None or len(class_names) == 0:
         # not using background
         class_names = coco_label_map_list[1:]
 
     for i in range(n_boxes):
         cls_id = int(cls_ids[i])
         if cls_id != background_id:
-            if scores is not None and scores[i] > thresh:
-                if force_color:
-                    if random:
-                        unique_color = force_color[np.random.randint(100)]
+            if scores is not None:
+                if scores[i] > thresh:
+                    if force_color:
+                        if random:
+                            unique_color = force_color[np.random.randint(100)]
+                        else:
+                            if cls_id > len(force_color)-1:
+                                unique_color = force_color[min(
+                                    cls_id, len(force_color)-1)]
+                            else:
+                                unique_color = force_color[cls_id]
                     else:
-                        unique_color = force_color[cls_id]
-                else:
-                    unique_color = colors(cls_id, True)
-                    # unique_color = colors[cls_id]
-                x1, y1, x2, y2 = 0, 0, 0, 0
-                if mode == 'xyxy':
-                    x1 = int(boxes[i, 0])
-                    y1 = int(boxes[i, 1])
-                    x2 = int(boxes[i, 2])
-                    y2 = int(boxes[i, 3])
-                else:
-                    x1 = int(boxes[i, 0])
-                    y1 = int(boxes[i, 1])
-                    x2 = x1 + int(boxes[i, 2])
-                    y2 = y1 + int(boxes[i, 3])
+                        unique_color = colors(cls_id, True)
+                        # unique_color = colors[cls_id]
+                    x1, y1, x2, y2 = 0, 0, 0, 0
+                    if mode == 'xyxy':
+                        x1 = int(boxes[i, 0])
+                        y1 = int(boxes[i, 1])
+                        x2 = int(boxes[i, 2])
+                        y2 = int(boxes[i, 3])
+                    else:
+                        x1 = int(boxes[i, 0])
+                        y1 = int(boxes[i, 1])
+                        x2 = x1 + int(boxes[i, 2])
+                        y2 = y1 + int(boxes[i, 3])
 
-                if style in ['dashed', 'dotted']:
-                    draw_rect_with_style(
-                        img, (x1, y1), (x2, y2), unique_color, line_thickness, style=style)
-                else:
-                    cv2.rectangle(img, (x1, y1), (x2, y2),
-                                  unique_color, line_thickness, cv2.LINE_AA)
+                    if style in ['dashed', 'dotted']:
+                        draw_rect_with_style(
+                            img, (x1, y1), (x2, y2), unique_color, line_thickness, style=style)
+                    else:
+                        cv2.rectangle(img, (x1, y1), (x2, y2),
+                                    unique_color, line_thickness, cv2.LINE_AA)
 
-                if class_names:
-                    text_label = '{} {:.2f}'.format(class_names[cls_id], scores[i])
-                else:
-                    text_label = '{} {:.2f}'.format(cls_id, scores[i])
+                    if class_names:
+                        if cls_id > len(class_names) - 1:
+                            n = class_names[min(cls_id, len(force_color)-1)]
+                        else:
+                            n = class_names[cls_id]
+                        text_label = '{} {:.2f}'.format(n, scores[i])
+                    else:
+                        text_label = '{} {:.2f}'.format(cls_id, scores[i])
 
-                (ret_val, _) = cv2.getTextSize(
-                    text_label, font, font_scale, font_thickness)
-                txt_bottom_left = (x1+4, y1-4)
-                cv2.rectangle(img, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
-                              (txt_bottom_left[0] + ret_val[0] +
-                               2, txt_bottom_left[1]+4),
-                              unique_color, -1, cv2.LINE_AA)
-                cv2.putText(img, text_label, txt_bottom_left, font,
-                            font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
+                    (ret_val, _) = cv2.getTextSize(
+                        text_label, font, font_scale, font_thickness)
+                    txt_bottom_left = (x1+4, y1-4)
+                    cv2.rectangle(img, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
+                                (txt_bottom_left[0] + ret_val[0] +
+                                2, txt_bottom_left[1]+4),
+                                unique_color, -1, cv2.LINE_AA)
+                    cv2.putText(img, text_label, txt_bottom_left, font,
+                                font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
             else:
                 if force_color:
                     if random:

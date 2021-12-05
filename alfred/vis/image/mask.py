@@ -200,7 +200,7 @@ def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list
 
 
 # more fast mask drawing here
-def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=1, draw_contours=True):
+def vis_bitmasks(img, bitmasks, classes=None, fill_mask=True, return_combined=True, thickness=1, draw_contours=True):
     """
     visualize bitmasks on image
     """
@@ -216,14 +216,17 @@ def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=
             m = cv2.resize(m, (img.shape[1], img.shape[0]))
         cts, _ = cv2.findContours(m, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         # inssue this is a unique color
-        c = get_unique_color_by_id2(i)
+        if classes is not None:
+            c = get_unique_color_by_id2(classes[i])
+        else:
+            c = get_unique_color_by_id2(i)
         if return_combined:
             if fill_mask:
                 cv2.drawContours(res_m, cts, -1,  color=c,
                                  thickness=-1, lineType=cv2.LINE_AA)
                 if draw_contours:
                     cv2.drawContours(img, cts, -1,  color=c,
-                                 thickness=thickness, lineType=cv2.LINE_AA)
+                                     thickness=thickness, lineType=cv2.LINE_AA)
             else:
                 cv2.drawContours(res_m, cts, -1,  color=c,
                                  thickness=thickness, lineType=cv2.LINE_AA)
@@ -241,7 +244,7 @@ def vis_bitmasks(img, bitmasks, fill_mask=True, return_combined=True, thickness=
         return img
 
 
-def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, mask_border_color=None, alpha=0.85, fill_mask=True, return_combined=True, thickness=1):
+def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, mask_border_color=None, draw_contours=False, alpha=0.85, fill_mask=True, return_combined=True, thickness=1):
     """
     visualize bitmasks on image
     """
@@ -266,8 +269,9 @@ def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, mask_bo
             if fill_mask:
                 cv2.drawContours(res_m, cts, -1,  color=c,
                                  thickness=-1, lineType=cv2.LINE_AA)
-                cv2.drawContours(img, cts, -1,  color=mask_border_color if mask_border_color else c,
-                                 thickness=thickness, lineType=cv2.LINE_8)
+                if draw_contours:
+                    cv2.drawContours(img, cts, -1,  color=c,
+                                     thickness=thickness, lineType=cv2.LINE_AA)
             else:
                 cv2.drawContours(res_m, cts, -1,  color=c,
                                  thickness=thickness, lineType=cv2.LINE_AA)
@@ -302,7 +306,8 @@ def label2color_mask(cls_id_mask, max_classes=90, override_id_clr_map=None, colo
             colors = np.array([override_id_clr_map[i % len(
                 override_id_clr_map)] for i in range(max_classes)])
     if len(colors) < max_classes:
-        colors = np.append(colors, ALL_COLORS_MAP['cityscapes'][:max_classes-len(colors)], axis=0)
+        colors = np.append(
+            colors, ALL_COLORS_MAP['cityscapes'][:max_classes-len(colors)], axis=0)
 
     s = cls_id_mask.shape
     if len(s) > 1:
