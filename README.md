@@ -87,6 +87,36 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 `alfred-py`　has been updating for 3 years, and it will keep going!
 
 - **2050-xxx**: *to be continue*;
+- **2021.12.05**: You can using `alfred.deploy.tensorrt` for tensorrt inference now:
+  ```python
+  from alfred.deploy.tensorrt.common import do_inference_v2, allocate_buffers_v2, build_engine_onnx_v3
+
+  def engine_infer(engine, context, inputs, outputs, bindings, stream, test_image):
+
+    # image_input, img_raw, _ = preprocess_np(test_image)
+    image_input, img_raw, _ = preprocess_img((test_image))
+    print('input shape: ', image_input.shape)
+    inputs[0].host = image_input.astype(np.float32).ravel()
+
+    start = time.time()
+    dets, labels, masks = do_inference_v2(context, bindings=bindings, inputs=inputs,
+                                          outputs=outputs, stream=stream, input_tensor=image_input)
+  img_f = 'demo/demo.jpg'
+  with build_engine_onnx_v3(onnx_file_path=onnx_f) as engine:
+      inputs, outputs, bindings, stream = allocate_buffers_v2(engine)
+      # Contexts are used to perform inference.
+      with engine.create_execution_context() as context:
+          print(engine.get_binding_shape(0))
+          print(engine.get_binding_shape(1))
+          print(engine.get_binding_shape(2))
+          INPUT_SHAPE = engine.get_binding_shape(0)[-2:]
+
+          print(context.get_binding_shape(0))
+          print(context.get_binding_shape(1))
+          dets, labels, masks, img_raw = engine_infer(
+              engine, context, inputs, outputs, bindings, stream, img_f)
+  ```
+  
 - **2021.11.13**: Now I add Siren SDK support!
   ```
   from functools import wraps

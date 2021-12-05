@@ -188,7 +188,8 @@ def build_engine_onnx_v2(onnx_file_path="", engine_file_path="", fp16_mode=False
             # parse onnx model file
             if not os.path.exists(onnx_file_path):
                 quit(f'[Error]ONNX file {onnx_file_path} not found')
-            logger.info(f'[INFO] Loading ONNX file from path {onnx_file_path}...')
+            logger.info(
+                f'[INFO] Loading ONNX file from path {onnx_file_path}...')
             with open(onnx_file_path, 'rb') as model:
                 logger.info('[INFO] Beginning ONNX file parsing')
                 parser.parse(model.read())
@@ -197,6 +198,83 @@ def build_engine_onnx_v2(onnx_file_path="", engine_file_path="", fp16_mode=False
             logger.info('[INFO] Completed parsing of ONNX file')
             logger.info(
                 f'[INFO] Building an engine from file {onnx_file_path}; this may take a while...')
+
+            # build trt engine
+            builder.max_batch_size = max_batch_size
+
+            if trt_version == TRT8:
+                trt_config.max_workspace_size = 2 << 30  # 2GB
+            else:
+                builder.max_workspace_size = 2 << 30  # 2GB
+
+            if trt_version == TRT8:
+                if fp16_mode:
+                    trt_config.set_flag(trt.BuilderFlag.FP16)
+            else:
+                builder.fp16_mode = fp16_mode
+
+            if int8_mode:
+                if trt_version == TRT8:
+                    trt_config.set_flag(trt.BuilderFlag.INT8)
+                else:
+                    builder.fp16_mode = fp16_mode
+
+                assert calibration_stream, '[Error] a calibration_stream should be provided for int8 mode'
+                config.int8_calibrator = Calibrator(
+                    calibration_stream, calibration_table_path)
+                # builder.int8_calibrator  = Calibrator(calibration_stream, calibration_table_path)
+                logger.info('[INFO] Int8 mode enabled')
+
+            engine = None
+            if trt_version == TRT8:
+                engine = builder.build_engine(network, trt_config)
+            else:
+                engine = builder.build_cuda_engine(network)
+
+            if engine is None:
+                logger.info('[INFO] Failed to create the engine')
+                return None
+            logger.info("[INFO] Completed creating the engine")
+            if save_engine:
+                with open(engine_file_path, "wb") as f:
+                    f.write(engine.serialize())
+            return engine
+
+    if os.path.exists(engine_file_path):
+        # If a serialized engine exists, load it instead of building a new one.
+        logger.info(f"[INFO] Reading engine from file {engine_file_path}")
+        with open(engine_file_path, "rb") as f, trt.Runtime(TRT_LOGGER) as runtime:
+            return runtime.deserialize_cuda_engine(f.read())
+    else:
+        return build_engine(max_batch_size, save_engine)
+
+
+def build_engine_onnx_v3(onnx_file_path="", fp16_mode=False, int8_mode=False,
+                         max_batch_size=1, calibration_stream=None, calibration_table_path="", save_engine=True):
+    """Attempts to load a serialized engine if available, otherwise builds a new TensorRT engine and saves it."""
+    engine_file_path = os.path.join(os.path.dirname(
+        onnx_file_path), os.path.basename(onnx_file_path).replace('.onnx', '.engine'))
+    trt.init_libnvinfer_plugins(None, "")
+
+    def build_engine(max_batch_size, save_engine):
+        """Takes an ONNX file and creates a TensorRT engine to run inference with"""
+        with trt.Builder(TRT_LOGGER) as builder, builder.create_network(1) as network,\
+                builder.create_builder_config() as config, trt.OnnxParser(network, TRT_LOGGER) as parser, builder.create_builder_config() as trt_config:
+
+            trt_version = int(trt.__version__[0])
+            # parse onnx model file
+            if not os.path.exists(onnx_file_path):
+                quit(f'[Error]ONNX file {onnx_file_path} not found')
+            logger.info(
+                f'[INFO] Loading ONNX file from path {onnx_file_path}...')
+            with open(onnx_file_path, 'rb') as model:
+                logger.info('[INFO] Beginning ONNX file parsing')
+                parser.parse(model.read())
+                assert network.num_layers > 0, '[Error] Failed to parse ONNX model. \
+                            Please check if the ONNX model is compatible '
+            logger.info('[INFO] Completed parsing of ONNX file')
+            logger.info(
+                f'[INFO] Building an engine from file {onnx_file_path}, this may take a while...')
 
             # build trt engine
             builder.max_batch_size = max_batch_size
