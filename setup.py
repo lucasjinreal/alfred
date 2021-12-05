@@ -35,7 +35,7 @@ with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='alfred-py',
-      version='2.8.14',
+      version='2.8.15',
       keywords=['deep learning', 'script helper', 'tools'],
       description='''
       Alfred is a DeepLearning utility library.
@@ -78,6 +78,7 @@ setup(name='alfred-py',
           'alfred.vis.image',
           'alfred.vis.pointcloud',
           'alfred.utils',
+          'alfred.siren',
           'alfred.protos',
           'alfred.deploy.tensorrt'
       ],
@@ -93,5 +94,5 @@ setup(name='alfred-py',
       url='https://github.com/jinfagang/alfred',
       platforms='any',
       install_requires=['colorama', 'requests', 'regex', 'funcy', 'pascal-voc-writer',
-                        'future', 'deprecated', 'loguru', 'pyquaternion', 'lxml']
+                        'future', 'deprecated', 'loguru', 'pyquaternion', 'lxml', 'jsons']
       )
