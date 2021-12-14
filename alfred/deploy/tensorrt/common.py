@@ -26,6 +26,9 @@ from alfred.utils.log import logger
 import sys
 import os
 import time
+import os
+import os.path as osp
+import ctypes
 
 TRT8 = 8
 TRT7 = 7
@@ -107,7 +110,47 @@ def do_inference_v2(context, bindings, inputs, outputs, stream, input_tensor):
     # Return only the host outputs.
     return [out.host for out in outputs]
 
-# The onnx path is used for Pytorch models.
+
+def allocate_buffers_v2_dynamic(engine, is_explicit_batch=False, input_shape=None):
+    inputs = []
+    outputs = []
+    bindings = []
+    stream = cuda.Stream()
+    for binding in engine:
+        dims = engine.get_binding_shape(binding)
+        if dims[-1] == -1:
+            assert input_shape is not None, 'dynamic trt engine must specific input_shape'
+            dims[-2], dims[-1] = input_shape
+        size = trt.volume(dims) * engine.max_batch_size
+        dtype = trt.nptype(engine.get_binding_dtype(binding))
+        # Allocate host and device buffers
+        host_mem = cuda.pagelocked_empty(size, dtype)
+        device_mem = cuda.mem_alloc(host_mem.nbytes)
+        # Append the device buffer to device bindings.
+        bindings.append(int(device_mem))
+        # Append to the appropriate list.
+        if engine.binding_is_input(binding):
+            inputs.append(HostDeviceMem(host_mem, device_mem))
+        else:
+            outputs.append(HostDeviceMem(host_mem, device_mem))
+    return inputs, outputs, bindings, stream
+
+
+def do_inference_v2_dynamic(context, bindings, inputs, outputs, stream, input_tensor):
+    """
+    this works for infer on dynamic engine, such as input dynamic
+    """
+    # Transfer input data to the GPU.
+    [cuda.memcpy_htod_async(inp.device, inp.host, stream) for inp in inputs]
+
+    # Run inference.
+    context.execute_async_v2(bindings=bindings, stream_handle=stream.handle)
+    # Transfer predictions back from the GPU.
+    [cuda.memcpy_dtoh_async(out.host, out.device, stream) for out in outputs]
+    # Synchronize the stream
+    stream.synchronize()
+    # Return only the host outputs.
+    return [out.host for out in outputs]
 
 
 def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False,
@@ -247,6 +290,28 @@ def build_engine_onnx_v2(onnx_file_path="", engine_file_path="", fp16_mode=False
             return runtime.deserialize_cuda_engine(f.read())
     else:
         return build_engine(max_batch_size, save_engine)
+
+
+def load_engine_from_local(engine_file_path):
+    if os.path.exists(engine_file_path):
+        # If a serialized engine exists, load it instead of building a new one.
+        logger.info(f"[INFO] Reading engine from file {engine_file_path}")
+        with open(engine_file_path, "rb") as f, trt.Runtime(TRT_LOGGER) as runtime:
+            return runtime.deserialize_cuda_engine(f.read())
+    else:
+        logger.info('engine does not exist, please build it first.')
+        exit(1)
+
+
+def load_torchtrt_plugins():
+    # ctypes.CDLL(osp.join(dir_path, 'libamirstan_plugin.so'))
+    # suppose plugins lib installed into HOME
+    lib_path = osp.join(osp.expanduser(
+        "~"), 'torchtrt_plugins/build/lib/libtorchtrt_plugins.so')
+    if os.path.exists(lib_path):
+        ctypes.CDLL(lib_path)
+    else:
+        logger.warning(f'{lib_path} not found.')
 
 
 def build_engine_onnx_v3(onnx_file_path="", fp16_mode=False, int8_mode=False,
