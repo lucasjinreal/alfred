@@ -389,3 +389,30 @@ def build_engine_onnx_v3(onnx_file_path="", fp16_mode=False, int8_mode=False,
             return runtime.deserialize_cuda_engine(f.read())
     else:
         return build_engine(max_batch_size, save_engine)
+
+
+def check_engine(engine, input_shape=(608, 608)):
+    tensor_names_shape_dict = {}
+    for binding in engine:
+        dims = engine.get_binding_shape(binding)
+        if dims[-1] == -1:
+            assert input_shape is not None, 'dynamic trt engine must specific input_shape'
+            dims[-2], dims[-1] = input_shape
+        size = trt.volume(dims) * engine.max_batch_size
+        dtype = trt.nptype(engine.get_binding_dtype(binding))
+
+        if engine.binding_is_input(binding):
+            tensor_names_shape_dict[binding] = {
+                'shape': dims,
+                'dtype': dtype,
+                'is_input': True
+            }
+            print(f'INPUT: {binding}, {dims}, {dtype}, {size}')
+        else:
+            tensor_names_shape_dict[binding] = {
+                'shape': dims,
+                'dtype': dtype,
+                'is_input': False
+            }
+            print(f'OUTPUT: {binding}, {dims}, {dtype}, {size}')
+    return tensor_names_shape_dict
