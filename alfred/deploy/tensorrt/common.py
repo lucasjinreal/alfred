@@ -15,6 +15,7 @@
 
 
 import pycuda.driver as cuda
+
 # https://documen.tician.de/pycuda/driver.html
 import pycuda.autoinit
 import numpy as np
@@ -80,8 +81,7 @@ def allocate_buffers_v2(engine):
     bindings = []
     stream = cuda.Stream()
     for binding in engine:
-        size = trt.volume(engine.get_binding_shape(
-            binding)) * engine.max_batch_size
+        size = trt.volume(engine.get_binding_shape(binding)) * engine.max_batch_size
         dtype = trt.nptype(engine.get_binding_dtype(binding))
         # Allocate host and device buffers
         host_mem = cuda.pagelocked_empty(size, dtype)
@@ -119,7 +119,9 @@ def allocate_buffers_v2_dynamic(engine, is_explicit_batch=False, input_shape=Non
     for binding in engine:
         dims = engine.get_binding_shape(binding)
         if dims[-1] == -1:
-            assert input_shape is not None, 'dynamic trt engine must specific input_shape'
+            assert (
+                input_shape is not None
+            ), "dynamic trt engine must specific input_shape"
             dims[-2], dims[-1] = input_shape
         size = trt.volume(dims) * engine.max_batch_size
         dtype = trt.nptype(engine.get_binding_dtype(binding))
@@ -153,15 +155,23 @@ def do_inference_v2_dynamic(context, bindings, inputs, outputs, stream, input_te
     return [out.host for out in outputs]
 
 
-def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False,
-                      dynamic_input=False, batch_size=1, chw_shape=None):
-
+def build_engine_onnx(
+    model_file,
+    engine_file,
+    FP16=False,
+    verbose=False,
+    dynamic_input=False,
+    batch_size=1,
+    chw_shape=None,
+):
     def get_engine():
-        EXPLICIT_BATCH = 1 << (int)(
-            trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
+        EXPLICIT_BATCH = 1 << (int)(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
         # with trt.Builder(TRT_LOGGER) as builder, builder.create_network(EXPLICIT_BATCH) as network,builder.create_builder_config() as config, trt.OnnxParser(network,TRT_LOGGER) as parser:
-        with trt.Builder(TRT_LOGGER) as builder, builder.create_network(EXPLICIT_BATCH) as network, builder.create_builder_config() as config,\
-                trt.OnnxParser(network, TRT_LOGGER) as parser:
+        with trt.Builder(TRT_LOGGER) as builder, builder.create_network(
+            EXPLICIT_BATCH
+        ) as network, builder.create_builder_config() as config, trt.OnnxParser(
+            network, TRT_LOGGER
+        ) as parser:
 
             trt_version = int(trt.__version__[0])
             # Workspace size is the maximum amount of memory available to the builder while building an engine.
@@ -177,10 +187,10 @@ def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False,
             else:
                 builder.fp16_mode = FP16
 
-            with open(model_file, 'rb') as model:
+            with open(model_file, "rb") as model:
                 parser.parse(model.read())
             if verbose:
-                logger.info(">"*50)
+                logger.info(">" * 50)
                 for error in range(parser.num_errors):
                     logger.info(parser.get_error(error))
 
@@ -190,8 +200,9 @@ def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False,
 
             if dynamic_input:
                 profile = builder.create_optimization_profile()
-                profile.set_shape("inputs", (1, 3, 800, 800),
-                                  (8, 3, 800, 800), (64, 3, 800, 800))
+                profile.set_shape(
+                    "inputs", (1, 3, 800, 800), (8, 3, 800, 800), (64, 3, 800, 800)
+                )
                 config.add_optimization_profile(profile)
 
             # builder engine
@@ -219,31 +230,68 @@ def build_engine_onnx(model_file, engine_file, FP16=False, verbose=False,
 
 
 # int8 quant
-def build_engine_onnx_v2(onnx_file_path="", engine_file_path="", fp16_mode=False, int8_mode=False,
-                         max_batch_size=1, calibration_stream=None, calibration_table_path="", save_engine=False):
+def build_engine_onnx_v2(
+    onnx_file_path="",
+    engine_file_path="",
+    fp16_mode=False,
+    int8_mode=False,
+    max_batch_size=1,
+    calibration_stream=None,
+    calibration_table_path="",
+    save_engine=False,
+    opt_params: dict = None,
+):
     """Attempts to load a serialized engine if available, otherwise builds a new TensorRT engine and saves it."""
-    def build_engine(max_batch_size, save_engine):
+
+    def build_engine(max_batch_size, save_engine, opt_params=None):
         """Takes an ONNX file and creates a TensorRT engine to run inference with"""
-        with trt.Builder(TRT_LOGGER) as builder, builder.create_network(1) as network,\
-                builder.create_builder_config() as config, trt.OnnxParser(network, TRT_LOGGER) as parser, builder.create_builder_config() as trt_config:
+        with trt.Builder(TRT_LOGGER) as builder, builder.create_network(
+            1
+        ) as network, builder.create_builder_config() as config, trt.OnnxParser(
+            network, TRT_LOGGER
+        ) as parser, builder.create_builder_config() as trt_config:
 
             trt_version = int(trt.__version__[0])
             # parse onnx model file
             if not os.path.exists(onnx_file_path):
-                quit(f'[Error]ONNX file {onnx_file_path} not found')
-            logger.info(
-                f'[INFO] Loading ONNX file from path {onnx_file_path}...')
-            with open(onnx_file_path, 'rb') as model:
-                logger.info('[INFO] Beginning ONNX file parsing')
+                quit(f"[Error]ONNX file {onnx_file_path} not found")
+            logger.info(f"[INFO] Loading ONNX file from path {onnx_file_path}...")
+            with open(onnx_file_path, "rb") as model:
+                logger.info("[INFO] Beginning ONNX file parsing")
                 parser.parse(model.read())
-                assert network.num_layers > 0, '[Error] Failed to parse ONNX model. \
-                            Please check if the ONNX model is compatible '
-            logger.info('[INFO] Completed parsing of ONNX file')
+                assert (
+                    network.num_layers > 0
+                ), "[Error] Failed to parse ONNX model. \
+                            Please check if the ONNX model is compatible "
+            logger.info("[INFO] Completed parsing of ONNX file")
             logger.info(
-                f'[INFO] Building an engine from file {onnx_file_path}; this may take a while...')
+                f"[INFO] Building an engine from file {onnx_file_path}; this may take a while..."
+            )
 
             # build trt engine
             builder.max_batch_size = max_batch_size
+
+            # set optimize profile for dynamic inputs
+            profile = builder.create_optimization_profile()
+            if opt_params is not None:
+                """
+                opt_params = {
+                    'input': [
+                        [1, 3, 416, 502], # min shape
+                        [1, 3, 416, 502], # opt shape
+                        [1, 3, 416, 502], # max shape
+                    ]
+                }
+                """
+                logger.info('using opt_params: {}'.format(opt_params))
+                for input_index, input_tensor_name in enumerate(opt_params.keys()):
+                    min_shape = tuple(opt_params[input_tensor_name][0][:])
+                    opt_shape = tuple(opt_params[input_tensor_name][1][:])
+                    max_shape = tuple(opt_params[input_tensor_name][2][:])
+                    profile.set_shape(
+                        input_tensor_name, min_shape, opt_shape, max_shape
+                    )
+            trt_config.add_optimization_profile(profile)
 
             if trt_version == TRT8:
                 trt_config.max_workspace_size = 2 << 30  # 2GB
@@ -262,11 +310,14 @@ def build_engine_onnx_v2(onnx_file_path="", engine_file_path="", fp16_mode=False
                 else:
                     builder.fp16_mode = fp16_mode
 
-                assert calibration_stream, '[Error] a calibration_stream should be provided for int8 mode'
+                assert (
+                    calibration_stream
+                ), "[Error] a calibration_stream should be provided for int8 mode"
                 config.int8_calibrator = Calibrator(
-                    calibration_stream, calibration_table_path)
+                    calibration_stream, calibration_table_path
+                )
                 # builder.int8_calibrator  = Calibrator(calibration_stream, calibration_table_path)
-                logger.info('[INFO] Int8 mode enabled')
+                logger.info("[INFO] Int8 mode enabled")
 
             engine = None
             if trt_version == TRT8:
@@ -275,7 +326,7 @@ def build_engine_onnx_v2(onnx_file_path="", engine_file_path="", fp16_mode=False
                 engine = builder.build_cuda_engine(network)
 
             if engine is None:
-                logger.info('[INFO] Failed to create the engine')
+                logger.info("[INFO] Failed to create the engine")
                 return None
             logger.info("[INFO] Completed creating the engine")
             if save_engine:
@@ -289,7 +340,7 @@ def build_engine_onnx_v2(onnx_file_path="", engine_file_path="", fp16_mode=False
         with open(engine_file_path, "rb") as f, trt.Runtime(TRT_LOGGER) as runtime:
             return runtime.deserialize_cuda_engine(f.read())
     else:
-        return build_engine(max_batch_size, save_engine)
+        return build_engine(max_batch_size, save_engine, opt_params=opt_params)
 
 
 def load_engine_from_local(engine_file_path):
@@ -299,47 +350,62 @@ def load_engine_from_local(engine_file_path):
         with open(engine_file_path, "rb") as f, trt.Runtime(TRT_LOGGER) as runtime:
             return runtime.deserialize_cuda_engine(f.read())
     else:
-        logger.info('engine does not exist, please build it first.')
+        logger.info("engine does not exist, please build it first.")
         exit(1)
 
 
 def load_torchtrt_plugins():
     # ctypes.CDLL(osp.join(dir_path, 'libamirstan_plugin.so'))
     # suppose plugins lib installed into HOME
-    lib_path = osp.join(osp.expanduser(
-        "~"), 'torchtrt_plugins/build/lib/libtorchtrt_plugins.so')
+    lib_path = osp.join(
+        osp.expanduser("~"), "torchtrt_plugins/build/lib/libtorchtrt_plugins.so"
+    )
     if os.path.exists(lib_path):
         ctypes.CDLL(lib_path)
     else:
-        logger.warning(f'{lib_path} not found.')
+        logger.warning(f"{lib_path} not found.")
 
 
-def build_engine_onnx_v3(onnx_file_path="", fp16_mode=False, int8_mode=False,
-                         max_batch_size=1, calibration_stream=None, calibration_table_path="", save_engine=True):
+def build_engine_onnx_v3(
+    onnx_file_path="",
+    fp16_mode=False,
+    int8_mode=False,
+    max_batch_size=1,
+    calibration_stream=None,
+    calibration_table_path="",
+    save_engine=True,
+):
     """Attempts to load a serialized engine if available, otherwise builds a new TensorRT engine and saves it."""
-    engine_file_path = os.path.join(os.path.dirname(
-        onnx_file_path), os.path.basename(onnx_file_path).replace('.onnx', '.engine'))
+    engine_file_path = os.path.join(
+        os.path.dirname(onnx_file_path),
+        os.path.basename(onnx_file_path).replace(".onnx", ".engine"),
+    )
     trt.init_libnvinfer_plugins(None, "")
 
     def build_engine(max_batch_size, save_engine):
         """Takes an ONNX file and creates a TensorRT engine to run inference with"""
-        with trt.Builder(TRT_LOGGER) as builder, builder.create_network(1) as network,\
-                builder.create_builder_config() as config, trt.OnnxParser(network, TRT_LOGGER) as parser, builder.create_builder_config() as trt_config:
+        with trt.Builder(TRT_LOGGER) as builder, builder.create_network(
+            1
+        ) as network, builder.create_builder_config() as config, trt.OnnxParser(
+            network, TRT_LOGGER
+        ) as parser, builder.create_builder_config() as trt_config:
 
             trt_version = int(trt.__version__[0])
             # parse onnx model file
             if not os.path.exists(onnx_file_path):
-                quit(f'[Error]ONNX file {onnx_file_path} not found')
-            logger.info(
-                f'[INFO] Loading ONNX file from path {onnx_file_path}...')
-            with open(onnx_file_path, 'rb') as model:
-                logger.info('[INFO] Beginning ONNX file parsing')
+                quit(f"[Error]ONNX file {onnx_file_path} not found")
+            logger.info(f"[INFO] Loading ONNX file from path {onnx_file_path}...")
+            with open(onnx_file_path, "rb") as model:
+                logger.info("[INFO] Beginning ONNX file parsing")
                 parser.parse(model.read())
-                assert network.num_layers > 0, '[Error] Failed to parse ONNX model. \
-                            Please check if the ONNX model is compatible '
-            logger.info('[INFO] Completed parsing of ONNX file')
+                assert (
+                    network.num_layers > 0
+                ), "[Error] Failed to parse ONNX model. \
+                            Please check if the ONNX model is compatible "
+            logger.info("[INFO] Completed parsing of ONNX file")
             logger.info(
-                f'[INFO] Building an engine from file {onnx_file_path}, this may take a while...')
+                f"[INFO] Building an engine from file {onnx_file_path}, this may take a while..."
+            )
 
             # build trt engine
             builder.max_batch_size = max_batch_size
@@ -361,11 +427,14 @@ def build_engine_onnx_v3(onnx_file_path="", fp16_mode=False, int8_mode=False,
                 else:
                     builder.fp16_mode = fp16_mode
 
-                assert calibration_stream, '[Error] a calibration_stream should be provided for int8 mode'
+                assert (
+                    calibration_stream
+                ), "[Error] a calibration_stream should be provided for int8 mode"
                 config.int8_calibrator = Calibrator(
-                    calibration_stream, calibration_table_path)
+                    calibration_stream, calibration_table_path
+                )
                 # builder.int8_calibrator  = Calibrator(calibration_stream, calibration_table_path)
-                logger.info('[INFO] Int8 mode enabled')
+                logger.info("[INFO] Int8 mode enabled")
 
             engine = None
             if trt_version == TRT8:
@@ -374,7 +443,7 @@ def build_engine_onnx_v3(onnx_file_path="", fp16_mode=False, int8_mode=False,
                 engine = builder.build_cuda_engine(network)
 
             if engine is None:
-                logger.info('[INFO] Failed to create the engine')
+                logger.info("[INFO] Failed to create the engine")
                 return None
             logger.info("[INFO] Completed creating the engine")
             if save_engine:
@@ -396,23 +465,25 @@ def check_engine(engine, input_shape=(608, 608)):
     for binding in engine:
         dims = engine.get_binding_shape(binding)
         if dims[-1] == -1:
-            assert input_shape is not None, 'dynamic trt engine must specific input_shape'
+            assert (
+                input_shape is not None
+            ), "dynamic trt engine must specific input_shape"
             dims[-2], dims[-1] = input_shape
         size = trt.volume(dims) * engine.max_batch_size
         dtype = trt.nptype(engine.get_binding_dtype(binding))
 
         if engine.binding_is_input(binding):
             tensor_names_shape_dict[binding] = {
-                'shape': dims,
-                'dtype': dtype,
-                'is_input': True
+                "shape": dims,
+                "dtype": dtype,
+                "is_input": True,
             }
-            print(f'INPUT: {binding}, {dims}, {dtype}, {size}')
+            print(f"INPUT: {binding}, {dims}, {dtype}, {size}")
         else:
             tensor_names_shape_dict[binding] = {
-                'shape': dims,
-                'dtype': dtype,
-                'is_input': False
+                "shape": dims,
+                "dtype": dtype,
+                "is_input": False,
             }
-            print(f'OUTPUT: {binding}, {dims}, {dtype}, {size}')
+            print(f"OUTPUT: {binding}, {dims}, {dtype}, {size}")
     return tensor_names_shape_dict
