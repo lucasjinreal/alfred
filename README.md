@@ -87,6 +87,14 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 `alfred-py`　has been updating for 3 years, and it will keep going!
 
 - **2050-xxx**: *to be continue*;
+- **2021.12.22**: Now alfred supported keypoints visualization, almost all datasets supported in mmpose were also supported by alfred:
+  ```python
+  from alfred.vis.image.pose import vis_pose_result
+
+  # preds are poses, which is (Bs, 17, 3) for coco body
+  vis_pose_result(ori_image, preds, radius=5, thickness=2, show=True)
+  ```
+
 - **2021.12.05**: You can using `alfred.deploy.tensorrt` for tensorrt inference now:
   ```python
   from alfred.deploy.tensorrt.common import do_inference_v2, allocate_buffers_v2, build_engine_onnx_v3
