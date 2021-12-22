@@ -16,10 +16,13 @@
 
 import os
 import tensorrt as trt
-import pycuda.driver as cuda
-import pycuda.autoinit
 import numpy as np
 import ctypes
+
+try:
+    import pycuda.driver as cuda
+except ImportError as e:
+    print('pycuda not installed, calibrator will disable.')
 
 
 
