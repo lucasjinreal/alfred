@@ -13,15 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-import pycuda.driver as cuda
-
-# https://documen.tician.de/pycuda/driver.html
-import pycuda.autoinit
 import numpy as np
 import tensorrt as trt
 from .calibrator import Calibrator
-
 from alfred.utils.log import logger
 
 import sys
@@ -30,6 +24,13 @@ import time
 import os
 import os.path as osp
 import ctypes
+
+try:
+    import pycuda.driver as cuda
+    # https://documen.tician.de/pycuda/driver.html
+    import pycuda.autoinit
+except ImportError as e:
+    print('pycuda not installed, inference on trt will be disabled.')
 
 TRT8 = 8
 TRT7 = 7
