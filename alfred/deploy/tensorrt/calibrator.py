@@ -22,7 +22,7 @@ import ctypes
 try:
     import pycuda.driver as cuda
 except ImportError as e:
-    print('pycuda not installed, calibrator will disable.')
+    print('pycuda not installed, calibrator will be disabled.')
 
 
 
