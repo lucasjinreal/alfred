@@ -82,7 +82,7 @@ def allocate_buffers_v2(engine):
     bindings = []
     stream = cuda.Stream()
     for binding in engine:
-        size = trt.volume(engine.get_binding_shape(binding)) * engine.max_batch_size
+        size = abs(trt.volume(engine.get_binding_shape(binding))) * engine.max_batch_size
         dtype = trt.nptype(engine.get_binding_dtype(binding))
         # Allocate host and device buffers
         host_mem = cuda.pagelocked_empty(size, dtype)
@@ -124,7 +124,7 @@ def allocate_buffers_v2_dynamic(engine, is_explicit_batch=False, input_shape=Non
                 input_shape is not None
             ), "dynamic trt engine must specific input_shape"
             dims[-2], dims[-1] = input_shape
-        size = trt.volume(dims) * engine.max_batch_size
+        size = abs(trt.volume(dims)) * engine.max_batch_size
         dtype = trt.nptype(engine.get_binding_dtype(binding))
         # Allocate host and device buffers
         host_mem = cuda.pagelocked_empty(size, dtype)
@@ -293,12 +293,11 @@ def build_engine_onnx_v2(
                             Please check if the ONNX model is compatible "
             logger.info("[INFO] Completed parsing of ONNX file")
             logger.info(
-                f"[INFO] Building an engine from file {onnx_file_path}; this may take a while..."
+                f"[INFO] Building an engine from file {onnx_file_path}, this may take a while..."
             )
 
             # build trt engine
-            builder.max_batch_size = max_batch_size
-
+            
             # set optimize profile for dynamic inputs
             profile = builder.create_optimization_profile()
             if opt_params is not None:
@@ -319,6 +318,9 @@ def build_engine_onnx_v2(
                     profile.set_shape(
                         input_tensor_name, min_shape, opt_shape, max_shape
                     )
+                    max_batch_size = max_shape[0]
+
+                builder.max_batch_size = max_batch_size
             trt_config.add_optimization_profile(profile)
 
             if trt_version == TRT8:
