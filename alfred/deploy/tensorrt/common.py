@@ -304,12 +304,16 @@ def build_engine_onnx_v2(
             if trt_version == TRT8:
                 if fp16_mode:
                     trt_config.set_flag(trt.BuilderFlag.FP16)
+                    logger.info('enabled fp16 mode.')
             else:
-                builder.fp16_mode = fp16_mode
+                if fp16_mode:
+                    builder.fp16_mode = fp16_mode
+                    logger.info('enabled fp16 mode.')
 
             if int8_mode:
                 if trt_version == TRT8:
                     trt_config.set_flag(trt.BuilderFlag.INT8)
+                    logger.info('enabled int8 mode.')
                 else:
                     builder.fp16_mode = fp16_mode
 
@@ -320,7 +324,7 @@ def build_engine_onnx_v2(
                     calibration_stream, calibration_table_path
                 )
                 # builder.int8_calibrator  = Calibrator(calibration_stream, calibration_table_path)
-                logger.info("[INFO] Int8 mode enabled")
+                logger.info("Int8 mode enabled")
 
             engine = None
             if trt_version == TRT8:
@@ -329,9 +333,9 @@ def build_engine_onnx_v2(
                 engine = builder.build_cuda_engine(network)
 
             if engine is None:
-                logger.info("[INFO] Failed to create the engine")
+                logger.info("Failed to create the engine")
                 return None
-            logger.info("[INFO] Completed creating the engine")
+            logger.info("Completed creating the engine")
             if save_engine:
                 with open(engine_file_path, "wb") as f:
                     f.write(engine.serialize())
@@ -339,7 +343,7 @@ def build_engine_onnx_v2(
 
     if os.path.exists(engine_file_path):
         # If a serialized engine exists, load it instead of building a new one.
-        logger.info(f"[INFO] Reading engine from file {engine_file_path}")
+        logger.info(f"Reading engine from file {engine_file_path}")
         with open(engine_file_path, "rb") as f, trt.Runtime(TRT_LOGGER) as runtime:
             return runtime.deserialize_cuda_engine(f.read())
     else:
@@ -349,7 +353,7 @@ def build_engine_onnx_v2(
 def load_engine_from_local(engine_file_path):
     if os.path.exists(engine_file_path):
         # If a serialized engine exists, load it instead of building a new one.
-        logger.info(f"[INFO] Reading engine from file {engine_file_path}")
+        logger.info(f"Reading engine from file {engine_file_path}")
         with open(engine_file_path, "rb") as f, trt.Runtime(TRT_LOGGER) as runtime:
             return runtime.deserialize_cuda_engine(f.read())
     else:
@@ -397,9 +401,9 @@ def build_engine_onnx_v3(
             # parse onnx model file
             if not os.path.exists(onnx_file_path):
                 quit(f"[Error]ONNX file {onnx_file_path} not found")
-            logger.info(f"[INFO] Loading ONNX file from path {onnx_file_path}...")
+            logger.info(f"Loading ONNX file from path {onnx_file_path}...")
             with open(onnx_file_path, "rb") as model:
-                logger.info("[INFO] Beginning ONNX file parsing")
+                logger.info("Beginning ONNX file parsing")
                 parser.parse(model.read())
                 assert (
                     network.num_layers > 0
@@ -407,7 +411,7 @@ def build_engine_onnx_v3(
                             Please check if the ONNX model is compatible "
             logger.info("[INFO] Completed parsing of ONNX file")
             logger.info(
-                f"[INFO] Building an engine from file {onnx_file_path}, this may take a while..."
+                f"Building an engine from file {onnx_file_path}, this may take a while..."
             )
 
             # build trt engine
@@ -437,7 +441,7 @@ def build_engine_onnx_v3(
                     calibration_stream, calibration_table_path
                 )
                 # builder.int8_calibrator  = Calibrator(calibration_stream, calibration_table_path)
-                logger.info("[INFO] Int8 mode enabled")
+                logger.info("Int8 mode enabled")
 
             engine = None
             if trt_version == TRT8:
@@ -446,17 +450,18 @@ def build_engine_onnx_v3(
                 engine = builder.build_cuda_engine(network)
 
             if engine is None:
-                logger.info("[INFO] Failed to create the engine")
+                logger.info("Failed to create the engine")
                 return None
-            logger.info("[INFO] Completed creating the engine")
+            logger.info("Completed creating the engine")
             if save_engine:
+                logger.info(f"engine saved into: {engine_file_path}")
                 with open(engine_file_path, "wb") as f:
                     f.write(engine.serialize())
             return engine
 
     if os.path.exists(engine_file_path):
         # If a serialized engine exists, load it instead of building a new one.
-        logger.info(f"[INFO] Reading engine from file {engine_file_path}")
+        logger.info(f"Reading engine from file {engine_file_path}")
         with open(engine_file_path, "rb") as f, trt.Runtime(TRT_LOGGER) as runtime:
             return runtime.deserialize_cuda_engine(f.read())
     else:
