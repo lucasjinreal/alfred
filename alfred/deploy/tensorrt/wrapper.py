@@ -65,6 +65,8 @@ class TensorRTInferencer:
             # make context aware what's batchsize current
             self.ori_input_shape[0] = bs
             self.context.set_binding_shape(0, (self.ori_input_shape))
+        else:
+            self.inputs[0].host = imgs.ravel()
 
         if self.timing:
             t0 = time.perf_counter()
@@ -85,7 +87,10 @@ class TensorRTInferencer:
             if self.is_dynamic_batch:
                 o_s[0] = self.engine.max_batch_size
             o = np.reshape(o, o_s)
-            outs_reshaped.append(o[:bs, ...])
+            if self.is_dynamic_batch:
+                outs_reshaped.append(o[:bs, ...])
+            else:
+                outs_reshaped.append(o)
         return outs_reshaped
 
     def __del__(self):
