@@ -2,7 +2,7 @@
 
 <img src="https://s4.ax1x.com/2022/01/05/TvNFtf.png">
 
-**Alfred Python - Born For Deeplearning**
+<h1>Alfred Python - Born For Deeplearning</h1>
 
 
 [![PyPI downloads](https://static.pepy.tech/personalized-badge/alfred-py?period=total&units=international_system&left_color=grey&right_color=blue&left_text=pypi%20downloads)](https://pepy.tech/project/alfred-py)
