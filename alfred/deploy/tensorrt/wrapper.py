@@ -11,11 +11,18 @@ from alfred.deploy.tensorrt.common import (
 import numpy as np
 from alfred.utils.log import logger
 import time
-
+import pycuda.driver as cuda
 
 class TensorRTInferencer:
-    def __init__(self, engine_f, timing=False) -> None:
+    def __init__(self, engine_f, device_id=0, cuda_ctx=None, timing=False) -> None:
         self.engine_f = engine_f
+        self.device_id = device_id
+        self.cuda_ctx = cuda_ctx
+        if self.cuda_ctx:
+            self.cuda_ctx.push()
+        else:
+            self.cuda_ctx = cuda.Device(self.device_id).make_context()
+            self.cuda_ctx.push()
         self.timing = timing
         self._init_engine()
 
@@ -38,27 +45,34 @@ class TensorRTInferencer:
         if self.is_dynamic_shape:
             logger.info("engine is dynamic on shape.")
 
-        if self.is_dynamic_shape:
-            (
-                self.inputs,
-                self.outputs,
-                self.bindings,
-                self.stream,
-            ) = allocate_buffers_v2_dynamic(self.engine)
-        else:
-            (
-                self.inputs,
-                self.outputs,
-                self.bindings,
-                self.stream,
-            ) = allocate_buffers_v2(self.engine)
+        # self.cuda_ctx = cuda.Device(self.device_id).make_context()
 
-        self.context.set_optimization_profile_async(0, self.stream.handle)
-        print("TRT engine loaded.")
+        try:
+            if self.is_dynamic_shape:
+                (
+                    self.inputs,
+                    self.outputs,
+                    self.bindings,
+                    self.stream,
+                ) = allocate_buffers_v2_dynamic(self.engine)
+                self.context.set_optimization_profile_async(0, self.stream.handle)
+            else:
+                (
+                    self.inputs,
+                    self.outputs,
+                    self.bindings,
+                    self.stream,
+                ) = allocate_buffers_v2(self.engine)
+            print("TRT engine loaded.")
+        except Exception as e:
+            self.cuda_ctx.pop()
+            del self.cuda_ctx
+            raise RuntimeError("Fail to allocate CUDA resources") from e
 
     def infer(self, imgs):
         assert isinstance(imgs, np.ndarray), "imgs must be numpy array"
-
+        if self.cuda_ctx:
+            self.cuda_ctx.push()
         if self.is_dynamic_batch:
             bs = imgs.shape[0]
             self.inputs[0].host = imgs.ravel()
@@ -78,6 +92,8 @@ class TensorRTInferencer:
             stream=self.stream,
             input_tensor=imgs,
         )
+        if self.cuda_ctx:
+            self.cuda_ctx.pop()
         if self.timing:
             t1 = time.perf_counter()
             print(f"engine cost: {t1 - t0}, fps: {1/(t1-t0)}")
@@ -91,8 +107,16 @@ class TensorRTInferencer:
                 outs_reshaped.append(o[:bs, ...])
             else:
                 outs_reshaped.append(o)
+        # self.cuda_ctx.pop()
         return outs_reshaped
 
     def __del__(self):
+        """Free CUDA memories"""
         del self.engine
         del self.context
+        del self.stream
+        del self.outputs
+        del self.inputs
+        # if self.cuda_ctx:
+        #     self.cuda_ctx.pop()
+        #     del self.cuda_ctx

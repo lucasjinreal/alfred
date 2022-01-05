@@ -12,6 +12,7 @@ def vis_pose_result(
     thickness=1,
     kpt_score_thr=0.3,
     dataset="TopDownCocoDataset",
+    dataset_info=None,
     show=False,
     out_file=None,
 ):
@@ -30,7 +31,12 @@ def vis_pose_result(
     """
 
     # get dataset info
-    dataset_info = get_dataset_info_by_name(dataset)
+    if dataset_info is None:
+        dataset_info = get_dataset_info_by_name(dataset)
+        assert dataset_info is None, '{} dataset not supported built in, you can specific dataset_info manually.'.format(dataset)
+    else:
+        dataset_info = DatasetInfo(dataset_info)
+    
     skeleton = dataset_info.skeleton
     pose_link_color = dataset_info.pose_link_color
     pose_kpt_color = dataset_info.pose_kpt_color

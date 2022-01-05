@@ -120,14 +120,13 @@ def get_dataset_info_by_name(dataset):
 
         dataset_info = DatasetInfo(dataset_info)
     elif dataset == "TopDownAicDataset":
-        raise NotImplementedError
+        dataset_info = None
     elif dataset == "TopDownMpiiDataset":
         from .pose_datasets.mpii import dataset_info
 
         dataset_info = DatasetInfo(dataset_info)
-
     elif dataset == "TopDownMpiiTrbDataset":
-        pass
+        dataset_info = None
     elif dataset in ("OneHand10KDataset", "FreiHandDataset", "PanopticDataset"):
         from .pose_datasets.onehand10k import dataset_info
 
@@ -142,29 +141,30 @@ def get_dataset_info_by_name(dataset):
         pass
 
     elif dataset == "FaceAFLWDataset":
-        pass
+        dataset_info = None
 
     elif dataset == "FaceCOFWDataset":
-        pass
+        dataset_info = None
 
     elif dataset == "FaceWFLWDataset":
-        pass
+        dataset_info = None
 
     elif dataset == "AnimalHorse10Dataset":
-        pass
+        dataset_info = None
 
     elif dataset == "AnimalFlyDataset":
-        pass
+        dataset_info = None
     elif dataset == "AnimalLocustDataset":
-        pass
+        dataset_info = None
 
     elif dataset == "AnimalZebraDataset":
-        pass
+        dataset_info = None
 
     elif dataset in "AnimalPoseDataset":
         from .pose_datasets.animalpose import dataset_info
 
         dataset_info = DatasetInfo(dataset_info)
     else:
-        print('{} not supported for now.'.format(dataset))
+        print("{} not supported for now.".format(dataset))
+        dataset_info = None
     return dataset_info

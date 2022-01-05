@@ -95,6 +95,7 @@ def allocate_buffers_v2(engine):
         else:
             outputs.append(HostDeviceMem(host_mem, device_mem))
     return inputs, outputs, bindings, stream
+    # return inputs, outputs, bindings
 
 
 # do inference  multi outputs

@@ -57,9 +57,7 @@ def download(
             def hook(t: tqdm.tqdm) -> Callable[[int, int, Optional[int]], None]:
                 last_b = [0]
 
-                def inner(
-                    b: int, bsize: int, tsize: Optional[int] = None
-                ) -> None:
+                def inner(b: int, bsize: int, tsize: Optional[int] = None) -> None:
                     if tsize is not None:
                         t.total = tsize
                     t.update((b - last_b[0]) * bsize)  # type: ignore
@@ -70,9 +68,7 @@ def download(
             with tqdm.tqdm(  # type: ignore
                 unit="B", unit_scale=True, miniters=1, desc=filename, leave=True
             ) as t:
-                tmp, _ = request.urlretrieve(
-                    url, filename=tmp, reporthook=hook(t)
-                )
+                tmp, _ = request.urlretrieve(url, filename=tmp, reporthook=hook(t))
 
         else:
             tmp, _ = request.urlretrieve(url, filename=tmp)
@@ -92,9 +88,7 @@ def download(
         except IOError:
             pass
 
-    logger.info(
-        "Successfully downloaded " + fpath + ". " + str(size) + " bytes."
-    )
+    logger.info("Successfully downloaded " + fpath + ". " + str(size) + " bytes.")
     return fpath
 
 
@@ -194,9 +188,7 @@ class PathHandler:
         """
         raise NotImplementedError()
 
-    def _copy(
-        self, src_path: str, dst_path: str, overwrite: bool = False
-    ) -> bool:
+    def _copy(self, src_path: str, dst_path: str, overwrite: bool = False) -> bool:
         """
         Copies a source path to a destination path.
 
@@ -291,9 +283,7 @@ class NativePathHandler(PathHandler):
     def _open(self, path: str, mode: str = "r") -> IO[Any]:
         return open(path, mode)
 
-    def _copy(
-        self, src_path: str, dst_path: str, overwrite: bool = False
-    ) -> bool:
+    def _copy(self, src_path: str, dst_path: str, overwrite: bool = False) -> bool:
         """
         Copies a source path to a destination path.
 
@@ -307,8 +297,7 @@ class NativePathHandler(PathHandler):
         """
         if os.path.exists(dst_path) and not overwrite:
             logger = logging.getLogger(__name__)
-            logger.error(
-                "Destination file {} already exists.".format(dst_path))
+            logger.error("Destination file {} already exists.".format(dst_path))
             return False
 
         try:
@@ -359,9 +348,7 @@ class HTTPURLHandler(PathHandler):
         This implementation downloads the remote resource and caches it locally.
         The resource will only be downloaded if not previously requested.
         """
-        if path not in self.cache_map or not os.path.exists(
-            self.cache_map[path]
-        ):
+        if path not in self.cache_map or not os.path.exists(self.cache_map[path]):
             logger = logging.getLogger(__name__)
             parsed_url = urlparse(path)
             dirname = os.path.join(
@@ -378,10 +365,7 @@ class HTTPURLHandler(PathHandler):
         return self.cache_map[path]
 
     def _open(self, path: str, mode: str = "r") -> IO[Any]:
-        assert mode in (
-            "r",
-            "rb",
-        ), "{} does not support open with {} mode".format(
+        assert mode in ("r", "rb",), "{} does not support open with {} mode".format(
             self.__class__.__name__, mode
         )
         local_path = self._get_local_path(path)
@@ -557,9 +541,7 @@ class PathManager:
         # eg: http://foo/bar before http://foo
         PathManager._PATH_HANDLERS = OrderedDict(
             sorted(
-                PathManager._PATH_HANDLERS.items(),
-                key=lambda t: t[0],
-                reverse=True,
+                PathManager._PATH_HANDLERS.items(), key=lambda t: t[0], reverse=True,
             )
         )
 
@@ -568,7 +550,6 @@ PathManager.register_handler(HTTPURLHandler())
 
 
 class SourceIter:
-
     def __init__(self, src):
         self.src = src
         self.srcs = []
@@ -581,10 +562,12 @@ class SourceIter:
 
     def __next__(self):
         if self.video_mode:
-            assert self.cap is not None, 'video mode on but cap is None. video open failed.'
+            assert (
+                self.cap is not None
+            ), "video mode on but cap is None. video open failed."
             ret, frame = self.cap.read()
             if not ret:
-                print('Seems iteration done. bye~')
+                print("Seems iteration done. bye~")
                 exit(0)
             return frame
         else:
@@ -593,24 +576,38 @@ class SourceIter:
                 self._index += 1
                 return p
             else:
-                print('Seems iteration done. bye~')
+                print("Seems iteration done. bye~")
                 exit(0)
                 # raise StopIteration
 
 
 class ImageSourceIter(SourceIter):
-
     def __init__(self, src):
         super(ImageSourceIter, self).__init__(src)
-        
+
         self._index_sources()
-        assert len(self.srcs) > 0, 'srcs indexed empty: {}'.format(self.srcs)
-    
+        assert len(self.srcs) > 0, "srcs indexed empty: {}".format(self.srcs)
+        if self.video_mode:
+            fourcc = cv.VideoWriter_fourcc(*"XVID")
+            width = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
+            height = int(self.cap.get(cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
+            self.filename = os.path.basename(src).split(".")[0]
+            self.save_f = os.path.join(os.path.dirname(src), self.filename + ".avi")
+            self.video_writter = cv.VideoWriter(
+                self.save_f, fourcc, 25.0, (width, height)
+            )
+
     def _is_video(self, p):
-        if str(p).endswith('.mp4') or str(p).endswith('.avi'):
+        if str(p).endswith(".mp4") or str(p).endswith(".avi"):
             return True
         else:
             return False
+
+    def save_res_image_or_video_frame(self, res):
+        if self.video_mode:
+            self.video_writter.write(res)
+        else:
+            return NotImplementedError
 
     def _index_sources(self):
         if os.path.isfile(self.src) and self._is_video(self.src):
@@ -620,8 +617,14 @@ class ImageSourceIter(SourceIter):
         elif os.path.isfile(self.src):
             self.srcs = [self.src]
         elif os.path.isdir(self.src):
-            for ext in ('*.bmp', '*.png', '*.jpg'):
+            for ext in ("*.bmp", "*.png", "*.jpg"):
                 self.srcs.extend(glob.glob(os.path.join(self.src, ext)))
             # print(self.srcs)
         else:
-            TypeError('{} must be dir or file'.format(self.src))
+            TypeError("{} must be dir or file".format(self.src))
+
+    def __del__(self) -> None:
+        if self.video_mode:
+            self.cap.release()
+            self.video_writter.release()
+
