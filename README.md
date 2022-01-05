@@ -19,10 +19,25 @@
 
 </div>
 
-![alfred vis segmentation annotation in coco format](https://i.loli.net/2021/01/25/Dev8LXE1CWhMm9g.png)
 
 *Alfred* is command line tool for deep-learning usage. if you want split an video into image frames or combine frames into a single video, then **alfred** is what you want.
 
+
+
+## Functions Summary
+
+Since many new users of alfred maybe not very familiar with it, conclude functions here briefly, more details see my updates:
+
+- Visualization, draw boxes, masks, keypoints is very simple, even **3D** boxes on point cloud supported;
+- Command line tools, such as view your annotation data in any format (yolo, voc, coco any one);
+- Deploy, you can using alfred deploy your tensorrt models;
+- DL common utils, such as torch.device() etc;
+- Renders, render your 3D models.
+
+
+A pic visualized from alfred:
+
+![alfred vis segmentation annotation in coco format](https://i.loli.net/2021/01/25/Dev8LXE1CWhMm9g.png)
 
 
 ## Install
