@@ -627,4 +627,5 @@ class ImageSourceIter(SourceIter):
         if self.video_mode:
             self.cap.release()
             self.video_writter.release()
+            print('your wrote video result file should saved into: ', self.save_f)
 

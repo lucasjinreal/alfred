@@ -13,6 +13,7 @@ from alfred.utils.log import logger
 import time
 import pycuda.driver as cuda
 
+
 class TensorRTInferencer:
     def __init__(self, engine_f, device_id=0, cuda_ctx=None, timing=False) -> None:
         self.engine_f = engine_f
@@ -20,22 +21,18 @@ class TensorRTInferencer:
         self.cuda_ctx = cuda_ctx
         if self.cuda_ctx:
             self.cuda_ctx.push()
-        else:
-            self.cuda_ctx = cuda.Device(self.device_id).make_context()
-            self.cuda_ctx.push()
         self.timing = timing
         self._init_engine()
 
     def _init_engine(self):
         self.engine = load_engine_from_local(self.engine_f)
-        self.context = self.engine.create_execution_context()
-
         sps = check_engine(self.engine)
-        self.input_shapes = [sps[i]["shape"] for i in sps.keys() if sps[i]["is_input"]]
+        self.input_shapes = [sps[i]["shape"]
+                             for i in sps.keys() if sps[i]["is_input"]]
         self.output_shapes = [
             sps[i]["shape"] for i in sps.keys() if not sps[i]["is_input"]
         ]
-        self.ori_input_shape = self.context.get_binding_shape(0)
+        self.ori_input_shape = self.engine.get_binding_shape(0)
         self.is_dynamic_batch = self.ori_input_shape[0] == -1
         self.is_dynamic_shape = self.ori_input_shape[-1] == -1
         if self.is_dynamic_batch:
@@ -45,9 +42,8 @@ class TensorRTInferencer:
         if self.is_dynamic_shape:
             logger.info("engine is dynamic on shape.")
 
-        # self.cuda_ctx = cuda.Device(self.device_id).make_context()
-
         try:
+            self.context = self.engine.create_execution_context()
             if self.is_dynamic_shape:
                 (
                     self.inputs,
@@ -55,7 +51,8 @@ class TensorRTInferencer:
                     self.bindings,
                     self.stream,
                 ) = allocate_buffers_v2_dynamic(self.engine)
-                self.context.set_optimization_profile_async(0, self.stream.handle)
+                self.context.set_optimization_profile_async(
+                    0, self.stream.handle)
             else:
                 (
                     self.inputs,
@@ -64,6 +61,8 @@ class TensorRTInferencer:
                     self.stream,
                 ) = allocate_buffers_v2(self.engine)
             print("TRT engine loaded.")
+            if self.cuda_ctx:
+                self.cuda_ctx.pop()
         except Exception as e:
             self.cuda_ctx.pop()
             del self.cuda_ctx
@@ -73,6 +72,7 @@ class TensorRTInferencer:
         assert isinstance(imgs, np.ndarray), "imgs must be numpy array"
         if self.cuda_ctx:
             self.cuda_ctx.push()
+
         if self.is_dynamic_batch:
             bs = imgs.shape[0]
             self.inputs[0].host = imgs.ravel()
@@ -107,16 +107,10 @@ class TensorRTInferencer:
                 outs_reshaped.append(o[:bs, ...])
             else:
                 outs_reshaped.append(o)
-        # self.cuda_ctx.pop()
         return outs_reshaped
 
     def __del__(self):
         """Free CUDA memories"""
-        del self.engine
-        del self.context
-        del self.stream
         del self.outputs
         del self.inputs
-        # if self.cuda_ctx:
-        #     self.cuda_ctx.pop()
-        #     del self.cuda_ctx
+        del self.stream
