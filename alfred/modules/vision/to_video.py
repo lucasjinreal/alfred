@@ -34,6 +34,7 @@ import cv2
 from colorama import Fore, Back, Style
 import numpy as np
 import sys
+from natsort import natsorted
 
 
 class VideoCombiner(object):
@@ -50,8 +51,9 @@ class VideoCombiner(object):
         self.all_images = [os.path.join(self.img_dir, i) for i in os.listdir(self.img_dir)]
 
         # this sorted method seems has problem
-        self.all_images.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
-        for item in self.all_images[:int(len(self.all_images) // 2)]:
+        # self.all_images.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
+        self.all_images = natsorted(self.all_images)
+        for item in self.all_images[:int(len(self.all_images) // 3)]:
             print(item)
         # order the images order.
 
@@ -68,7 +70,7 @@ class VideoCombiner(object):
         print('=> target video frame size: ', size)
         print('=> all {} frames to solve.'.format(len(self.all_images)))
         target_f = 'combined_{}.mp4'.format(os.path.basename(self.img_dir))
-        video_writer = cv2.VideoWriter(target_f, cv2.VideoWriter_fourcc(*'DIVX'), 24, size)
+        video_writer = cv2.VideoWriter(target_f, cv2.VideoWriter_fourcc(*'DIVX'), 26, size)
         i = 0
         print('=> Solving, be patient.')
         for img in self.all_images:

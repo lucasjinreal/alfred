@@ -93,6 +93,6 @@ setup(name='alfred-py',
       author_email="jinfagang19@163.com",
       url='https://github.com/jinfagang/alfred',
       platforms='any',
-      install_requires=['colorama', 'requests', 'regex', 'funcy', 'pascal-voc-writer', 'markdown',
+      install_requires=['colorama', 'natsort', 'requests', 'regex', 'funcy', 'pascal-voc-writer', 'markdown',
                         'future', 'deprecated', 'loguru', 'pyquaternion', 'lxml', 'jsons']
       )

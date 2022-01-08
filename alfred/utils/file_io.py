@@ -569,6 +569,7 @@ class SourceIter:
                 self.cap is not None
             ), "video mode on but cap is None. video open failed."
             ret, frame = self.cap.read()
+            self.crt_index += 1
             if not ret:
                 print("Seems iteration done. bye~")
                 exit(0)
