@@ -1,17 +1,24 @@
-import os
-# os.environ['PYOPENGL_PLATFORM'] = 'egl'
-import math
-import trimesh
-import pyrender
-import numpy as np
+import cv2
+from pyrender.constants import DEFAULT_Z_NEAR
 from pyrender.constants import RenderFlags
+import numpy as np
+import pyrender
+import trimesh
+import math
+import os
+import platform
+os_name = platform.platform.lower()
+if os_name == 'centos' or os_name == 'windows':
+    os.environ['PYOPENGL_PLATFORM'] = 'egl'
+elif os_name == 'debian' or os_name == 'ubuntu':
+    os.environ['PYOPENGL_PLATFORM'] = 'osmesa'
 
 
 class WeakPerspectiveCamera(pyrender.Camera):
     def __init__(self,
                  scale,
                  translation,
-                 znear=pyrender.camera.DEFAULT_Z_NEAR,
+                 znear=DEFAULT_Z_NEAR,
                  zfar=None,
                  name=None):
         super(WeakPerspectiveCamera, self).__init__(
@@ -33,7 +40,7 @@ class WeakPerspectiveCamera(pyrender.Camera):
 
 
 class Renderer:
-    def __init__(self, smpl_faces, resolution=(224,224), orig_img=False, wireframe=False):
+    def __init__(self, smpl_faces, resolution=(224, 224), orig_img=False, wireframe=False):
         self.resolution = resolution
 
         self.faces = smpl_faces
@@ -46,7 +53,8 @@ class Renderer:
         )
 
         # set the scene
-        self.scene = pyrender.Scene(bg_color=[0.0, 0.0, 0.0, 0.0], ambient_light=(0.3, 0.3, 0.3))
+        self.scene = pyrender.Scene(
+            bg_color=[0.0, 0.0, 0.0, 0.0], ambient_light=(0.3, 0.3, 0.3))
 
         # light = pyrender.PointLight(color=[1.0, 1.0, 1.0], intensity=0.8)
         light = pyrender.DirectionalLight(color=[1.0, 1.0, 1.0], intensity=0.8)
@@ -64,7 +72,8 @@ class Renderer:
     def render(self, img, verts, cam, angle=None, axis=None, mesh_filename=None, color=[1.0, 1.0, 0.9], rotate=False):
         mesh = trimesh.Trimesh(vertices=verts, faces=self.faces, process=False)
 
-        Rx = trimesh.transformations.rotation_matrix(math.radians(180), [1, 0, 0])
+        Rx = trimesh.transformations.rotation_matrix(
+            math.radians(180), [1, 0, 0])
         mesh.apply_transform(Rx)
 
         if rotate:
@@ -72,12 +81,13 @@ class Renderer:
                 np.radians(60), [0, 1, 0])
             mesh.apply_transform(rot)
 
+        if angle and axis:
+            R = trimesh.transformations.rotation_matrix(
+                math.radians(angle), axis)
+            mesh.apply_transform(R)
+
         if mesh_filename is not None:
             mesh.export(mesh_filename)
-
-        if angle and axis:
-            R = trimesh.transformations.rotation_matrix(math.radians(angle), axis)
-            mesh.apply_transform(R)
 
         sx, sy, tx, ty = cam
 
@@ -98,7 +108,6 @@ class Renderer:
         )
 
         mesh = pyrender.Mesh.from_trimesh(mesh, material=material)
-
         mesh_node = self.scene.add(mesh, 'mesh')
 
         camera_pose = np.eye(4)
@@ -108,13 +117,18 @@ class Renderer:
             render_flags = RenderFlags.RGBA | RenderFlags.ALL_WIREFRAME
         else:
             render_flags = RenderFlags.RGBA
-
         rgb, _ = self.renderer.render(self.scene, flags=render_flags)
-        valid_mask = (rgb[:, :, -1] > 0)[:, :, np.newaxis]
-        output_img = rgb[:, :, :-1] * valid_mask + (1 - valid_mask) * img
-        image = output_img.astype(np.uint8)
+
+        if rgb.shape[-1] == 4:
+            valid_mask = (rgb[:, :, -1] > 0)[:, :, np.newaxis]
+            output_img = rgb[:, :, :-1] * valid_mask + (1 - valid_mask) * img
+            image = output_img.astype(np.uint8)
+        else:
+            # rgb could be 3 channel output
+            valid_mask = (rgb > 0)
+            output_img = rgb * valid_mask + (1 - valid_mask) * img
+            image = output_img.astype(np.uint8)
 
         self.scene.remove_node(mesh_node)
         self.scene.remove_node(cam_node)
-
         return image

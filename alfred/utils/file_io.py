@@ -68,7 +68,8 @@ def download(
             with tqdm.tqdm(  # type: ignore
                 unit="B", unit_scale=True, miniters=1, desc=filename, leave=True
             ) as t:
-                tmp, _ = request.urlretrieve(url, filename=tmp, reporthook=hook(t))
+                tmp, _ = request.urlretrieve(
+                    url, filename=tmp, reporthook=hook(t))
 
         else:
             tmp, _ = request.urlretrieve(url, filename=tmp)
@@ -88,7 +89,8 @@ def download(
         except IOError:
             pass
 
-    logger.info("Successfully downloaded " + fpath + ". " + str(size) + " bytes.")
+    logger.info("Successfully downloaded " +
+                fpath + ". " + str(size) + " bytes.")
     return fpath
 
 
@@ -297,7 +299,8 @@ class NativePathHandler(PathHandler):
         """
         if os.path.exists(dst_path) and not overwrite:
             logger = logging.getLogger(__name__)
-            logger.error("Destination file {} already exists.".format(dst_path))
+            logger.error(
+                "Destination file {} already exists.".format(dst_path))
             return False
 
         try:
@@ -553,7 +556,7 @@ class SourceIter:
     def __init__(self, src):
         self.src = src
         self.srcs = []
-        self._index = 0
+        self.crt_index = 0
         self.video_mode = False
         self.cap = None
 
@@ -571,9 +574,9 @@ class SourceIter:
                 exit(0)
             return frame
         else:
-            if self._index < len(self.srcs):
-                p = self.srcs[self._index]
-                self._index += 1
+            if self.crt_index < len(self.srcs):
+                p = self.srcs[self.crt_index]
+                self.crt_index += 1
                 return p
             else:
                 print("Seems iteration done. bye~")
@@ -590,12 +593,15 @@ class ImageSourceIter(SourceIter):
         assert len(self.srcs) > 0, "srcs indexed empty: {}".format(self.srcs)
         if self.video_mode:
             fourcc = cv.VideoWriter_fourcc(*"XVID")
-            width = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
-            height = int(self.cap.get(cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
+            self.video_width = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
+            self.video_height = int(self.cap.get(
+                cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
             self.filename = os.path.basename(src).split(".")[0]
-            self.save_f = os.path.join(os.path.dirname(src), self.filename + ".avi")
+            self.save_f = os.path.join(
+                os.path.dirname(src), self.filename + ".avi")
             self.video_writter = cv.VideoWriter(
-                self.save_f, fourcc, 25.0, (width, height)
+                self.save_f, fourcc, 25.0, (self.video_width,
+                                            self.video_height)
             )
 
     def _is_video(self, p):
@@ -632,4 +638,3 @@ class ImageSourceIter(SourceIter):
             self.video_writter.release()
             if self.is_written:
                 print('your wrote video result file should saved into: ', self.save_f)
-
