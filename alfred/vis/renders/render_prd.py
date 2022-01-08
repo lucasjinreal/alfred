@@ -7,7 +7,7 @@ import trimesh
 import math
 import os
 import platform
-os_name = platform.platform.lower()
+os_name = platform.platform().lower()
 if os_name == 'centos' or os_name == 'windows':
     os.environ['PYOPENGL_PLATFORM'] = 'egl'
 elif os_name == 'debian' or os_name == 'ubuntu':
