@@ -586,6 +586,7 @@ class ImageSourceIter(SourceIter):
         super(ImageSourceIter, self).__init__(src)
 
         self._index_sources()
+        self.is_written = False
         assert len(self.srcs) > 0, "srcs indexed empty: {}".format(self.srcs)
         if self.video_mode:
             fourcc = cv.VideoWriter_fourcc(*"XVID")
@@ -606,6 +607,8 @@ class ImageSourceIter(SourceIter):
     def save_res_image_or_video_frame(self, res):
         if self.video_mode:
             self.video_writter.write(res)
+            if not self.is_written:
+                self.is_written = True
         else:
             return NotImplementedError
 
@@ -627,5 +630,6 @@ class ImageSourceIter(SourceIter):
         if self.video_mode:
             self.cap.release()
             self.video_writter.release()
-            print('your wrote video result file should saved into: ', self.save_f)
+            if self.is_written:
+                print('your wrote video result file should saved into: ', self.save_f)
 
