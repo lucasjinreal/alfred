@@ -35,10 +35,9 @@ except ImportError as e:
 TRT8 = 8
 TRT7 = 7
 
-# TRT_LOGGER = trt.Logger(trt.Logger.VERBOSE)
-# TRT_LOGGER = trt.Logger(trt.Logger.INFO)
-TRT_LOGGER = trt.Logger()
-
+TRT_LOGGER = trt.Logger(trt.Logger.INFO)
+# TRT_LOGGER = trt.Logger()
+trt.init_libnvinfer_plugins(TRT_LOGGER, namespace="")
 # Allocate host and device buffers, and create a stream.
 
 
@@ -410,7 +409,9 @@ def build_engine_onnx_v3(
     calibration_table_path="",
     save_engine=True,
 ):
-    """Attempts to load a serialized engine if available, otherwise builds a new TensorRT engine and saves it."""
+    """
+    this is deprecated.
+    """
     engine_file_path = os.path.join(
         os.path.dirname(onnx_file_path),
         os.path.basename(onnx_file_path).replace(".onnx", ".engine"),
