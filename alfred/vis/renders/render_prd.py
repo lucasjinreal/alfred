@@ -1,17 +1,23 @@
-import cv2
-from pyrender.constants import DEFAULT_Z_NEAR
-from pyrender.constants import RenderFlags
-import numpy as np
-import pyrender
-import trimesh
-import math
-import os
 import platform
+import os
+import math
+
+# autopep8: off
 os_name = platform.platform().lower()
-if os_name == 'centos' or os_name == 'windows':
+if 'centos' in os_name or 'windows' in os_name or 'tlinux' in os_name:
     os.environ['PYOPENGL_PLATFORM'] = 'egl'
-elif os_name == 'debian' or os_name == 'ubuntu':
-    os.environ['PYOPENGL_PLATFORM'] = 'osmesa'
+# elif 'debian' in os_name or 'ubuntu' in os_name:
+    # os.environ['PYOPENGL_PLATFORM'] = 'osmesa'
+print(os.environ['PYOPENGL_PLATFORM'])
+# autopep8: on
+
+import trimesh
+import pyrender
+import numpy as np
+from pyrender.constants import RenderFlags
+from pyrender.constants import DEFAULT_Z_NEAR
+import cv2
+
 
 
 class WeakPerspectiveCamera(pyrender.Camera):
