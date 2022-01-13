@@ -4,6 +4,7 @@ import sys
 import os
 import json
 from typing import Tuple
+from pytorch3d.renderer.cameras import PerspectiveCameras
 import torch
 from torch import nn
 import pickle
@@ -66,6 +67,7 @@ class Renderer(nn.Module):
         use_gpu=False,
     ):
         super(Renderer, self).__init__()
+        self.name = 'pytorch3d'
         self.perps = perps
         if use_gpu:
             self.device = torch.device('cuda')
@@ -91,8 +93,11 @@ class Renderer(nn.Module):
         self.fov = 60
 
         if self.perps:
-            self.cameras = FoVPerspectiveCameras(zfar=1000,
-                R=self.default_R, T=self.default_T, fov=60, device=self.device
+            # self.cameras = FoVPerspectiveCameras(zfar=1000,
+            #     R=self.default_R, T=self.default_T, fov=60, device=self.device
+            # )
+            self.cameras = PerspectiveCameras(focal_length=5000,
+                R=self.default_R, T=self.default_T, device=self.device
             )
             self.lights = PointLights(
                 ambient_color=((0.56, 0.56, 0.56),),
@@ -177,7 +182,7 @@ class Renderer(nn.Module):
             self.save_io.save_mesh(meshes, mesh_filename)
         if cam is not None:
             # cam = cam.float()
-            print(cam)
+            # print(cam)
             cam = torch.as_tensor(cam).to(self.device)
             if self.perps:
                 # R, T, fov = cam
@@ -189,11 +194,14 @@ class Renderer(nn.Module):
                 # print(R, T)
                 # print(R.shape, T.shape)
                 # fov = 60
-                R, T = get_projection_matrix_for_weak_perspective_camera(cam[0], cam[1], cam[2], cam[3])
-                R = R.unsqueeze(0).repeat(BS, 1, 1)
+                # R, T = get_projection_matrix_for_weak_perspective_camera(cam[0], cam[1], cam[2], cam[3])
+                # R = R.unsqueeze(0).repeat(BS, 1, 1)
+                T = cam
                 T = T.unsqueeze(0).repeat(BS, 1)
-                new_cam = FoVPerspectiveCameras(zfar=1000, znear=0.05,
-                    R=R, T=T, fov=self.fov, device=self.device)
+                # new_cam = FoVPerspectiveCameras(zfar=1000, znear=0.05,
+                #     R=self.default_R, T=T, fov=self.fov, device=self.device)
+                new_cam = PerspectiveCameras(focal_length=5000,
+                    R=self.default_R, T=T, device=self.device)
             else:
                 R, T, xyz_ranges = cam
                 new_cam = FoVOrthographicCameras(

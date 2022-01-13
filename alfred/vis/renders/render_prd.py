@@ -47,6 +47,7 @@ class WeakPerspectiveCamera(pyrender.Camera):
 
 class Renderer:
     def __init__(self, smpl_faces, resolution=(224, 224), orig_img=False, wireframe=False):
+        self.name = 'pyrender'
         self.resolution = resolution
 
         self.faces = smpl_faces

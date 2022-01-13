@@ -606,7 +606,8 @@ class ImageSourceIter(SourceIter):
             )
 
     def _is_video(self, p):
-        if str(p).endswith(".mp4") or str(p).endswith(".avi"):
+        suffix = os.path.basename(p).split('.')[-1]
+        if suffix in ['mp4', 'avi', 'flv', 'wmv', 'mpeg', 'mov']:
             return True
         else:
             return False
