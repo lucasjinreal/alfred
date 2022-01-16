@@ -558,13 +558,14 @@ class SourceIter:
         self.srcs = []
         self.crt_index = 0
         self.video_mode = False
+        self.webcam_mode = False
         self.cap = None
 
     def __len__(self):
         return len(self.src)
 
     def __next__(self):
-        if self.video_mode:
+        if self.video_mode or self.webcam_mode:
             assert (
                 self.cap is not None
             ), "video mode on but cap is None. video open failed."
@@ -592,14 +593,18 @@ class ImageSourceIter(SourceIter):
         self._index_sources()
         self.is_written = False
         assert len(self.srcs) > 0, "srcs indexed empty: {}".format(self.srcs)
-        if self.video_mode:
+        if self.video_mode or self.webcam_mode:
             fourcc = cv.VideoWriter_fourcc(*"XVID")
             self.video_width = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
             self.video_height = int(self.cap.get(
                 cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
-            self.filename = os.path.basename(src).split(".")[0]
-            self.save_f = os.path.join(
-                os.path.dirname(src), self.filename + ".avi")
+            if self.video_mode:
+                self.filename = os.path.basename(src).split(".")[0]
+                self.save_f = os.path.join(
+                    os.path.dirname(src), self.filename + ".avi")
+            else:
+                os.makedirs('results', exist_ok=True)
+                self.save_f = os.path.join("results/webcam_result.avi")
             self.video_writter = cv.VideoWriter(
                 self.save_f, fourcc, 25.0, (self.video_width,
                                             self.video_height)
@@ -621,6 +626,7 @@ class ImageSourceIter(SourceIter):
             return NotImplementedError
 
     def _index_sources(self):
+        assert os.path.exists(self.src), f'{self.src} not exist.'
         if os.path.isfile(self.src) and self._is_video(self.src):
             self.video_mode = True
             self.cap = cv.VideoCapture(self.src)
@@ -631,6 +637,10 @@ class ImageSourceIter(SourceIter):
             for ext in ("*.bmp", "*.png", "*.jpg"):
                 self.srcs.extend(glob.glob(os.path.join(self.src, ext)))
             # print(self.srcs)
+        elif isinstance(self.src, int):
+            self.webcam_mode = True
+            self.cap = cv.VideoCapture(self.src)
+            self.srcs = [self.src]
         else:
             TypeError("{} must be dir or file".format(self.src))
 
