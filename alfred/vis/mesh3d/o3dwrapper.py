@@ -271,7 +271,7 @@ def create_ground(**kwargs):
 def create_coord(camera=[0, 0, 0], radius=1, scale=1):
     camera_frame = TriangleMesh.create_coordinate_frame(
         size=radius, origin=camera)
-    camera_frame.scale(scale)
+    camera_frame.scale(scale, np.zeros([3, 1]))
     return camera_frame
 
 

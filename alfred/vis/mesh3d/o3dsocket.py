@@ -1,4 +1,5 @@
 
+from traceback import print_tb
 import open3d as o3d
 from .o3dwrapper import Vector3dVector, create_mesh, load_mesh
 from .utils import Timer
@@ -26,7 +27,9 @@ def o3d_callback_rotate(vis=None):
 class VisOpen3DSocket(BaseSocket):
     def __init__(self, cfg=None) -> None:
         if cfg is None:
-            cfg = DefaultConfig.load()
+            crt_dir = os.path.dirname(__file__)
+            cfg = DefaultConfig.load(
+                filename=os.path.join(crt_dir, 'default_viscfg.yml'))
         # output
         host = cfg.host
         port = cfg.port
@@ -44,9 +47,12 @@ class VisOpen3DSocket(BaseSocket):
                           width=cfg.width, height=cfg.height)
         self.vis = vis
         # load the scene
-        for key, mesh_args in cfg.scene.items():
+        for sc in cfg.scene:
+            key = sc['module']
+            mesh_args = sc['args']
             mesh = load_object(key, mesh_args)
             self.vis.add_geometry(mesh)
+
         for key, val in cfg.extra.items():
             mesh = load_mesh(val["path"])
             trans = np.array(val['transform']).reshape(4, 4)

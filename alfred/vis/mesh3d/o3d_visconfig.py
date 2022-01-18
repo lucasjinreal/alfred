@@ -25,7 +25,8 @@ class Config(BaseConfig):
         cfg.out = './results'
         # scene:
         cfg.scene_module = "alfred.vis.mesh3d.o3dwrapper"
-        cfg.scene = CN()
+        cfg.scene = []
+
         cfg.extra = CN()
         cfg.range = CN()
         cfg.new_frames = 0
@@ -60,7 +61,8 @@ class Config(BaseConfig):
     @staticmethod
     def parse(cfg):
         if cfg.host == 'auto':
-            cfg.host = socket.gethostname()
+            # cfg.host = socket.gethostname()
+            cfg.host = '127.0.0.1'
         if cfg.camera.set_camera:
             pass
         else:  # use default camera
