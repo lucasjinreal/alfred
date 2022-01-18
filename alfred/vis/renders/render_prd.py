@@ -29,9 +29,7 @@ class WeakPerspectiveCamera(pyrender.Camera):
                  zfar=None,
                  name=None):
         super(WeakPerspectiveCamera, self).__init__(
-            znear=znear,
-            zfar=zfar,
-            name=name,
+            znear=znear, zfar=zfar, name=name,
         )
         self.scale = scale
         self.translation = translation
@@ -53,16 +51,15 @@ class Renderer:
         """
         self.name = 'pyrender'
         self.resolution = resolution
-
+        print('aa')
         self.faces = smpl_faces
         self.orig_img = orig_img
         self.wireframe = wireframe
         self.renderer = pyrender.OffscreenRenderer(
-            viewport_width=self.resolution[1],
-            viewport_height=self.resolution[0],
-            point_size=1.0
+            viewport_width=self.resolution[0],
+            viewport_height=self.resolution[1],
+            point_size=1.0,
         )
-
         # set the scene
         self.scene = pyrender.Scene(
             bg_color=[0.0, 0.0, 0.0, 0.0], ambient_light=(0.3, 0.3, 0.3))
@@ -73,25 +70,35 @@ class Renderer:
         light_pose = np.eye(4)
         light_pose[:3, 3] = [0, -1, 1]
         self.scene.add(light, pose=light_pose)
+        print('bb')
 
         light_pose[:3, 3] = [0, 1, 1]
         self.scene.add(light, pose=light_pose)
 
         light_pose[:3, 3] = [1, 1, 2]
         self.scene.add(light, pose=light_pose)
+        print('render initiated.')
 
-    def render(self, img, verts, cam, angle=None, axis=None, mesh_filename=None, color=[1.0, 1.0, 0.9], rotate=False):
-        if isinstance(verts, torch.Tensor):
-            verts = verts.cpu().numpy()
+    def render(
+        self,
+        img,
+        verts,
+        cam,
+        angle=None,
+        axis=None,
+        mesh_filename=None,
+        color=[1.0, 1.0, 0.9],
+        rotate=False,
+    ):
         mesh = trimesh.Trimesh(vertices=verts, faces=self.faces, process=False)
 
         Rx = trimesh.transformations.rotation_matrix(
             math.radians(180), [1, 0, 0])
         mesh.apply_transform(Rx)
+        print("???")
 
         if rotate:
-            rot = trimesh.transformations.rotation_matrix(
-                np.radians(60), [0, 1, 0])
+            rot = trimesh.transformations.rotation_matrix(np.radians(60), [0, 1, 0])
             mesh.apply_transform(rot)
 
         if angle and axis:
@@ -105,19 +112,17 @@ class Renderer:
         sx, sy, tx, ty = cam
 
         camera = WeakPerspectiveCamera(
-            scale=[sx, sy],
-            translation=[tx, ty],
-            zfar=1000.
+            scale=[sx, sy], translation=[tx, ty], zfar=1000.0
         )
 
         material = pyrender.MetallicRoughnessMaterial(
             metallicFactor=0.0,
-            alphaMode='OPAQUE',
+            alphaMode="OPAQUE",
             smooth=True,
             wireframe=True,
             roughnessFactor=1.0,
             emissiveFactor=(0.1, 0.1, 0.1),
-            baseColorFactor=(color[0], color[1], color[2], 1.0)
+            baseColorFactor=(color[0], color[1], color[2], 1.0),
         )
 
         mesh = pyrender.Mesh.from_trimesh(mesh, material=material)
