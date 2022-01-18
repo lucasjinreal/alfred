@@ -77,7 +77,10 @@ def decorator(f):
         args_dict = dict(zip(names, args))
         for k, v in args_dict.items():
             k = k.strip()
-            print(f'[{k}]: ', v.shape)
+            if isinstance(v, torch.tensor):
+                print(f'[{k}]: ', v.shape, v.device)
+            else:
+                print(f'[{k}]: ', v.shape)
         return f(*args, **kwargs)
     return wrapper
 
