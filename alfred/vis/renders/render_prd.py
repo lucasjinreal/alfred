@@ -1,23 +1,24 @@
 import platform
 import os
 import math
+import torch
+import numpy as np
+import cv2
+import trimesh
+
 
 # autopep8: off
 os_name = platform.platform().lower()
 if 'centos' in os_name or 'windows' in os_name or 'tlinux' in os_name:
     os.environ['PYOPENGL_PLATFORM'] = 'egl'
-# elif 'debian' in os_name or 'ubuntu' in os_name:
-    # os.environ['PYOPENGL_PLATFORM'] = 'osmesa'
+elif 'debian' in os_name or 'ubuntu' in os_name:
+    os.environ['PYOPENGL_PLATFORM'] = 'osmesa'
 print(os.environ['PYOPENGL_PLATFORM'])
-# autopep8: on
 
-import trimesh
 import pyrender
-import numpy as np
 from pyrender.constants import RenderFlags
 from pyrender.constants import DEFAULT_Z_NEAR
-import cv2
-
+# autopep8: on
 
 
 class WeakPerspectiveCamera(pyrender.Camera):
@@ -46,7 +47,10 @@ class WeakPerspectiveCamera(pyrender.Camera):
 
 
 class Renderer:
-    def __init__(self, smpl_faces, resolution=(224, 224), orig_img=False, wireframe=False):
+    def __init__(self, smpl_faces, resolution=(224, 224), orig_img=False, wireframe=False, use_gpu=True):
+        """
+        resolution is: h, w
+        """
         self.name = 'pyrender'
         self.resolution = resolution
 
@@ -54,8 +58,8 @@ class Renderer:
         self.orig_img = orig_img
         self.wireframe = wireframe
         self.renderer = pyrender.OffscreenRenderer(
-            viewport_width=self.resolution[0],
-            viewport_height=self.resolution[1],
+            viewport_width=self.resolution[1],
+            viewport_height=self.resolution[0],
             point_size=1.0
         )
 
@@ -77,6 +81,8 @@ class Renderer:
         self.scene.add(light, pose=light_pose)
 
     def render(self, img, verts, cam, angle=None, axis=None, mesh_filename=None, color=[1.0, 1.0, 0.9], rotate=False):
+        if isinstance(verts, torch.Tensor):
+            verts = verts.cpu().numpy()
         mesh = trimesh.Trimesh(vertices=verts, faces=self.faces, process=False)
 
         Rx = trimesh.transformations.rotation_matrix(
