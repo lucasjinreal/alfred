@@ -119,6 +119,23 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 `alfred-py`　has been updating for 3 years, and it will keep going!
 
 - **2050-xxx**: *to be continue*;
+- **2022.01.18**: Now alfred support a Mesh3D visualizer server based on Open3D:
+  ```python
+  from alfred.vis.mesh3d.o3dsocket import VisOpen3DSocket
+
+  def main():
+      server = VisOpen3DSocket()
+      while True:
+          server.update()
+
+
+  if __name__ == "__main__":
+      main()
+  ```
+  Then, you just need setup an client, send keypoints3d to server, and it will automatically visualized out.
+  Here is what it looks like:
+  ![](https://s4.ax1x.com/2022/01/18/7BDUZn.gif)
+
 - **2021.12.22**: Now alfred supported keypoints visualization, almost all datasets supported in mmpose were also supported by alfred:
   ```python
   from alfred.vis.image.pose import vis_pose_result
