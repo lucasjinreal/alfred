@@ -68,7 +68,8 @@ def download(
             with tqdm.tqdm(  # type: ignore
                 unit="B", unit_scale=True, miniters=1, desc=filename, leave=True
             ) as t:
-                tmp, _ = request.urlretrieve(url, filename=tmp, reporthook=hook(t))
+                tmp, _ = request.urlretrieve(
+                    url, filename=tmp, reporthook=hook(t))
 
         else:
             tmp, _ = request.urlretrieve(url, filename=tmp)
@@ -88,7 +89,8 @@ def download(
         except IOError:
             pass
 
-    logger.info("Successfully downloaded " + fpath + ". " + str(size) + " bytes.")
+    logger.info("Successfully downloaded " +
+                fpath + ". " + str(size) + " bytes.")
     return fpath
 
 
@@ -297,7 +299,8 @@ class NativePathHandler(PathHandler):
         """
         if os.path.exists(dst_path) and not overwrite:
             logger = logging.getLogger(__name__)
-            logger.error("Destination file {} already exists.".format(dst_path))
+            logger.error(
+                "Destination file {} already exists.".format(dst_path))
             return False
 
         try:
@@ -553,27 +556,29 @@ class SourceIter:
     def __init__(self, src):
         self.src = src
         self.srcs = []
-        self._index = 0
+        self.crt_index = 0
         self.video_mode = False
+        self.webcam_mode = False
         self.cap = None
 
     def __len__(self):
         return len(self.src)
 
     def __next__(self):
-        if self.video_mode:
+        if self.video_mode or self.webcam_mode:
             assert (
                 self.cap is not None
             ), "video mode on but cap is None. video open failed."
             ret, frame = self.cap.read()
+            self.crt_index += 1
             if not ret:
                 print("Seems iteration done. bye~")
                 exit(0)
             return frame
         else:
-            if self._index < len(self.srcs):
-                p = self.srcs[self._index]
-                self._index += 1
+            if self.crt_index < len(self.srcs):
+                p = self.srcs[self.crt_index]
+                self.crt_index += 1
                 return p
             else:
                 print("Seems iteration done. bye~")
@@ -586,19 +591,28 @@ class ImageSourceIter(SourceIter):
         super(ImageSourceIter, self).__init__(src)
 
         self._index_sources()
+        self.is_written = False
         assert len(self.srcs) > 0, "srcs indexed empty: {}".format(self.srcs)
-        if self.video_mode:
+        if self.video_mode or self.webcam_mode:
             fourcc = cv.VideoWriter_fourcc(*"XVID")
-            width = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
-            height = int(self.cap.get(cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
-            self.filename = os.path.basename(src).split(".")[0]
-            self.save_f = os.path.join(os.path.dirname(src), self.filename + ".avi")
+            self.video_width = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
+            self.video_height = int(self.cap.get(
+                cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
+            if self.video_mode:
+                self.filename = os.path.basename(src).split(".")[0]
+                self.save_f = os.path.join(
+                    os.path.dirname(src), self.filename + ".avi")
+            else:
+                os.makedirs('results', exist_ok=True)
+                self.save_f = os.path.join("results/webcam_result.avi")
             self.video_writter = cv.VideoWriter(
-                self.save_f, fourcc, 25.0, (width, height)
+                self.save_f, fourcc, 25.0, (self.video_width,
+                                            self.video_height)
             )
 
     def _is_video(self, p):
-        if str(p).endswith(".mp4") or str(p).endswith(".avi"):
+        suffix = os.path.basename(p).split('.')[-1]
+        if suffix in ['mp4', 'avi', 'flv', 'wmv', 'mpeg', 'mov']:
             return True
         else:
             return False
@@ -606,10 +620,13 @@ class ImageSourceIter(SourceIter):
     def save_res_image_or_video_frame(self, res):
         if self.video_mode:
             self.video_writter.write(res)
+            if not self.is_written:
+                self.is_written = True
         else:
             return NotImplementedError
 
     def _index_sources(self):
+        assert os.path.exists(self.src), f'{self.src} not exist.'
         if os.path.isfile(self.src) and self._is_video(self.src):
             self.video_mode = True
             self.cap = cv.VideoCapture(self.src)
@@ -620,6 +637,10 @@ class ImageSourceIter(SourceIter):
             for ext in ("*.bmp", "*.png", "*.jpg"):
                 self.srcs.extend(glob.glob(os.path.join(self.src, ext)))
             # print(self.srcs)
+        elif isinstance(self.src, int):
+            self.webcam_mode = True
+            self.cap = cv.VideoCapture(self.src)
+            self.srcs = [self.src]
         else:
             TypeError("{} must be dir or file".format(self.src))
 
@@ -627,5 +648,5 @@ class ImageSourceIter(SourceIter):
         if self.video_mode:
             self.cap.release()
             self.video_writter.release()
-            print('your wrote video result file should saved into: ', self.save_f)
-
+            if self.is_written:
+                print('your wrote video result file should saved into: ', self.save_f)

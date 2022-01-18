@@ -367,7 +367,7 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.2, is_show=F
 
 def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh=0.2,
                            is_show=False, random=False, background_id=-1, mode='xyxy', style='none',
-                           force_color=None, line_thickness=2, font_scale=0.2, wait_t=0):
+                           force_color=None, line_thickness=2, font_scale=0.2, show_time=0, wait_t=0):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
 
@@ -440,7 +440,7 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                             img, (x1, y1), (x2, y2), unique_color, line_thickness, style=style)
                     else:
                         cv2.rectangle(img, (x1, y1), (x2, y2),
-                                    unique_color, line_thickness, cv2.LINE_AA)
+                                      unique_color, line_thickness, cv2.LINE_AA)
 
                     if class_names:
                         if cls_id > len(class_names) - 1:
@@ -455,9 +455,9 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                         text_label, font, font_scale, font_thickness)
                     txt_bottom_left = (x1+4, y1-4)
                     cv2.rectangle(img, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
-                                (txt_bottom_left[0] + ret_val[0] +
-                                2, txt_bottom_left[1]+4),
-                                unique_color, -1, cv2.LINE_AA)
+                                  (txt_bottom_left[0] + ret_val[0] +
+                                   2, txt_bottom_left[1]+4),
+                                  unique_color, -1, cv2.LINE_AA)
                     cv2.putText(img, text_label, txt_bottom_left, font,
                                 font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
             else:
@@ -502,6 +502,9 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                               unique_color, -1, cv2.LINE_AA)
                 cv2.putText(img, text_label, txt_bottom_left, font,
                             font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
+    if show_time > 0:
+        cv2.putText(img, f'{round(1/show_time, 1)}FPS {show_time*1000}ms', (46, 60), font,
+                    font_scale+0.6, (125, 209, 46), 2, cv2.LINE_AA)
     if is_show:
         cv2.imshow('image', img)
         cv2.waitKey(wait_t)
