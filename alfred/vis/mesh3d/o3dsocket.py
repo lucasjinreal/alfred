@@ -151,6 +151,7 @@ class VisOpen3DSocket(BaseSocket):
             log('[Info] Load data {}'.format(self.count))
         if isinstance(datas, str):
             datas = json.loads(datas)
+        print(datas)
         for data in datas:
             for key in data.keys():
                 if key == 'id':
@@ -188,6 +189,7 @@ class VisOpen3DSocket(BaseSocket):
                 if i < len(datas) and self.track:
                     col = get_rgb_01(datas[i]['id'])
                     self.meshes[i].paint_uniform_color(col)
+        print('verts done.')
 
     def o3dcallback(self):
         if rotate:
