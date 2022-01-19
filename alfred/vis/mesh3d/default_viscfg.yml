@@ -9,7 +9,7 @@ track: True
 filter: False
 block: False # block visualization or not, True for visualize each frame, False in realtime applications
 rotate: False
-debug: True
+debug: False
 write: False
 out: 'none'
 
@@ -43,8 +43,8 @@ scene:
       xdir: [1, 0, 0]
       ydir: [0, 1, 0]
       step: 1
-      xrange: 3
-      yrange: 3
+      xrange: 4
+      yrange: 4
       white: [1., 1., 1.]
       black: [0.,0.,0.]
       two_sides: True

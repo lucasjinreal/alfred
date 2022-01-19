@@ -4,6 +4,7 @@ import cv2
 from os.path import join
 import os
 from .o3d_visconfig import CONFIG
+from alfred.utils.log import logger
 
 
 def calTransformation(v_i, v_j, r, adaptr=False, ratio=10):
@@ -72,6 +73,8 @@ class SkelModel:
             keypoints3d = np.dstack((keypoints3d, np.ones(
                 (keypoints3d.shape[0], keypoints3d.shape[1], 1))))
         r = self.joint_radius
+        if keypoints3d.shape[0] > 15 and keypoints3d.shape[0] != self.nJoints:
+            logger.warning(f'keypoint3d shape not equal to nJoints: {keypoints3d.shape[0]} vs {self.nJoints}')
         # joints
         min_conf = 0.1
         verts_final = []

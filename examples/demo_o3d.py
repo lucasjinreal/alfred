@@ -6,7 +6,7 @@ import numpy as np
 import json
 
 
-def send_rand(client):
+def send_body25(client):
     crt_d = os.path.dirname(__file__)
     aa = json.load(open(os.path.join(crt_d, 'data/keyp3d.json')))
     for d in aa:
@@ -17,6 +17,20 @@ def send_rand(client):
             pose3d[46, :] = pose3d[4, :]
         if pose3d.shape[1] == 3:
             pose3d = np.hstack([pose3d, np.ones((pose3d.shape[0], 1))])
+        a = [{
+            'id': pid,
+            'keypoints3d': pose3d
+        }]
+        client.send(a)
+        time.sleep(0.05)
+
+
+def send_smpl24(client):
+    crt_d = os.path.dirname(__file__)
+    aa = json.load(open('/media/jintian/samsung/source/ai/swarm/toolchains/mmkd/a.json'))
+    for d in aa:
+        pid = d['id'] if 'id' in d.keys() else d['personID']
+        pose3d = np.array(d['keypoints3d'], dtype=np.float32)
         a = [{
             'id': pid,
             'keypoints3d': pose3d
@@ -38,4 +52,7 @@ if __name__ == "__main__":
     if args.host == 'auto':
         args.host = socket.gethostname()
     client = BaseSocketClient(args.host, args.port)
-    send_rand(client)
+    if args.smpl:
+        send_smpl24(client)
+    else:
+        send_body25(client)

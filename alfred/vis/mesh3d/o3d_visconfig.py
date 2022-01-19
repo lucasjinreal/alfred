@@ -4,6 +4,7 @@ from yacs.config import CfgNode as CN
 from alfred.utils.base_config import Config as BaseConfig
 import socket
 import numpy as np
+import os
 
 
 class Config(BaseConfig):
@@ -81,6 +82,13 @@ class Config(BaseConfig):
             cfg.camera.camera_pose = camera_pose.tolist()
 
 
+def get_default_visconfig():
+    crt_dir = os.path.dirname(__file__)
+    cfg = Config.load(
+        filename=os.path.join(crt_dir, 'default_viscfg.yml'))
+    return cfg
+
+
 '''
 Global Config of sketlon
 
@@ -115,6 +123,7 @@ CONFIG['smpl'] = {'nJoints': 24, 'kintree':
                       [20, 22],
                       [21, 23],
                   ],
+                  # order like: https://github.com/YeeCY/SMPLpp/blob/master/docs/media/kinematic_tree.png
                   'joint_names': [
                       'MidHip',            # 0
                       'LUpLeg',       # 1
