@@ -51,13 +51,12 @@ class Renderer:
         """
         self.name = 'pyrender'
         self.resolution = resolution
-        print('aa')
         self.faces = smpl_faces
         self.orig_img = orig_img
         self.wireframe = wireframe
         self.renderer = pyrender.OffscreenRenderer(
-            viewport_width=self.resolution[0],
-            viewport_height=self.resolution[1],
+            viewport_width=self.resolution[1],
+            viewport_height=self.resolution[0],
             point_size=1.0,
         )
         # set the scene
@@ -70,7 +69,6 @@ class Renderer:
         light_pose = np.eye(4)
         light_pose[:3, 3] = [0, -1, 1]
         self.scene.add(light, pose=light_pose)
-        print('bb')
 
         light_pose[:3, 3] = [0, 1, 1]
         self.scene.add(light, pose=light_pose)
@@ -95,8 +93,7 @@ class Renderer:
         Rx = trimesh.transformations.rotation_matrix(
             math.radians(180), [1, 0, 0])
         mesh.apply_transform(Rx)
-        print("???")
-
+        
         if rotate:
             rot = trimesh.transformations.rotation_matrix(np.radians(60), [0, 1, 0])
             mesh.apply_transform(rot)
