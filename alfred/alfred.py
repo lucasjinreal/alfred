@@ -60,11 +60,14 @@ from .modules.cabinet.changesource import change_pypi_source
 from .modules.dltool.cal_anchors import KmeansYolo
 
 from alfred.utils.log import logger as logging
+import pkg_resources  # part of setuptools
 
-__VERSION__ = '👍    2.8.13'
+version = pkg_resources.require("alfred-py")[0].version
+
+__VERSION__ = f'👍    {version}'
 __AUTHOR__ = '😀    Lucas Jin'
 __CONTACT__ = '😍    telegram: lucasjin'
-__DATE__ = '👉    2021.05.01, since 2019.11.11'
+__DATE__ = '👉    2022.01.20, since 2019.11.11'
 __LOC__ = '👉    Shenzhen, China'
 __git__ = '👍    http://github.com/jinfagang/alfred'
 
@@ -521,7 +524,8 @@ def main(args=None):
                 elif action == 'voc2coco':
                     logging.info('start convert VOC to coco... Annotations root: {}'.format(
                         args_dict['xml_dir']))
-                    convert(args_dict['xml_dir'], args_dict['img_dir'], index_1=args_dict['index_1'])
+                    convert(
+                        args_dict['xml_dir'], args_dict['img_dir'], index_1=args_dict['index_1'])
                 elif action == 'coco2yolo':
                     logging.info('start convert COCO to yolo... images root: {}, json file: {}'.format(
                         args_dict['image_dir'], args_dict['json_file']))
