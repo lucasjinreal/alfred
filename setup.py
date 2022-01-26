@@ -29,7 +29,6 @@ from setuptools import setup, find_packages
 from setuptools import setup, Extension
 import io
 from os import path
-from alfred.alfred import __VERSION__
 
 this_directory = path.abspath(path.dirname(__file__))
 with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
