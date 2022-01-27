@@ -20,23 +20,76 @@ except ImportError:
 import cv2
 import numpy as np
 
+import os
+import torch
+import matplotlib.pyplot as plt
+from skimage.io import imread
 
-obj_f = "examples/dolphine.obj"
-ori_img = cv2.imread("examples/data/000000.png")
-fuze_trimesh = trimesh.load(obj_f, force="mesh")
-verts = fuze_trimesh.vertices
-faces = fuze_trimesh.faces
+# Util function for loading meshes
+from pytorch3d.io import load_objs_as_meshes, load_obj
 
-renderer = Renderer(smpl_faces=faces, resolution=ori_img.shape[:-1])
-mesh_color = colorsys.hsv_to_rgb(np.random.rand(), 0.5, 1.0)
-img = renderer.render(
-    None,
-    verts,
-    # cam=orig_cam,
-    color=mesh_color,
-    mesh_filename=None,
+# Data structures and functions for rendering
+from pytorch3d.structures import Meshes
+from pytorch3d.vis.plotly_vis import AxisArgs, plot_batch_individually, plot_scene
+from pytorch3d.vis.texture_vis import texturesuv_image_matplotlib
+from pytorch3d.renderer import (
+    look_at_view_transform,
+    FoVPerspectiveCameras,
+    PerspectiveCameras, 
+    PointLights, 
+    DirectionalLights, 
+    Materials, 
+    RasterizationSettings, 
+    MeshRenderer, 
+    MeshRasterizer,  
+    SoftPhongShader,
+    TexturesUV,
+    TexturesVertex
 )
-print(img)
-cv2.imwrite("a.png", img)
-print("saved?")
 
+import numpy as np
+from alfred.dl.torch.common import device, print_shape
+# add path for demo utils functions 
+import sys
+import os
+
+
+'''
+wget -P data/cow_mesh https://dl.fbaipublicfiles.com/pytorch3d/data/cow_mesh/cow.obj
+wget -P data/cow_mesh https://dl.fbaipublicfiles.com/pytorch3d/data/cow_mesh/cow.mtl
+wget -P data/cow_mesh https://dl.fbaipublicfiles.com/pytorch3d/data/cow_mesh/cow_texture.png
+'''
+
+obj_filename = os.path.join('./cow_mesh', "cow.obj")
+
+# Load obj file
+mesh = load_objs_as_meshes([obj_filename], device=device)
+
+R, T = look_at_view_transform(2.7, 0, 180)
+print(R, T)
+# R = torch.eye(3).unsqueeze(0)
+R = torch.randn([1, 3, 3])
+print_shape(R, T)
+sfm_camera = PerspectiveCameras(device=device, R=R, T=T)
+width = 500
+height = 500
+raster_settings = RasterizationSettings(
+    image_size=(height, width), 
+    blur_radius=0.0, 
+    faces_per_pixel=1,
+)
+lights = PointLights(device=device, location=[[0.0, 0.0, -3.0]])
+sfm_renderer = MeshRenderer(
+    rasterizer=MeshRasterizer(
+        cameras=sfm_camera, 
+        raster_settings=raster_settings
+    ),
+    shader=SoftPhongShader(
+        device=device, 
+        cameras=sfm_camera,
+        lights=lights
+    )
+)
+images = sfm_renderer(mesh)
+cv2.imshow('aa', images[0, ..., :3].cpu().numpy())
+cv2.waitKey(0)
