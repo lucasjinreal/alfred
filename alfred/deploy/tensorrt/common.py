@@ -503,7 +503,7 @@ def build_engine_onnx_v3(
         return build_engine(max_batch_size, save_engine)
 
 
-def check_engine(engine, input_shape=(608, 608)):
+def check_engine(engine, input_shape=(608, 608), print=False):
     tensor_names_shape_dict = {}
     for binding in engine:
         dims = engine.get_binding_shape(binding)
@@ -521,12 +521,14 @@ def check_engine(engine, input_shape=(608, 608)):
                 "dtype": dtype,
                 "is_input": True,
             }
-            print(f"[{binding}]: {dims}, {dtype.name}, [INPUT]")
+            if print:
+                print(f"[{binding}]: {dims}, {dtype.name}, [INPUT]")
         else:
             tensor_names_shape_dict[binding] = {
                 "shape": dims,
                 "dtype": dtype,
                 "is_input": False,
             }
-            print(f"[{binding}]: {dims}, {dtype.name}, [OUTPUT]")
+            if print:
+                print(f"[{binding}]: {dims}, {dtype.name}, [OUTPUT]")
     return tensor_names_shape_dict
