@@ -513,7 +513,7 @@ def check_engine(engine, input_shape=(608, 608)):
             ), "dynamic trt engine must specific input_shape"
             dims[-2], dims[-1] = input_shape
         size = trt.volume(dims) * engine.max_batch_size
-        dtype = trt.nptype(engine.get_binding_dtype(binding))
+        dtype = np.dtype(trt.nptype(engine.get_binding_dtype(binding)))
 
         if engine.binding_is_input(binding):
             tensor_names_shape_dict[binding] = {
@@ -521,12 +521,12 @@ def check_engine(engine, input_shape=(608, 608)):
                 "dtype": dtype,
                 "is_input": True,
             }
-            print(f"INPUT: {binding}, {dims}, {dtype}, {size}")
+            print(f"[{binding}]: {dims}, {dtype.name}, [INPUT]")
         else:
             tensor_names_shape_dict[binding] = {
                 "shape": dims,
                 "dtype": dtype,
                 "is_input": False,
             }
-            print(f"OUTPUT: {binding}, {dims}, {dtype}, {size}")
+            print(f"[{binding}]: {dims}, {dtype.name}, [OUTPUT]")
     return tensor_names_shape_dict
