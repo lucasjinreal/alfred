@@ -30,7 +30,8 @@ try:
     # https://documen.tician.de/pycuda/driver.html
     import pycuda.autoinit
 except ImportError as e:
-    print('pycuda not installed, inference on trt will be disabled.')
+    print(
+        f'pycuda not installed, or import failed. inference on trt will be disabled. error: {e}')
 
 TRT8 = 8
 TRT7 = 7
@@ -81,7 +82,8 @@ def allocate_buffers_v2(engine):
     bindings = []
     stream = cuda.Stream()
     for binding in engine:
-        size = abs(trt.volume(engine.get_binding_shape(binding))) * engine.max_batch_size
+        size = abs(trt.volume(engine.get_binding_shape(binding))) * \
+            engine.max_batch_size
         dtype = trt.nptype(engine.get_binding_dtype(binding))
         # Allocate host and device buffers
         host_mem = cuda.pagelocked_empty(size, dtype)
@@ -193,7 +195,8 @@ def build_engine_onnx(
     chw_shape=None,
 ):
     def get_engine():
-        EXPLICIT_BATCH = 1 << (int)(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
+        EXPLICIT_BATCH = 1 << (int)(
+            trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
         # with trt.Builder(TRT_LOGGER) as builder, builder.create_network(EXPLICIT_BATCH) as network,builder.create_builder_config() as config, trt.OnnxParser(network,TRT_LOGGER) as parser:
         with trt.Builder(TRT_LOGGER) as builder, builder.create_network(
             EXPLICIT_BATCH
@@ -229,7 +232,8 @@ def build_engine_onnx(
             if dynamic_input:
                 profile = builder.create_optimization_profile()
                 profile.set_shape(
-                    "inputs", (1, 3, 800, 800), (8, 3, 800, 800), (64, 3, 800, 800)
+                    "inputs", (1, 3, 800, 800), (8, 3,
+                                                 800, 800), (64, 3, 800, 800)
                 )
                 config.add_optimization_profile(profile)
 
@@ -283,7 +287,8 @@ def build_engine_onnx_v2(
             # parse onnx model file
             if not os.path.exists(onnx_file_path):
                 quit(f"[Error]ONNX file {onnx_file_path} not found")
-            logger.info(f"[INFO] Loading ONNX file from path {onnx_file_path}...")
+            logger.info(
+                f"[INFO] Loading ONNX file from path {onnx_file_path}...")
             with open(onnx_file_path, "rb") as model:
                 logger.info("[INFO] Beginning ONNX file parsing")
                 parser.parse(model.read())
@@ -297,7 +302,7 @@ def build_engine_onnx_v2(
             )
 
             # build trt engine
-            
+
             # set optimize profile for dynamic inputs
             profile = builder.create_optimization_profile()
             if opt_params is not None:
@@ -392,7 +397,8 @@ def load_torchtrt_plugins():
     # ctypes.CDLL(osp.join(dir_path, 'libamirstan_plugin.so'))
     # suppose plugins lib installed into HOME
     lib_path = osp.join(
-        osp.expanduser("~"), "torchtrt_plugins/build/lib/libtorchtrt_plugins.so"
+        osp.expanduser(
+            "~"), "torchtrt_plugins/build/lib/libtorchtrt_plugins.so"
     )
     if os.path.exists(lib_path):
         ctypes.CDLL(lib_path)
@@ -497,7 +503,7 @@ def build_engine_onnx_v3(
         return build_engine(max_batch_size, save_engine)
 
 
-def check_engine(engine, input_shape=(608, 608)):
+def check_engine(engine, input_shape=(608, 608), print=False):
     tensor_names_shape_dict = {}
     for binding in engine:
         dims = engine.get_binding_shape(binding)
@@ -507,7 +513,7 @@ def check_engine(engine, input_shape=(608, 608)):
             ), "dynamic trt engine must specific input_shape"
             dims[-2], dims[-1] = input_shape
         size = trt.volume(dims) * engine.max_batch_size
-        dtype = trt.nptype(engine.get_binding_dtype(binding))
+        dtype = np.dtype(trt.nptype(engine.get_binding_dtype(binding)))
 
         if engine.binding_is_input(binding):
             tensor_names_shape_dict[binding] = {
@@ -515,12 +521,14 @@ def check_engine(engine, input_shape=(608, 608)):
                 "dtype": dtype,
                 "is_input": True,
             }
-            print(f"INPUT: {binding}, {dims}, {dtype}, {size}")
+            if print:
+                print(f"[{binding}]: {dims}, {dtype.name}, [INPUT]")
         else:
             tensor_names_shape_dict[binding] = {
                 "shape": dims,
                 "dtype": dtype,
                 "is_input": False,
             }
-            print(f"OUTPUT: {binding}, {dims}, {dtype}, {size}")
+            if print:
+                print(f"[{binding}]: {dims}, {dtype.name}, [OUTPUT]")
     return tensor_names_shape_dict

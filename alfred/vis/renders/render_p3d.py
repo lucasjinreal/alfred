@@ -59,7 +59,7 @@ def get_projection_matrix_for_weak_perspective_camera(s_x, s_y, t_x, t_y):
 class Renderer(nn.Module):
     def __init__(
         self,
-        smpl_faces,
+        faces,
         resolution=(512, 512),
         perps=True,
         R=None,
@@ -76,10 +76,10 @@ class Renderer(nn.Module):
             self.device = torch.device("cpu")
             print("visualize in cpu mode")
 
-        if isinstance(smpl_faces, np.ndarray):
-            smpl_faces = torch.from_numpy(smpl_faces.astype(np.float))
-            smpl_faces.to(self.device)
-        self.faces = smpl_faces.unsqueeze(0).to(
+        if isinstance(faces, np.ndarray):
+            faces = torch.from_numpy(faces.astype(np.float))
+            faces.to(self.device)
+        self.faces = faces.unsqueeze(0).to(
             self.device)  # add a BatchSize dim
         self.default_color = torch.as_tensor(colors["neutral"]).unsqueeze(0)
         print('default color: ', self.default_color.shape)
@@ -142,7 +142,11 @@ class Renderer(nn.Module):
 
     # def render(self, img, verts, cam, angle=None, axis=None, mesh_filename=None, color=[1.0, 1.0, 0.9], rotate=False):
     def render(
-        self, img, verts, faces=None, color=None, merge_meshes=True, cam=None, mesh_filename=None, **kwargs
+        self, img, verts, faces=None, color=None, 
+        camera_t=torch.zeros([1, 3, 3], dtype=torch.float32),
+        camera_rot=torch.zeros([1, 3, 3], dtype=torch.float32),
+        focal_length=1000,
+        merge_meshes=True, cam=None, mesh_filename=None, **kwargs
     ):
         assert len(
             verts.shape) >= 2, f"The input verts of visualizer is bounded to be 3-dims (Nx6890 x3) tensor, but got: {verts.shape}"
@@ -159,10 +163,7 @@ class Renderer(nn.Module):
 
         verts = verts.to(self.device)
 
-        # print('vertis: ', verts.shape, verts.device)
-        # print('faces: ', faces.shape, faces.device)
-        # print('cam: ', cam)
-        if isinstance(color, np.ndarray) or isinstance(color, tuple):
+        if isinstance(color, np.ndarray) or isinstance(color, tuple) or isinstance(color, list):
             # color = torch.from_numpy(np.array(color)).to(self.device).unsqueeze(1)
             color = torch.from_numpy(np.array(color)).to(
                 self.device).unsqueeze(0)
@@ -180,27 +181,17 @@ class Renderer(nn.Module):
             meshes = join_meshes_as_scene(meshes)
         if mesh_filename is not None:
             self.save_io.save_mesh(meshes, mesh_filename)
-        if cam is not None:
+        if camera_t is not None:
             # cam = cam.float()
             # print(cam)
-            cam = torch.as_tensor(cam).to(self.device)
+            cam = torch.as_tensor(camera_t).to(self.device)
             if self.perps:
-                # R, T, fov = cam
-                # distance = 3   # distance from camera to the object
-                # elevation = 50.0   # angle of elevation in degrees
-                # azimuth = 0.0
-                # R, T = look_at_view_transform(
-                #     distance, elevation, azimuth, device=self.device)
-                # print(R, T)
-                # print(R.shape, T.shape)
-                # fov = 60
-                # R, T = get_projection_matrix_for_weak_perspective_camera(cam[0], cam[1], cam[2], cam[3])
-                # R = R.unsqueeze(0).repeat(BS, 1, 1)
                 T = cam
                 T = T.unsqueeze(0).repeat(BS, 1)
+                print(T)
                 # new_cam = FoVPerspectiveCameras(zfar=1000, znear=0.05,
                 #     R=self.default_R, T=T, fov=self.fov, device=self.device)
-                new_cam = PerspectiveCameras(focal_length=5000,
+                new_cam = PerspectiveCameras(focal_length=focal_length,
                     R=self.default_R, T=T, device=self.device)
             else:
                 R, T, xyz_ranges = cam
@@ -210,8 +201,12 @@ class Renderer(nn.Module):
             images = self.renderer(meshes, cameras=new_cam)
         else:
             images = self.renderer(meshes)
-        images[:, :, :-1] *= 255
-        images = images[:, :, :-1].cpu().numpy()
+        print(images)
+        images[..., :-1] *= 255
+        images = images[..., :-1].cpu().numpy()
+        print(images)
+        if images.shape[-1] > 3:
+            images = images[..., :-1]
         return images
 
 

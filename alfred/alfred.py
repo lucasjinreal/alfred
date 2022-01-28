@@ -58,16 +58,17 @@ from .modules.cabinet.markdown_tool import download_images_from_md
 from .modules.cabinet.changesource import change_pypi_source
 
 from .modules.dltool.cal_anchors import KmeansYolo
+from .utils.log import logger as logging
+from .version import __version__, short_version
+from datetime import datetime
 
-from alfred.utils.log import logger as logging
-import pkg_resources  # part of setuptools
+dt = datetime.now()
 
-version = pkg_resources.require("alfred-py")[0].version
 
-__VERSION__ = f'👍    {version}'
+__VERSION__ = f'👍    {__version__}'
 __AUTHOR__ = '😀    Lucas Jin'
 __CONTACT__ = '😍    telegram: lucasjin'
-__DATE__ = '👉    2022.01.20, since 2019.11.11'
+__DATE__ = f"👉    {dt.strftime('%Y.%m.%d')}, since 2019.11.11"
 __LOC__ = '👉    Shenzhen, China'
 __git__ = '👍    http://github.com/jinfagang/alfred'
 

@@ -29,14 +29,24 @@ from setuptools import setup, find_packages
 from setuptools import setup, Extension
 import io
 from os import path
-from alfred.alfred import __VERSION__
 
 this_directory = path.abspath(path.dirname(__file__))
 with io.open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+
+
+version_file = 'alfred/version.py'
+
+
+def get_version():
+    with open(version_file, 'r') as f:
+        exec(compile(f.read(), version_file, 'exec'))
+    return locals()['__version__']
+
+
 setup(name='alfred-py',
-      version='2.9.6',
+      version=get_version(),
       keywords=['deep learning', 'script helper', 'tools'],
       description='Alfred is a DeepLearning utility library.',
       long_description=long_description,
@@ -121,6 +131,7 @@ setup(name='alfred-py',
       url='https://github.com/jinfagang/alfred',
       platforms='any',
       install_requires=['colorama', 'natsort', 'requests', 'regex', 'funcy', 'pascal-voc-writer', 'markdown',
-                        'future', 'deprecated', 'loguru', 'pyquaternion', 'lxml', 'jsons',
+                        'future', 'deprecated', 'loguru', 'pyquaternion', 'lxml', 'jsons', 'natsort', 'loguru', 'pycocotools',
+                        'pascal_voc_writer', 'funcy',
                         'portalocker']
       )
