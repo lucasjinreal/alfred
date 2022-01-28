@@ -367,7 +367,7 @@ def visualize_det_cv2_fancy(img, detections, classes=None, thresh=0.2, is_show=F
 
 def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh=0.2,
                            is_show=False, random=False, background_id=-1, mode='xyxy', style='none',
-                           force_color=None, line_thickness=2, font_scale=0.2, show_time=0, wait_t=0):
+                           force_color=None, line_thickness=2, font_scale=0.2, show_time=0, wait_t=0, transparent=False):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
 
@@ -393,6 +393,9 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_thickness = 1
     line_thickness = line_thickness
+
+    if transparent:
+        img_mask = np.zeros_like(img)
 
     n_boxes = 0
     if isinstance(boxes, np.ndarray):
@@ -439,25 +442,36 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                         draw_rect_with_style(
                             img, (x1, y1), (x2, y2), unique_color, line_thickness, style=style)
                     else:
-                        cv2.rectangle(img, (x1, y1), (x2, y2),
-                                      unique_color, line_thickness, cv2.LINE_AA)
+                        if transparent:
+                            cv2.rectangle(img_mask, (x1, y1), (x2, y2),
+                                          unique_color, line_thickness, cv2.LINE_AA)
+                        else:
+                            cv2.rectangle(img, (x1, y1), (x2, y2),
+                                          unique_color, line_thickness, cv2.LINE_AA)
 
                     if class_names:
                         if cls_id > len(class_names) - 1:
                             n = class_names[min(cls_id, len(force_color)-1)]
                         else:
                             n = class_names[cls_id]
-                        text_label = '{} {:.2f}'.format(n, scores[i])
+                        text_label = '{} {:.1f}%'.format(n, scores[i]*100)
                     else:
-                        text_label = '{} {:.2f}'.format(cls_id, scores[i])
+                        text_label = '{} {:.1f}%'.format(cls_id, scores[i]*100)
 
                     (ret_val, _) = cv2.getTextSize(
                         text_label, font, font_scale, font_thickness)
-                    txt_bottom_left = (x1+4, y1-4)
-                    cv2.rectangle(img, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
-                                  (txt_bottom_left[0] + ret_val[0] +
-                                   2, txt_bottom_left[1]+4),
-                                  unique_color, -1, cv2.LINE_AA)
+                    # txt_bottom_left = (x1+4, y1-4)
+                    txt_bottom_left = (x1, y1-6) # make text a little higher
+                    if transparent:
+                        cv2.rectangle(img_mask, (txt_bottom_left[0], txt_bottom_left[1] - ret_val[1]-6),
+                                      (txt_bottom_left[0] + ret_val[0]
+                                       , txt_bottom_left[1]+6),
+                                      unique_color, -1, cv2.LINE_AA)
+                    else:
+                        cv2.rectangle(img_mask, (txt_bottom_left[0], txt_bottom_left[1] - ret_val[1]-6),
+                                      (txt_bottom_left[0] + ret_val[0]
+                                       , txt_bottom_left[1]+6),
+                                      unique_color, -1, cv2.LINE_AA)
                     cv2.putText(img, text_label, txt_bottom_left, font,
                                 font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
             else:
@@ -485,8 +499,12 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                     draw_rect_with_style(
                         img, (x1, y1), (x2, y2), unique_color, line_thickness, style=style)
                 else:
-                    cv2.rectangle(img, (x1, y1), (x2, y2),
-                                  unique_color, line_thickness, cv2.LINE_8)
+                    if transparent:
+                        cv2.rectangle(img_mask, (x1, y1), (x2, y2),
+                                      unique_color, line_thickness, cv2.LINE_AA)
+                    else:
+                        cv2.rectangle(img, (x1, y1), (x2, y2),
+                                      unique_color, line_thickness, cv2.LINE_AA)
 
                 if class_names:
                     text_label = '{}'.format(class_names[cls_id])
@@ -496,15 +514,25 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                 (ret_val, _) = cv2.getTextSize(
                     text_label, font, font_scale, font_thickness)
                 txt_bottom_left = (x1+4, y1-4)
-                cv2.rectangle(img, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
-                              (txt_bottom_left[0] + ret_val[0] +
-                               2, txt_bottom_left[1]+4),
-                              unique_color, -1, cv2.LINE_AA)
+                if transparent:
+                    cv2.rectangle(img_mask, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
+                                  (txt_bottom_left[0] + ret_val[0] +
+                                   2, txt_bottom_left[1]+4),
+                                  unique_color, -1, cv2.LINE_AA)
+                else:
+                    cv2.rectangle(img, (txt_bottom_left[0]-4, txt_bottom_left[1] - ret_val[1]-2),
+                                  (txt_bottom_left[0] + ret_val[0] +
+                                   2, txt_bottom_left[1]+4),
+                                  unique_color, -1, cv2.LINE_AA)
                 cv2.putText(img, text_label, txt_bottom_left, font,
                             font_scale, (237, 237, 237), font_thickness, cv2.LINE_AA)
     if show_time > 0:
         cv2.putText(img, f'{round(1/show_time, 1)}FPS {show_time*1000}ms', (46, 60), font,
                     font_scale+0.6, (125, 209, 46), 2, cv2.LINE_AA)
+
+    if transparent:
+        img = cv2.addWeighted(img_mask, 1.0, img, 0.8, 0.8)
+
     if is_show:
         cv2.imshow('image', img)
         cv2.waitKey(wait_t)

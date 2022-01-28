@@ -626,23 +626,26 @@ class ImageSourceIter(SourceIter):
             return NotImplementedError
 
     def _index_sources(self):
-        assert os.path.exists(self.src), f'{self.src} not exist.'
-        if os.path.isfile(self.src) and self._is_video(self.src):
-            self.video_mode = True
-            self.cap = cv.VideoCapture(self.src)
-            self.srcs = [self.src]
-        elif os.path.isfile(self.src):
-            self.srcs = [self.src]
-        elif os.path.isdir(self.src):
-            for ext in ("*.bmp", "*.png", "*.jpg"):
-                self.srcs.extend(glob.glob(os.path.join(self.src, ext)))
-            # print(self.srcs)
-        elif isinstance(self.src, int):
+        if self.src.isdigit():
+            # failed on macOS??
             self.webcam_mode = True
-            self.cap = cv.VideoCapture(self.src)
+            self.cap = cv.VideoCapture(int(self.src))
+            # self.cap = cv.VideoCapture(0)
             self.srcs = [self.src]
         else:
-            TypeError("{} must be dir or file".format(self.src))
+            assert os.path.exists(self.src), f'{self.src} not exist.'
+            if os.path.isfile(self.src) and self._is_video(self.src):
+                self.video_mode = True
+                self.cap = cv.VideoCapture(self.src)
+                self.srcs = [self.src]
+            elif os.path.isfile(self.src):
+                self.srcs = [self.src]
+            elif os.path.isdir(self.src):
+                for ext in ("*.bmp", "*.png", "*.jpg"):
+                    self.srcs.extend(glob.glob(os.path.join(self.src, ext)))
+                # print(self.srcs)
+            else:
+                TypeError("{} must be dir or file".format(self.src))
 
     def __del__(self) -> None:
         if self.video_mode:
