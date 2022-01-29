@@ -593,7 +593,7 @@ class ImageSourceIter(SourceIter):
         self._index_sources()
         self.is_written = False
         assert len(self.srcs) > 0, "srcs indexed empty: {}".format(self.srcs)
-        if self.video_mode or self.webcam_mode:
+        if self.video_mode and not self.webcam_mode:
             fourcc = cv.VideoWriter_fourcc(*"XVID")
             self.video_width = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
             self.video_height = int(self.cap.get(
@@ -626,9 +626,9 @@ class ImageSourceIter(SourceIter):
             return NotImplementedError
 
     def _index_sources(self):
-        if self.src.isdigit():
-            # failed on macOS??
+        if str(self.src).isdigit():
             self.webcam_mode = True
+            self.video_mode = True
             self.cap = cv.VideoCapture(int(self.src))
             # self.cap = cv.VideoCapture(0)
             self.srcs = [self.src]
@@ -650,6 +650,7 @@ class ImageSourceIter(SourceIter):
     def __del__(self) -> None:
         if self.video_mode:
             self.cap.release()
-            self.video_writter.release()
+            if not self.webcam_mode:
+                self.video_writter.release()
             if self.is_written:
                 print('your wrote video result file should saved into: ', self.save_f)
