@@ -11,8 +11,11 @@ from PIL import Image
 import numpy as np
 
 
-def cv2pil(image):
-    new_image = image.copy()
+def cv2pil(image, inplace=True):
+    if inplace:
+        new_image = image
+    else:
+        new_image = image.copy()
     if new_image.ndim == 2:
         pass
     elif new_image.shape[2] == 3:

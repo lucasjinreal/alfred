@@ -9,4 +9,4 @@ vendor/
 
 *.pyc
 a.py
-__pycache__/
+__pycache__/vendor/

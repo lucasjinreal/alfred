@@ -468,7 +468,7 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                                        , txt_bottom_left[1]+6),
                                       unique_color, -1, cv2.LINE_AA)
                     else:
-                        cv2.rectangle(img_mask, (txt_bottom_left[0], txt_bottom_left[1] - ret_val[1]-6),
+                        cv2.rectangle(img, (txt_bottom_left[0], txt_bottom_left[1] - ret_val[1]-6),
                                       (txt_bottom_left[0] + ret_val[0]
                                        , txt_bottom_left[1]+6),
                                       unique_color, -1, cv2.LINE_AA)

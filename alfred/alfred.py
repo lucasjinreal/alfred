@@ -25,6 +25,7 @@
 """
 main entrance of Alfred
 """
+import imp
 import os
 import sys
 import argparse
@@ -56,6 +57,7 @@ from .modules.cabinet.stack_imgs import stack_imgs
 from .modules.cabinet.webcam import webcam_test
 from .modules.cabinet.markdown_tool import download_images_from_md
 from .modules.cabinet.changesource import change_pypi_source
+from .modules.cabinet.gtrend import get_github_trending
 
 from .modules.dltool.cal_anchors import KmeansYolo
 from .utils.log import logger as logging
@@ -195,6 +197,14 @@ def arg_parse():
     webcam_parser.set_defaults(which='cab-webcam')
     webcam_parser.add_argument(
         '--file', '-f', help='Also can set file.')
+    
+    gtrend_parser = cabinet_sub_parser.add_parser(
+        'gtrend', help='Get github trending in terminal.')
+    gtrend_parser.set_defaults(which='cab-gtrend')
+    gtrend_parser.add_argument(
+        '--language', '-l', default='', help='Also can set file.')
+    gtrend_parser.add_argument(
+        '--layout', '-L', default='table', help='default layout.')
 
     changesource_parser = cabinet_sub_parser.add_parser(
         'changesource', help='Test your changesource_parser.')
@@ -482,6 +492,10 @@ def main(args=None):
                     download_images_from_md(f)
                 elif action == 'changesource':
                     change_pypi_source()
+                elif action == 'gtrend':
+                    lan = args_dict['language']
+                    layout = args_dict['layout']
+                    get_github_trending(lang=lan, layout=layout)
             elif module == 'dltool':
                 if action == 'anchor':
                     ann_dir = args_dict['annotation_dir']
