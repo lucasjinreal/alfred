@@ -134,6 +134,6 @@ setup(name='alfred-py',
                         'future', 'deprecated', 'loguru',
                         'pyquaternion', 'jsons', 'natsort',
                         'loguru', 'pycocotools',
-                        'pascal_voc_writer', 'funcy', 'gtrending',
+                        'pascal_voc_writer', 'funcy', 'gtrending', 'xdg',
                         'portalocker']
       )
