@@ -35,13 +35,13 @@ from pytorch3d.vis.texture_vis import texturesuv_image_matplotlib
 from pytorch3d.renderer import (
     look_at_view_transform,
     FoVPerspectiveCameras,
-    PerspectiveCameras, 
-    PointLights, 
-    DirectionalLights, 
-    Materials, 
-    RasterizationSettings, 
-    MeshRenderer, 
-    MeshRasterizer,  
+    PerspectiveCameras,
+    PointLights,
+    DirectionalLights,
+    Materials,
+    RasterizationSettings,
+    MeshRenderer,
+    MeshRasterizer,
     SoftPhongShader,
     TexturesUV,
     TexturesVertex
@@ -49,7 +49,7 @@ from pytorch3d.renderer import (
 
 import numpy as np
 from alfred.dl.torch.common import device, print_shape
-# add path for demo utils functions 
+# add path for demo utils functions
 import sys
 import os
 
@@ -68,24 +68,27 @@ mesh = load_objs_as_meshes([obj_filename], device=device)
 R, T = look_at_view_transform(2.7, 0, 180)
 print(R, T)
 # R = torch.eye(3).unsqueeze(0)
-R = torch.randn([1, 3, 3])
+# R = torch.randn([1, 3, 3])
+R = torch.Tensor(
+    [[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]])
+T = torch.Tensor([[-0.0098, -0.1803,  7.9463]])
 print_shape(R, T)
-sfm_camera = PerspectiveCameras(device=device, R=R, T=T)
-width = 500
-height = 500
+sfm_camera = PerspectiveCameras(device=device, R=R, T=T, focal_length=1000/224)
+width = 224
+height = 224
 raster_settings = RasterizationSettings(
-    image_size=(height, width), 
-    blur_radius=0.0, 
+    image_size=(height, width),
+    blur_radius=0.0,
     faces_per_pixel=1,
 )
 lights = PointLights(device=device, location=[[0.0, 0.0, -3.0]])
 sfm_renderer = MeshRenderer(
     rasterizer=MeshRasterizer(
-        cameras=sfm_camera, 
+        cameras=sfm_camera,
         raster_settings=raster_settings
     ),
     shader=SoftPhongShader(
-        device=device, 
+        device=device,
         cameras=sfm_camera,
         lights=lights
     )
