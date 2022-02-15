@@ -28,7 +28,6 @@ import ctypes
 try:
     import pycuda.driver as cuda
     # https://documen.tician.de/pycuda/driver.html
-    import pycuda.autoinit
 except ImportError as e:
     print(
         f'pycuda not installed, or import failed. inference on trt will be disabled. error: {e}')
