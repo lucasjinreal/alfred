@@ -24,7 +24,8 @@ import textwrap
 import math
 from shutil import get_terminal_size
 from rich.align import Align
-from rich.console import Console, render_group
+from rich.console import Console
+from rich.console import group as render_group
 from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text

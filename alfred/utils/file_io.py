@@ -53,6 +53,7 @@ def download(
         logger.info("Downloading from {} ...".format(url))
         if progress:
             import tqdm
+            # todo: change tqdm to rich for download progress
 
             def hook(t: tqdm.tqdm) -> Callable[[int, int, Optional[int]], None]:
                 last_b = [0]

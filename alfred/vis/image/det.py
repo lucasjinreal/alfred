@@ -531,7 +531,7 @@ def visualize_det_cv2_part(img, scores, cls_ids, boxes, class_names=None, thresh
                     font_scale+0.6, (125, 209, 46), 2, cv2.LINE_AA)
 
     if transparent:
-        img = cv2.addWeighted(img_mask, 1.0, img, 0.8, 0.8)
+        img = cv2.addWeighted(img_mask, 0.99, img, 0.7, 0.9)
 
     if is_show:
         cv2.imshow('image', img)
