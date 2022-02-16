@@ -3,6 +3,7 @@ from .pose_dataset_info import get_dataset_info_by_name
 import cv2
 import numpy as np
 import math
+from alfred.vis.image.common import colors
 
 
 def vis_pose_result(
@@ -33,10 +34,11 @@ def vis_pose_result(
     # get dataset info
     if dataset_info is None:
         dataset_info = get_dataset_info_by_name(dataset)
-        assert dataset_info is None, '{} dataset not supported built in, you can specific dataset_info manually.'.format(dataset)
+        assert dataset_info is not None, '{} dataset not supported built in, you can specific dataset_info manually.'.format(
+            dataset)
     else:
         dataset_info = DatasetInfo(dataset_info)
-    
+
     skeleton = dataset_info.skeleton
     pose_link_color = dataset_info.pose_link_color
     pose_kpt_color = dataset_info.pose_kpt_color
@@ -93,10 +95,42 @@ def imshow_keypoints(
 
         # draw each point on image
         if pose_kpt_color is not None:
-            assert len(pose_kpt_color) == len(kpts)
+            if len(pose_kpt_color) != len(kpts):
+                c = colors(np.random.randint(50))
+                pose_kpt_color = [c for _ in range(len(kpts))]
+            # assert len(pose_kpt_color) == len(
+                # kpts), 'pose_kpt_color: {} not equal kpts: {}'.format(len(pose_kpt_color), len(kpts))
             for kid, kpt in enumerate(kpts):
-                x_coord, y_coord, kpt_score = int(kpt[0]), int(kpt[1]), kpt[2]
-                if kpt_score > kpt_score_thr:
+                if len(kpt) > 2:
+                    x_coord, y_coord, kpt_score = int(kpt[0]), int(kpt[1]), kpt[2]
+                    if kpt_score > kpt_score_thr:
+                        if show_keypoint_weight:
+                            img_copy = img.copy()
+                            r, g, b = pose_kpt_color[kid]
+                            cv2.circle(
+                                img_copy,
+                                (int(x_coord), int(y_coord)),
+                                radius,
+                                (int(r), int(g), int(b)),
+                                -1,
+                                cv2.LINE_AA,
+                            )
+                            transparency = max(0, min(1, kpt_score))
+                            cv2.addWeighted(
+                                img_copy, transparency, img, 1 - transparency, 0, dst=img
+                            )
+                        else:
+                            r, g, b = pose_kpt_color[kid]
+                            cv2.circle(
+                                img,
+                                (int(x_coord), int(y_coord)),
+                                radius,
+                                (int(r), int(g), int(b)),
+                                -1,
+                                cv2.LINE_AA,
+                            )
+                else:
+                    x_coord, y_coord = int(kpt[0]), int(kpt[1])
                     if show_keypoint_weight:
                         img_copy = img.copy()
                         r, g, b = pose_kpt_color[kid]
@@ -129,51 +163,103 @@ def imshow_keypoints(
             for sk_id, sk in enumerate(skeleton):
                 pos1 = (int(kpts[sk[0], 0]), int(kpts[sk[0], 1]))
                 pos2 = (int(kpts[sk[1], 0]), int(kpts[sk[1], 1]))
-                if (
-                    pos1[0] > 0
-                    and pos1[0] < img_w
-                    and pos1[1] > 0
-                    and pos1[1] < img_h
-                    and pos2[0] > 0
-                    and pos2[0] < img_w
-                    and pos2[1] > 0
-                    and pos2[1] < img_h
-                    and kpts[sk[0], 2] > kpt_score_thr
-                    and kpts[sk[1], 2] > kpt_score_thr
-                ):
-                    r, g, b = pose_link_color[sk_id]
-                    if show_keypoint_weight:
-                        img_copy = img.copy()
-                        X = (pos1[0], pos2[0])
-                        Y = (pos1[1], pos2[1])
-                        mX = np.mean(X)
-                        mY = np.mean(Y)
-                        length = ((Y[0] - Y[1]) ** 2 + (X[0] - X[1]) ** 2) ** 0.5
-                        angle = math.degrees(math.atan2(Y[0] - Y[1], X[0] - X[1]))
-                        stickwidth = 2
-                        polygon = cv2.ellipse2Poly(
-                            (int(mX), int(mY)),
-                            (int(length / 2), int(stickwidth)),
-                            int(angle),
-                            0,
-                            360,
-                            1,
-                        )
-                        cv2.fillConvexPoly(img_copy, polygon, (int(r), int(g), int(b)))
-                        transparency = max(
-                            0, min(1, 0.5 * (kpts[sk[0], 2] + kpts[sk[1], 2]))
-                        )
-                        cv2.addWeighted(
-                            img_copy, transparency, img, 1 - transparency, 0, dst=img
-                        )
-                    else:
-                        cv2.line(
-                            img,
-                            pos1,
-                            pos2,
-                            (int(r), int(g), int(b)),
-                            thickness=thickness,
-                            lineType=cv2.LINE_AA,
-                        )
+                if len(kpts[sk[0]]) > 2:
+                    if (
+                        pos1[0] > 0
+                        and pos1[0] < img_w
+                        and pos1[1] > 0
+                        and pos1[1] < img_h
+                        and pos2[0] > 0
+                        and pos2[0] < img_w
+                        and pos2[1] > 0
+                        and pos2[1] < img_h
+                        and kpts[sk[0], 2] > kpt_score_thr
+                        and kpts[sk[1], 2] > kpt_score_thr
+                    ):
+                        r, g, b = pose_link_color[sk_id]
+                        if show_keypoint_weight:
+                            img_copy = img.copy()
+                            X = (pos1[0], pos2[0])
+                            Y = (pos1[1], pos2[1])
+                            mX = np.mean(X)
+                            mY = np.mean(Y)
+                            length = ((Y[0] - Y[1]) ** 2 +
+                                    (X[0] - X[1]) ** 2) ** 0.5
+                            angle = math.degrees(
+                                math.atan2(Y[0] - Y[1], X[0] - X[1]))
+                            stickwidth = 2
+                            polygon = cv2.ellipse2Poly(
+                                (int(mX), int(mY)),
+                                (int(length / 2), int(stickwidth)),
+                                int(angle),
+                                0,
+                                360,
+                                1,
+                            )
+                            cv2.fillConvexPoly(
+                                img_copy, polygon, (int(r), int(g), int(b)))
+                            transparency = max(
+                                0, min(1, 0.5 * (kpts[sk[0], 2] + kpts[sk[1], 2]))
+                            )
+                            cv2.addWeighted(
+                                img_copy, transparency, img, 1 - transparency, 0, dst=img
+                            )
+                        else:
+                            cv2.line(
+                                img,
+                                pos1,
+                                pos2,
+                                (int(r), int(g), int(b)),
+                                thickness=thickness,
+                                lineType=cv2.LINE_AA,
+                            )
+                else:
+                    if (
+                        pos1[0] > 0
+                        and pos1[0] < img_w
+                        and pos1[1] > 0
+                        and pos1[1] < img_h
+                        and pos2[0] > 0
+                        and pos2[0] < img_w
+                        and pos2[1] > 0
+                        and pos2[1] < img_h
+                    ):
+                        r, g, b = pose_link_color[sk_id]
+                        if show_keypoint_weight:
+                            img_copy = img.copy()
+                            X = (pos1[0], pos2[0])
+                            Y = (pos1[1], pos2[1])
+                            mX = np.mean(X)
+                            mY = np.mean(Y)
+                            length = ((Y[0] - Y[1]) ** 2 +
+                                    (X[0] - X[1]) ** 2) ** 0.5
+                            angle = math.degrees(
+                                math.atan2(Y[0] - Y[1], X[0] - X[1]))
+                            stickwidth = 2
+                            polygon = cv2.ellipse2Poly(
+                                (int(mX), int(mY)),
+                                (int(length / 2), int(stickwidth)),
+                                int(angle),
+                                0,
+                                360,
+                                1,
+                            )
+                            cv2.fillConvexPoly(
+                                img_copy, polygon, (int(r), int(g), int(b)))
+                            transparency = max(
+                                0, min(1, 0.5 * (kpts[sk[0], 2] + kpts[sk[1], 2]))
+                            )
+                            cv2.addWeighted(
+                                img_copy, transparency, img, 1 - transparency, 0, dst=img
+                            )
+                        else:
+                            cv2.line(
+                                img,
+                                pos1,
+                                pos2,
+                                (int(r), int(g), int(b)),
+                                thickness=thickness,
+                                lineType=cv2.LINE_AA,
+                            )
 
     return img
