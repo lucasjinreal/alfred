@@ -6,6 +6,27 @@ import math
 from alfred.vis.image.common import colors
 
 
+def vis_pose_by_joints(img, poses, joints, color=colors(0)):
+    N, num_kps, _ = poses.shape
+    for pose in poses:
+        for part_id in range(num_kps - 1):
+            # if num_kps is 18, then 0 ... 17
+            kpt_a_id = joints[part_id][0]
+            global_kpt_a_id = pose[kpt_a_id, 0]
+            if global_kpt_a_id != -1:
+                x_a, y_a = pose[kpt_a_id]
+                cv2.circle(img, (int(x_a), int(y_a)), 3, color, -1)
+            kpt_b_id = joints[part_id][1]
+            global_kpt_b_id = pose[kpt_b_id, 0]
+            if global_kpt_b_id != -1:
+                x_b, y_b = pose[kpt_b_id]
+                cv2.circle(img, (int(x_b), int(y_b)), 3, color, -1)
+            if global_kpt_a_id != -1 and global_kpt_b_id != -1:
+                cv2.line(img, (int(x_a), int(y_a)),
+                        (int(x_b), int(y_b)), color, 2)
+    return img
+
+
 def vis_pose_result(
     img,
     pose_result,
@@ -102,7 +123,8 @@ def imshow_keypoints(
                 # kpts), 'pose_kpt_color: {} not equal kpts: {}'.format(len(pose_kpt_color), len(kpts))
             for kid, kpt in enumerate(kpts):
                 if len(kpt) > 2:
-                    x_coord, y_coord, kpt_score = int(kpt[0]), int(kpt[1]), kpt[2]
+                    x_coord, y_coord, kpt_score = int(
+                        kpt[0]), int(kpt[1]), kpt[2]
                     if kpt_score > kpt_score_thr:
                         if show_keypoint_weight:
                             img_copy = img.copy()
@@ -184,7 +206,7 @@ def imshow_keypoints(
                             mX = np.mean(X)
                             mY = np.mean(Y)
                             length = ((Y[0] - Y[1]) ** 2 +
-                                    (X[0] - X[1]) ** 2) ** 0.5
+                                      (X[0] - X[1]) ** 2) ** 0.5
                             angle = math.degrees(
                                 math.atan2(Y[0] - Y[1], X[0] - X[1]))
                             stickwidth = 2
@@ -199,7 +221,8 @@ def imshow_keypoints(
                             cv2.fillConvexPoly(
                                 img_copy, polygon, (int(r), int(g), int(b)))
                             transparency = max(
-                                0, min(1, 0.5 * (kpts[sk[0], 2] + kpts[sk[1], 2]))
+                                0, min(
+                                    1, 0.5 * (kpts[sk[0], 2] + kpts[sk[1], 2]))
                             )
                             cv2.addWeighted(
                                 img_copy, transparency, img, 1 - transparency, 0, dst=img
@@ -232,7 +255,7 @@ def imshow_keypoints(
                             mX = np.mean(X)
                             mY = np.mean(Y)
                             length = ((Y[0] - Y[1]) ** 2 +
-                                    (X[0] - X[1]) ** 2) ** 0.5
+                                      (X[0] - X[1]) ** 2) ** 0.5
                             angle = math.degrees(
                                 math.atan2(Y[0] - Y[1], X[0] - X[1]))
                             stickwidth = 2
@@ -247,7 +270,8 @@ def imshow_keypoints(
                             cv2.fillConvexPoly(
                                 img_copy, polygon, (int(r), int(g), int(b)))
                             transparency = max(
-                                0, min(1, 0.5 * (kpts[sk[0], 2] + kpts[sk[1], 2]))
+                                0, min(
+                                    1, 0.5 * (kpts[sk[0], 2] + kpts[sk[1], 2]))
                             )
                             cv2.addWeighted(
                                 img_copy, transparency, img, 1 - transparency, 0, dst=img
