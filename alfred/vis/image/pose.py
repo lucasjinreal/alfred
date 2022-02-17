@@ -6,7 +6,7 @@ import math
 from alfred.vis.image.common import colors
 
 
-def vis_pose_by_joints(img, poses, joints, color=colors(0)):
+def vis_pose_by_joints(img, poses, joints, color=colors(0), point_color=[255, 255, 255], point_size=3):
     N, num_kps, _ = poses.shape
     for pose in poses:
         for part_id in range(num_kps - 1):
@@ -20,10 +20,11 @@ def vis_pose_by_joints(img, poses, joints, color=colors(0)):
             global_kpt_b_id = pose[kpt_b_id, 0]
             if global_kpt_b_id != -1:
                 x_b, y_b = pose[kpt_b_id]
-                cv2.circle(img, (int(x_b), int(y_b)), 3, color, -1)
+                cv2.circle(img, (int(x_b), int(y_b)),
+                           point_size, point_color, -1)
             if global_kpt_a_id != -1 and global_kpt_b_id != -1:
                 cv2.line(img, (int(x_a), int(y_a)),
-                        (int(x_b), int(y_b)), color, 2)
+                         (int(x_b), int(y_b)), color, 2)
     return img
 
 
