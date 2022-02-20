@@ -595,6 +595,7 @@ class ImageSourceIter(SourceIter):
         self.is_written = False
         assert len(self.srcs) > 0, "srcs indexed empty: {}".format(self.srcs)
         if self.video_mode and not self.webcam_mode:
+            self.is_save_video_called = False
             fourcc = cv.VideoWriter_fourcc(*"XVID")
             self.video_width = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
             self.video_height = int(self.cap.get(
@@ -611,6 +612,17 @@ class ImageSourceIter(SourceIter):
                                             self.video_height)
             )
 
+    def get_new_video_writter(self, new_width, new_height, save_f=None):
+        '''
+        for users want save a video with new width and height
+        '''
+        fourcc = cv.VideoWriter_fourcc(*"XVID")
+        video_writter = cv.VideoWriter(
+            save_f, fourcc, 25.0, (new_width,
+                                   new_height)
+        )
+        return video_writter
+
     def _is_video(self, p):
         suffix = os.path.basename(p).split('.')[-1]
         if suffix in ['mp4', 'avi', 'flv', 'wmv', 'mpeg', 'mov']:
@@ -620,6 +632,7 @@ class ImageSourceIter(SourceIter):
 
     def save_res_image_or_video_frame(self, res):
         if self.video_mode:
+            self.is_save_video_called = True
             self.video_writter.write(res)
             if not self.is_written:
                 self.is_written = True
@@ -653,5 +666,9 @@ class ImageSourceIter(SourceIter):
             self.cap.release()
             if not self.webcam_mode:
                 self.video_writter.release()
-            if self.is_written:
+            if self.is_written and self.is_save_video_called:
                 print('your wrote video result file should saved into: ', self.save_f)
+            else:
+                if os.path.exists(self.save_f):
+                    # clean up remove saved file.
+                    os.remove(self.save_f)
