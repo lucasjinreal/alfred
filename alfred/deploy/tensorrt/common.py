@@ -28,6 +28,7 @@ import ctypes
 try:
     import pycuda.driver as cuda
     # https://documen.tician.de/pycuda/driver.html
+    import pycuda.autoinit
 except ImportError as e:
     print(
         f'pycuda not installed, or import failed. inference on trt will be disabled. error: {e}')
@@ -399,8 +400,11 @@ def load_torchtrt_plugins():
         osp.expanduser(
             "~"), "torchtrt_plugins/build/lib/libtorchtrt_plugins.so"
     )
+    lib_path2 = '/usr/local/lib/libtorchtrt_plugins.so'
     if os.path.exists(lib_path):
         ctypes.CDLL(lib_path)
+    elif os.path.exists(lib_path2):
+        ctypes.CDLL(lib_path2)
     else:
         logger.warning(f"{lib_path} not found.")
 
@@ -502,7 +506,7 @@ def build_engine_onnx_v3(
         return build_engine(max_batch_size, save_engine)
 
 
-def check_engine(engine, input_shape=(608, 608), print=False):
+def check_engine(engine, input_shape=(608, 608), do_print=False):
     tensor_names_shape_dict = {}
     for binding in engine:
         dims = engine.get_binding_shape(binding)
@@ -520,7 +524,7 @@ def check_engine(engine, input_shape=(608, 608), print=False):
                 "dtype": dtype,
                 "is_input": True,
             }
-            if print:
+            if do_print:
                 print(f"[{binding}]: {dims}, {dtype.name}, [INPUT]")
         else:
             tensor_names_shape_dict[binding] = {
@@ -528,6 +532,6 @@ def check_engine(engine, input_shape=(608, 608), print=False):
                 "dtype": dtype,
                 "is_input": False,
             }
-            if print:
+            if do_print:
                 print(f"[{binding}]: {dims}, {dtype.name}, [OUTPUT]")
     return tensor_names_shape_dict
