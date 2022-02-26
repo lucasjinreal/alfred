@@ -53,6 +53,7 @@ def download(
         logger.info("Downloading from {} ...".format(url))
         if progress:
             import tqdm
+
             # todo: change tqdm to rich for download progress
 
             def hook(t: tqdm.tqdm) -> Callable[[int, int, Optional[int]], None]:
@@ -69,8 +70,7 @@ def download(
             with tqdm.tqdm(  # type: ignore
                 unit="B", unit_scale=True, miniters=1, desc=filename, leave=True
             ) as t:
-                tmp, _ = request.urlretrieve(
-                    url, filename=tmp, reporthook=hook(t))
+                tmp, _ = request.urlretrieve(url, filename=tmp, reporthook=hook(t))
 
         else:
             tmp, _ = request.urlretrieve(url, filename=tmp)
@@ -90,8 +90,7 @@ def download(
         except IOError:
             pass
 
-    logger.info("Successfully downloaded " +
-                fpath + ". " + str(size) + " bytes.")
+    logger.info("Successfully downloaded " + fpath + ". " + str(size) + " bytes.")
     return fpath
 
 
@@ -300,8 +299,7 @@ class NativePathHandler(PathHandler):
         """
         if os.path.exists(dst_path) and not overwrite:
             logger = logging.getLogger(__name__)
-            logger.error(
-                "Destination file {} already exists.".format(dst_path))
+            logger.error("Destination file {} already exists.".format(dst_path))
             return False
 
         try:
@@ -369,9 +367,10 @@ class HTTPURLHandler(PathHandler):
         return self.cache_map[path]
 
     def _open(self, path: str, mode: str = "r") -> IO[Any]:
-        assert mode in ("r", "rb",), "{} does not support open with {} mode".format(
-            self.__class__.__name__, mode
-        )
+        assert mode in (
+            "r",
+            "rb",
+        ), "{} does not support open with {} mode".format(self.__class__.__name__, mode)
         local_path = self._get_local_path(path)
         return open(local_path, mode)
 
@@ -545,7 +544,9 @@ class PathManager:
         # eg: http://foo/bar before http://foo
         PathManager._PATH_HANDLERS = OrderedDict(
             sorted(
-                PathManager._PATH_HANDLERS.items(), key=lambda t: t[0], reverse=True,
+                PathManager._PATH_HANDLERS.items(),
+                key=lambda t: t[0],
+                reverse=True,
             )
         )
 
@@ -593,39 +594,34 @@ class ImageSourceIter(SourceIter):
 
         self._index_sources()
         self.is_written = False
+        self.save_f = None
         assert len(self.srcs) > 0, "srcs indexed empty: {}".format(self.srcs)
         if self.video_mode and not self.webcam_mode:
             self.is_save_video_called = False
             fourcc = cv.VideoWriter_fourcc(*"XVID")
             self.video_width = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
-            self.video_height = int(self.cap.get(
-                cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
+            self.video_height = int(self.cap.get(cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
             if self.video_mode:
                 self.filename = os.path.basename(src).split(".")[0]
-                self.save_f = os.path.join(
-                    os.path.dirname(src), self.filename + ".avi")
+                self.save_f = os.path.join(os.path.dirname(src), self.filename + ".avi")
             else:
-                os.makedirs('results', exist_ok=True)
+                os.makedirs("results", exist_ok=True)
                 self.save_f = os.path.join("results/webcam_result.avi")
             self.video_writter = cv.VideoWriter(
-                self.save_f, fourcc, 25.0, (self.video_width,
-                                            self.video_height)
+                self.save_f, fourcc, 25.0, (self.video_width, self.video_height)
             )
 
     def get_new_video_writter(self, new_width, new_height, save_f=None):
-        '''
+        """
         for users want save a video with new width and height
-        '''
+        """
         fourcc = cv.VideoWriter_fourcc(*"XVID")
-        video_writter = cv.VideoWriter(
-            save_f, fourcc, 25.0, (new_width,
-                                   new_height)
-        )
+        video_writter = cv.VideoWriter(save_f, fourcc, 25.0, (new_width, new_height))
         return video_writter
 
     def _is_video(self, p):
-        suffix = os.path.basename(p).split('.')[-1]
-        if suffix in ['mp4', 'avi', 'flv', 'wmv', 'mpeg', 'mov']:
+        suffix = os.path.basename(p).split(".")[-1]
+        if suffix in ["mp4", "avi", "flv", "wmv", "mpeg", "mov"]:
             return True
         else:
             return False
@@ -647,7 +643,7 @@ class ImageSourceIter(SourceIter):
             # self.cap = cv.VideoCapture(0)
             self.srcs = [self.src]
         else:
-            assert os.path.exists(self.src), f'{self.src} not exist.'
+            assert os.path.exists(self.src), f"{self.src} not exist."
             if os.path.isfile(self.src) and self._is_video(self.src):
                 self.video_mode = True
                 self.cap = cv.VideoCapture(self.src)
@@ -667,8 +663,8 @@ class ImageSourceIter(SourceIter):
             if not self.webcam_mode:
                 self.video_writter.release()
             if self.is_written and self.is_save_video_called:
-                print('your wrote video result file should saved into: ', self.save_f)
+                print("your wrote video result file should saved into: ", self.save_f)
             else:
-                if os.path.exists(self.save_f):
+                if self.save_f and os.path.exists(self.save_f):
                     # clean up remove saved file.
                     os.remove(self.save_f)
