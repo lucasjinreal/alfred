@@ -12,6 +12,7 @@ class LocalSocketExchanger:
 
         self.ip = ip
         self.port = port
+        self.did_received_data_func = None
         self.is_server = is_server
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._connect()
@@ -34,12 +35,17 @@ class LocalSocketExchanger:
         else:
             print('server can not send data for now.')
 
+    def did_received_data(self, func):
+        self.did_received_data_func = func
+
     def receive(self):
         data = self.conn.recv(self.MAX_BUFFER_SIZE)
         a = np.frombuffer(data, dtype=np.float32)
         if len(a) > 0:
-            print("receive data: ", a, a.shape)
+            # print("receive data: ", a, a.shape)
+            if self.did_received_data_func:
+                self.did_received_data_func(a)
 
-    def listen(self):
+    def listen_and_loop(self):
         while True:
             self.receive()
