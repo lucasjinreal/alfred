@@ -15,7 +15,7 @@ import shutil
 from typing import Callable, Optional
 from urllib import request
 import cv2 as cv
-
+from natsort import natsorted
 
 __all__ = ["PathManager", "get_cache_dir", "file_lock"]
 
@@ -555,13 +555,15 @@ PathManager.register_handler(HTTPURLHandler())
 
 
 class SourceIter:
-    def __init__(self, src):
+    def __init__(self, src, exit_auto=True):
         self.src = src
         self.srcs = []
         self.crt_index = 0
         self.video_mode = False
         self.webcam_mode = False
         self.cap = None
+        self.ok = True
+        self.exit_auto = exit_auto
 
     def __len__(self):
         return len(self.src)
@@ -574,28 +576,36 @@ class SourceIter:
             ret, frame = self.cap.read()
             self.crt_index += 1
             if not ret:
-                print("Seems iteration done. bye~")
-                exit(0)
-            return frame
-        else:
+                if self.exit_auto:
+                    print("Seems iteration done. bye~")
+                    exit(0)
+                else:
+                    self.ok = False
+            else:
+                return frame
+        else:                
             if self.crt_index < len(self.srcs):
                 p = self.srcs[self.crt_index]
                 self.crt_index += 1
                 return p
             else:
-                print("Seems iteration done. bye~")
-                exit(0)
+                if self.exit_auto:
+                    print("Seems iteration done. bye~")
+                    exit(0)
+                else:
+                    self.ok = False
                 # raise StopIteration
 
 
 class ImageSourceIter(SourceIter):
-    def __init__(self, src):
-        super(ImageSourceIter, self).__init__(src)
+    def __init__(self, src, exit_auto=True):
+        super(ImageSourceIter, self).__init__(src, exit_auto)
 
         self._index_sources()
         self.is_written = False
         self.save_f = None
         assert len(self.srcs) > 0, "srcs indexed empty: {}".format(self.srcs)
+        self.lens = len(self.srcs)
         if self.video_mode and not self.webcam_mode:
             self.is_save_video_called = False
             fourcc = cv.VideoWriter_fourcc(*"XVID")
@@ -651,9 +661,10 @@ class ImageSourceIter(SourceIter):
             elif os.path.isfile(self.src):
                 self.srcs = [self.src]
             elif os.path.isdir(self.src):
-                for ext in ("*.bmp", "*.png", "*.jpg"):
+                for ext in ("*.bmp", "*.png", "*.jpg", "*.jpeg"):
                     self.srcs.extend(glob.glob(os.path.join(self.src, ext)))
-                # print(self.srcs)
+                # sort srcs with natural order
+                self.srcs = natsorted(self.srcs)
             else:
                 TypeError("{} must be dir or file".format(self.src))
 
