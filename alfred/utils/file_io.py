@@ -562,12 +562,8 @@ class SourceIter:
         self.video_mode = False
         self.webcam_mode = False
         self.cap = None
-<<<<<<< HEAD
-        self.is_ok = True
-=======
         self.ok = True
         self.exit_auto = exit_auto
->>>>>>> 024a75357a3836c4de031658f005628a03f16978
 
     def __len__(self):
         return len(self.src)
