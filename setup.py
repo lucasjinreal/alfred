@@ -132,8 +132,7 @@ setup(name='alfred-py',
       install_requires=['colorama', 'natsort', 'requests', 'regex',
                         'funcy', 'pascal-voc-writer', 'markdown',
                         'future', 'deprecated', 'loguru',
-                        'pyquaternion', 'jsons', 'natsort',
-                        'loguru', 'pycocotools',
+                        'pyquaternion', 'jsons', 'natsort', 'loguru',
                         'pascal_voc_writer', 'funcy', 'gtrending', 'xdg',
                         'portalocker']
       )

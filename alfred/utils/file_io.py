@@ -15,7 +15,7 @@ import shutil
 from typing import Callable, Optional
 from urllib import request
 import cv2 as cv
-
+from natsort import natsorted
 
 __all__ = ["PathManager", "get_cache_dir", "file_lock"]
 
@@ -53,6 +53,7 @@ def download(
         logger.info("Downloading from {} ...".format(url))
         if progress:
             import tqdm
+
             # todo: change tqdm to rich for download progress
 
             def hook(t: tqdm.tqdm) -> Callable[[int, int, Optional[int]], None]:
@@ -69,8 +70,7 @@ def download(
             with tqdm.tqdm(  # type: ignore
                 unit="B", unit_scale=True, miniters=1, desc=filename, leave=True
             ) as t:
-                tmp, _ = request.urlretrieve(
-                    url, filename=tmp, reporthook=hook(t))
+                tmp, _ = request.urlretrieve(url, filename=tmp, reporthook=hook(t))
 
         else:
             tmp, _ = request.urlretrieve(url, filename=tmp)
@@ -90,8 +90,7 @@ def download(
         except IOError:
             pass
 
-    logger.info("Successfully downloaded " +
-                fpath + ". " + str(size) + " bytes.")
+    logger.info("Successfully downloaded " + fpath + ". " + str(size) + " bytes.")
     return fpath
 
 
@@ -300,8 +299,7 @@ class NativePathHandler(PathHandler):
         """
         if os.path.exists(dst_path) and not overwrite:
             logger = logging.getLogger(__name__)
-            logger.error(
-                "Destination file {} already exists.".format(dst_path))
+            logger.error("Destination file {} already exists.".format(dst_path))
             return False
 
         try:
@@ -369,9 +367,10 @@ class HTTPURLHandler(PathHandler):
         return self.cache_map[path]
 
     def _open(self, path: str, mode: str = "r") -> IO[Any]:
-        assert mode in ("r", "rb",), "{} does not support open with {} mode".format(
-            self.__class__.__name__, mode
-        )
+        assert mode in (
+            "r",
+            "rb",
+        ), "{} does not support open with {} mode".format(self.__class__.__name__, mode)
         local_path = self._get_local_path(path)
         return open(local_path, mode)
 
@@ -545,7 +544,9 @@ class PathManager:
         # eg: http://foo/bar before http://foo
         PathManager._PATH_HANDLERS = OrderedDict(
             sorted(
-                PathManager._PATH_HANDLERS.items(), key=lambda t: t[0], reverse=True,
+                PathManager._PATH_HANDLERS.items(),
+                key=lambda t: t[0],
+                reverse=True,
             )
         )
 
@@ -554,14 +555,19 @@ PathManager.register_handler(HTTPURLHandler())
 
 
 class SourceIter:
-    def __init__(self, src):
+    def __init__(self, src, exit_auto=True):
         self.src = src
         self.srcs = []
         self.crt_index = 0
         self.video_mode = False
         self.webcam_mode = False
         self.cap = None
+<<<<<<< HEAD
         self.is_ok = True
+=======
+        self.ok = True
+        self.exit_auto = exit_auto
+>>>>>>> 024a75357a3836c4de031658f005628a03f16978
 
     def __len__(self):
         return len(self.src)
@@ -574,28 +580,36 @@ class SourceIter:
             ret, frame = self.cap.read()
             self.crt_index += 1
             if not ret:
-                print("Seems iteration done. bye~")
-                self.is_ok = False
-                exit(0)
-            return frame
-        else:
+                if self.exit_auto:
+                    print("Seems iteration done. bye~")
+                    exit(0)
+                else:
+                    self.ok = False
+            else:
+                return frame
+        else:                
             if self.crt_index < len(self.srcs):
                 p = self.srcs[self.crt_index]
                 self.crt_index += 1
                 return p
             else:
-                print("Seems iteration done. bye~")
-                exit(0)
+                if self.exit_auto:
+                    print("Seems iteration done. bye~")
+                    exit(0)
+                else:
+                    self.ok = False
                 # raise StopIteration
 
 
 class ImageSourceIter(SourceIter):
-    def __init__(self, src):
-        super(ImageSourceIter, self).__init__(src)
+    def __init__(self, src, exit_auto=True):
+        super(ImageSourceIter, self).__init__(src, exit_auto)
 
         self._index_sources()
         self.is_written = False
+        self.save_f = None
         assert len(self.srcs) > 0, "srcs indexed empty: {}".format(self.srcs)
+        self.lens = len(self.srcs)
         if self.video_mode and not self.webcam_mode:
             self.is_save_video_called = False
             fourcc = cv.VideoWriter_fourcc(*"XVID")
@@ -605,30 +619,25 @@ class ImageSourceIter(SourceIter):
                 cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
             if self.video_mode:
                 self.filename = os.path.basename(src).split(".")[0]
-                self.save_f = os.path.join(
-                    os.path.dirname(src), self.filename + ".avi")
+                self.save_f = os.path.join(os.path.dirname(src), self.filename + ".avi")
             else:
-                os.makedirs('results', exist_ok=True)
+                os.makedirs("results", exist_ok=True)
                 self.save_f = os.path.join("results/webcam_result.avi")
             self.video_writter = cv.VideoWriter(
-                self.save_f, fourcc, 25.0, (self.video_width,
-                                            self.video_height)
+                self.save_f, fourcc, 25.0, (self.video_width, self.video_height)
             )
 
     def get_new_video_writter(self, new_width, new_height, save_f=None):
-        '''
+        """
         for users want save a video with new width and height
-        '''
+        """
         fourcc = cv.VideoWriter_fourcc(*"XVID")
-        video_writter = cv.VideoWriter(
-            save_f, fourcc, 25.0, (new_width,
-                                   new_height)
-        )
+        video_writter = cv.VideoWriter(save_f, fourcc, 25.0, (new_width, new_height))
         return video_writter
 
     def _is_video(self, p):
-        suffix = os.path.basename(p).split('.')[-1]
-        if suffix in ['mp4', 'avi', 'flv', 'wmv', 'mpeg', 'mov']:
+        suffix = os.path.basename(p).split(".")[-1]
+        if suffix in ["mp4", "avi", "flv", "wmv", "mpeg", "mov"]:
             return True
         else:
             return False
@@ -650,7 +659,7 @@ class ImageSourceIter(SourceIter):
             # self.cap = cv.VideoCapture(0)
             self.srcs = [self.src]
         else:
-            assert os.path.exists(self.src), f'{self.src} not exist.'
+            assert os.path.exists(self.src), f"{self.src} not exist."
             if os.path.isfile(self.src) and self._is_video(self.src):
                 self.video_mode = True
                 self.cap = cv.VideoCapture(self.src)
@@ -658,9 +667,10 @@ class ImageSourceIter(SourceIter):
             elif os.path.isfile(self.src):
                 self.srcs = [self.src]
             elif os.path.isdir(self.src):
-                for ext in ("*.bmp", "*.png", "*.jpg"):
+                for ext in ("*.bmp", "*.png", "*.jpg", "*.jpeg"):
                     self.srcs.extend(glob.glob(os.path.join(self.src, ext)))
-                # print(self.srcs)
+                # sort srcs with natural order
+                self.srcs = natsorted(self.srcs)
             else:
                 TypeError("{} must be dir or file".format(self.src))
 
@@ -670,8 +680,8 @@ class ImageSourceIter(SourceIter):
             if not self.webcam_mode:
                 self.video_writter.release()
             if self.is_written and self.is_save_video_called:
-                print('your wrote video result file should saved into: ', self.save_f)
+                print("your wrote video result file should saved into: ", self.save_f)
             else:
-                if os.path.exists(self.save_f):
+                if self.save_f and os.path.exists(self.save_f):
                     # clean up remove saved file.
                     os.remove(self.save_f)

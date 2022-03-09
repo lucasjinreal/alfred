@@ -12,8 +12,7 @@ try:
     from pycocotools.coco import COCO
     from pycocotools import mask as maskUtils
 except ImportError as e:
-    print('Got import error: {}'.format(e))
-    print('[WARN] you are not either install pycocotools or its dependencies. pls install first.')
+    print('[WARN] coco2yolo need pycocotools installed.')
     # exit(-1)
 import numpy as np
 import matplotlib.pyplot as plt

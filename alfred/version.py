@@ -1,6 +1,10 @@
-# Copyright (c) OpenMMLab. All rights reserved.
+# Copyright (c) Lucas Jin. All rights reserved.
 
+<<<<<<< HEAD
 __version__ = '2.10.1'
+=======
+__version__ = '2.10.4'
+>>>>>>> 024a75357a3836c4de031658f005628a03f16978
 short_version = __version__
 
 
