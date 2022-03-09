@@ -52,6 +52,10 @@ def vis_pose_result(
         show (bool):  Whether to show the image. Default True.
         out_file (str|None): The filename of the output visualization image.
     """
+    if isinstance(pose_result, np.ndarray):
+        if len(pose_result.shape) < 3:
+            # if shape is 2, expand to 3
+            pose_result = np.expand_dims(pose_result, axis=0)
 
     # get dataset info
     if dataset_info is None:

@@ -561,6 +561,7 @@ class SourceIter:
         self.video_mode = False
         self.webcam_mode = False
         self.cap = None
+        self.is_ok = True
 
     def __len__(self):
         return len(self.src)
@@ -574,6 +575,7 @@ class SourceIter:
             self.crt_index += 1
             if not ret:
                 print("Seems iteration done. bye~")
+                self.is_ok = False
                 exit(0)
             return frame
         else:
@@ -598,6 +600,7 @@ class ImageSourceIter(SourceIter):
             self.is_save_video_called = False
             fourcc = cv.VideoWriter_fourcc(*"XVID")
             self.video_width = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
+            self.video_frame_count = int(self.cap.get(cv.CAP_PROP_FRAME_COUNT))
             self.video_height = int(self.cap.get(
                 cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
             if self.video_mode:
