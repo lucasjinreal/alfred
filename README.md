@@ -2,7 +2,7 @@
 
 <img src="https://s2.loli.net/2022/03/14/zLsIBi5xueUmnrw.png">
 
-<h1>Alfred Python - Born For Deeplearning</h1>
+<h1>alfred-py: Born For Deeplearning</h1>
 
 
 [![PyPI downloads](https://static.pepy.tech/personalized-badge/alfred-py?period=total&units=international_system&left_color=grey&right_color=blue&left_text=pypi%20downloads)](https://pepy.tech/project/alfred-py)
@@ -20,7 +20,7 @@
 </div>
 
 
-*Alfred* is command line tool for deep-learning usage. if you want split an video into image frames or combine frames into a single video, then **alfred** is what you want.
+*alfred-py* can be called from terminal via `alfred` as a tool for deep-learning usage. It also provides massive utilities to boost your daily efficiency APIs, for instance, if you want draw a box with score and label, if you want logging in your python applications, if you want convert your model to TRT engine, just `import alfred`, you can get whatever you want. More usage you can read instructions below.
 
 
 
