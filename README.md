@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://s4.ax1x.com/2022/01/05/TvNFtf.png">
+<img src="https://s2.loli.net/2022/03/14/zLsIBi5xueUmnrw.png">
 
 <h1>Alfred Python - Born For Deeplearning</h1>
 
