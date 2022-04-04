@@ -5,26 +5,78 @@ import numpy as np
 import math
 from alfred.vis.image.common import colors
 
+BUILTIN_JOINTS_17_COCO = [
+    [1, 2],
+    [1, 5],
+    [2, 3],
+    [3, 4],
+    [5, 6],
+    [6, 7],
+    [1, 8],
+    [8, 9],
+    [9, 10],
+    [1, 11],
+    [11, 12],
+    [12, 13],
+    [1, 0],
+    [0, 14],
+    [14, 16],
+    [0, 15],
+    [15, 17],
+    [2, 16],
+    [5, 17],
+]
 
-def vis_pose_by_joints(img, poses, joints, color=colors(0), point_color=[255, 255, 255], point_size=3):
+BUILTIN_JOINTS_26_HALPE = [
+    (0, 1),
+    (0, 2),
+    (1, 3),
+    (2, 4),  # Head
+    (5, 18),
+    (6, 18),
+    (5, 7),
+    (7, 9),
+    (6, 8),
+    (8, 10),  # Body
+    (17, 18),
+    (18, 19),
+    (19, 11),
+    (19, 12),
+    (11, 13),
+    (12, 14),
+    (13, 15),
+    (14, 16),
+    (20, 24),
+    (21, 25),
+    (23, 25),
+    (22, 24),
+    (15, 24),
+    (16, 25),
+]
+
+BUILTIN_JOINT_28_COMBINED = []
+
+
+def vis_pose_by_joints(
+    img, poses, joints, color=colors(0), point_color=[252, 219, 3], point_size=3
+):
     N, num_kps, _ = poses.shape
     for pose in poses:
-        for part_id in range(num_kps - 1):
+        # for part_id in range(num_kps - 1):
+        for part_id in range(len(joints)):
             # if num_kps is 18, then 0 ... 17
             kpt_a_id = joints[part_id][0]
             global_kpt_a_id = pose[kpt_a_id, 0]
             if global_kpt_a_id != -1:
                 x_a, y_a = pose[kpt_a_id]
-                cv2.circle(img, (int(x_a), int(y_a)), 3, color, -1)
+                cv2.circle(img, (int(x_a), int(y_a)), 3, color, -1, cv2.LINE_AA)
             kpt_b_id = joints[part_id][1]
             global_kpt_b_id = pose[kpt_b_id, 0]
             if global_kpt_b_id != -1:
                 x_b, y_b = pose[kpt_b_id]
-                cv2.circle(img, (int(x_b), int(y_b)),
-                           point_size, point_color, -1)
+                cv2.circle(img, (int(x_b), int(y_b)), point_size, point_color, -1, cv2.LINE_AA)
             if global_kpt_a_id != -1 and global_kpt_b_id != -1:
-                cv2.line(img, (int(x_a), int(y_a)),
-                         (int(x_b), int(y_b)), color, 2)
+                cv2.line(img, (int(x_a), int(y_a)), (int(x_b), int(y_b)), color, 2, cv2.LINE_AA)
     return img
 
 
@@ -60,8 +112,11 @@ def vis_pose_result(
     # get dataset info
     if dataset_info is None:
         dataset_info = get_dataset_info_by_name(dataset)
-        assert dataset_info is not None, '{} dataset not supported built in, you can specific dataset_info manually.'.format(
-            dataset)
+        assert (
+            dataset_info is not None
+        ), "{} dataset not supported built in, you can specific dataset_info manually.".format(
+            dataset
+        )
     else:
         dataset_info = DatasetInfo(dataset_info)
 
@@ -125,11 +180,10 @@ def imshow_keypoints(
                 c = colors(np.random.randint(50))
                 pose_kpt_color = [c for _ in range(len(kpts))]
             # assert len(pose_kpt_color) == len(
-                # kpts), 'pose_kpt_color: {} not equal kpts: {}'.format(len(pose_kpt_color), len(kpts))
+            # kpts), 'pose_kpt_color: {} not equal kpts: {}'.format(len(pose_kpt_color), len(kpts))
             for kid, kpt in enumerate(kpts):
                 if len(kpt) > 2:
-                    x_coord, y_coord, kpt_score = int(
-                        kpt[0]), int(kpt[1]), kpt[2]
+                    x_coord, y_coord, kpt_score = int(kpt[0]), int(kpt[1]), kpt[2]
                     if kpt_score > kpt_score_thr:
                         if show_keypoint_weight:
                             img_copy = img.copy()
@@ -144,7 +198,12 @@ def imshow_keypoints(
                             )
                             transparency = max(0, min(1, kpt_score))
                             cv2.addWeighted(
-                                img_copy, transparency, img, 1 - transparency, 0, dst=img
+                                img_copy,
+                                transparency,
+                                img,
+                                1 - transparency,
+                                0,
+                                dst=img,
                             )
                         else:
                             r, g, b = pose_kpt_color[kid]
@@ -210,10 +269,8 @@ def imshow_keypoints(
                             Y = (pos1[1], pos2[1])
                             mX = np.mean(X)
                             mY = np.mean(Y)
-                            length = ((Y[0] - Y[1]) ** 2 +
-                                      (X[0] - X[1]) ** 2) ** 0.5
-                            angle = math.degrees(
-                                math.atan2(Y[0] - Y[1], X[0] - X[1]))
+                            length = ((Y[0] - Y[1]) ** 2 + (X[0] - X[1]) ** 2) ** 0.5
+                            angle = math.degrees(math.atan2(Y[0] - Y[1], X[0] - X[1]))
                             stickwidth = 2
                             polygon = cv2.ellipse2Poly(
                                 (int(mX), int(mY)),
@@ -224,13 +281,18 @@ def imshow_keypoints(
                                 1,
                             )
                             cv2.fillConvexPoly(
-                                img_copy, polygon, (int(r), int(g), int(b)))
+                                img_copy, polygon, (int(r), int(g), int(b))
+                            )
                             transparency = max(
-                                0, min(
-                                    1, 0.5 * (kpts[sk[0], 2] + kpts[sk[1], 2]))
+                                0, min(1, 0.5 * (kpts[sk[0], 2] + kpts[sk[1], 2]))
                             )
                             cv2.addWeighted(
-                                img_copy, transparency, img, 1 - transparency, 0, dst=img
+                                img_copy,
+                                transparency,
+                                img,
+                                1 - transparency,
+                                0,
+                                dst=img,
                             )
                         else:
                             cv2.line(
@@ -259,10 +321,8 @@ def imshow_keypoints(
                             Y = (pos1[1], pos2[1])
                             mX = np.mean(X)
                             mY = np.mean(Y)
-                            length = ((Y[0] - Y[1]) ** 2 +
-                                      (X[0] - X[1]) ** 2) ** 0.5
-                            angle = math.degrees(
-                                math.atan2(Y[0] - Y[1], X[0] - X[1]))
+                            length = ((Y[0] - Y[1]) ** 2 + (X[0] - X[1]) ** 2) ** 0.5
+                            angle = math.degrees(math.atan2(Y[0] - Y[1], X[0] - X[1]))
                             stickwidth = 2
                             polygon = cv2.ellipse2Poly(
                                 (int(mX), int(mY)),
@@ -273,13 +333,18 @@ def imshow_keypoints(
                                 1,
                             )
                             cv2.fillConvexPoly(
-                                img_copy, polygon, (int(r), int(g), int(b)))
+                                img_copy, polygon, (int(r), int(g), int(b))
+                            )
                             transparency = max(
-                                0, min(
-                                    1, 0.5 * (kpts[sk[0], 2] + kpts[sk[1], 2]))
+                                0, min(1, 0.5 * (kpts[sk[0], 2] + kpts[sk[1], 2]))
                             )
                             cv2.addWeighted(
-                                img_copy, transparency, img, 1 - transparency, 0, dst=img
+                                img_copy,
+                                transparency,
+                                img,
+                                1 - transparency,
+                                0,
+                                dst=img,
                             )
                         else:
                             cv2.line(
