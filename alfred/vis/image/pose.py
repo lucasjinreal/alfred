@@ -58,7 +58,7 @@ BUILTIN_JOINT_28_COMBINED = []
 
 
 def vis_pose_by_joints(
-    img, poses, joints, color=colors(0), point_color=[252, 219, 3], point_size=3
+    img, poses, joints, color=colors(np.random.randint(30)), point_color=[252, 219, 3], point_size=3
 ):
     N, num_kps, _ = poses.shape
     for pose in poses:
