@@ -615,10 +615,100 @@ class ImageSourceIter(SourceIter):
                 cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
             if self.video_mode:
                 self.filename = os.path.basename(src).split(".")[0]
-                self.save_f = os.path.join(os.path.dirname(src), self.filename + ".avi")
+                self.save_f = os.path.join(os.path.dirname(src), self.filename + "_result.mp4")
             else:
                 os.makedirs("results", exist_ok=True)
-                self.save_f = os.path.join("results/webcam_result.avi")
+                self.save_f = os.path.join("results/webcam_result.mp4")
+            self.video_writter = cv.VideoWriter(
+                self.save_f, fourcc, 25.0, (self.video_width, self.video_height)
+            )
+
+    def get_new_video_writter(self, new_width, new_height, save_f=None):
+        """
+        for users want save a video with new width and height
+        """
+        fourcc = cv.VideoWriter_fourcc(*"XVID")
+        video_writter = cv.VideoWriter(save_f, fourcc, 25.0, (new_width, new_height))
+        return video_writter
+
+    def _is_video(self, p):
+        suffix = os.path.basename(p).split(".")[-1]
+        if suffix.lower() in ["mp4", "avi", "flv", "wmv", "mpeg", "mov"]:
+            return True
+        else:
+            return False
+
+    def save_res_image_or_video_frame(self, res):
+        if self.video_mode:
+            self.is_save_video_called = True
+            self.video_writter.write(res)
+            if not self.is_written:
+                self.is_written = True
+        else:
+            return NotImplementedError
+
+    def _index_sources(self):
+        if str(self.src).isdigit():
+            self.webcam_mode = True
+            self.video_mode = True
+            self.cap = cv.VideoCapture(int(self.src))
+            # self.cap = cv.VideoCapture(0)
+            self.srcs = [self.src]
+        else:
+            assert os.path.exists(self.src), f"{self.src} not exist."
+            if os.path.isfile(self.src) and self._is_video(self.src):
+                self.video_mode = True
+                self.cap = cv.VideoCapture(self.src)
+                self.srcs = [self.src]
+            elif os.path.isfile(self.src):
+                self.srcs = [self.src]
+            elif os.path.isdir(self.src):
+                for ext in ("*.bmp", "*.png", "*.jpg", "*.jpeg"):
+                    self.srcs.extend(glob.glob(os.path.join(self.src, ext)))
+                # sort srcs with natural order
+                self.srcs = natsorted(self.srcs)
+            else:
+                TypeError("{} must be dir or file".format(self.src))
+
+    def __del__(self) -> None:
+        if self.video_mode:
+            self.cap.release()
+            if not self.webcam_mode:
+                self.video_writter.release()
+            if self.is_written and self.is_save_video_called:
+                print("your wrote video result file should saved into: ", self.save_f)
+            else:
+                if self.save_f and os.path.exists(self.save_f):
+                    # clean up remove saved file.
+                    os.remove(self.save_f)
+
+
+class ImageSourceIterAsync(SourceIter):
+    '''
+    reading frames in threads if on video mode
+    using queue to to contains readed frames
+    '''
+    def __init__(self, src, exit_auto=True):
+        super(ImageSourceIter, self).__init__(src, exit_auto)
+
+        self._index_sources()
+        self.is_written = False
+        self.save_f = None
+        assert len(self.srcs) > 0, "srcs indexed empty: {}".format(self.srcs)
+        self.lens = len(self.srcs)
+        if self.video_mode and not self.webcam_mode:
+            self.is_save_video_called = False
+            fourcc = cv.VideoWriter_fourcc(*"XVID")
+            self.video_width = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
+            self.video_frame_count = int(self.cap.get(cv.CAP_PROP_FRAME_COUNT))
+            self.video_height = int(self.cap.get(
+                cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
+            if self.video_mode:
+                self.filename = os.path.basename(src).split(".")[0]
+                self.save_f = os.path.join(os.path.dirname(src), self.filename + "_result.mp4")
+            else:
+                os.makedirs("results", exist_ok=True)
+                self.save_f = os.path.join("results/webcam_result.mp4")
             self.video_writter = cv.VideoWriter(
                 self.save_f, fourcc, 25.0, (self.video_width, self.video_height)
             )
