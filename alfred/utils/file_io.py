@@ -614,7 +614,9 @@ class ImageSourceIter(SourceIter):
             self.video_height = int(self.cap.get(cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
             if self.video_mode:
                 self.filename = os.path.basename(src).split(".")[0]
-                self.save_f = os.path.join(os.path.dirname(src), self.filename + "_result.mp4")
+                self.save_f = os.path.join(
+                    os.path.dirname(src), self.filename + "_result.mp4"
+                )
                 self.lens = self.video_frame_count
             else:
                 os.makedirs("results", exist_ok=True)
@@ -622,6 +624,32 @@ class ImageSourceIter(SourceIter):
             self.video_writter = cv.VideoWriter(
                 self.save_f, fourcc, 25.0, (self.video_width, self.video_height)
             )
+
+    def get_specific_frames(self, frame_indexes, verbose=True):
+        """
+        get specific frames by a series frames idxes
+        CAUTION: this will drain your memory, better not use
+        """
+        frames = []
+        for i in frame_indexes:
+            self.cap.set(cv.CAP_PROP_POS_FRAMES, i - 1)
+            res, frame = self.cap.read()
+            if verbose:
+                print(f"\r{i}/{len(frame_indexes)}", end="", flush=True)
+            if res:
+                frames.append(frame)
+            else:
+                print("failed to get frame at index: ", i)
+        return frames
+
+    def get_specific_frame_at(self, frame_index):
+        self.cap.set(cv.CAP_PROP_POS_FRAMES, frame_index - 1)
+        res, frame = self.cap.read()
+        if res:
+            return frame
+        else:
+            print("get frame at failed: ", frame_index)
+            return
 
     def get_new_video_writter(self, new_width, new_height, save_f=None):
         """
@@ -684,10 +712,11 @@ class ImageSourceIter(SourceIter):
 
 
 class ImageSourceIterAsync(SourceIter):
-    '''
+    """
     reading frames in threads if on video mode
     using queue to to contains readed frames
-    '''
+    """
+
     def __init__(self, src, exit_auto=True):
         super(ImageSourceIter, self).__init__(src, exit_auto)
 
@@ -701,11 +730,12 @@ class ImageSourceIterAsync(SourceIter):
             fourcc = cv.VideoWriter_fourcc(*"XVID")
             self.video_width = int(self.cap.get(cv.CAP_PROP_FRAME_WIDTH) + 0.5)
             self.video_frame_count = int(self.cap.get(cv.CAP_PROP_FRAME_COUNT))
-            self.video_height = int(self.cap.get(
-                cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
+            self.video_height = int(self.cap.get(cv.CAP_PROP_FRAME_HEIGHT) + 0.5)
             if self.video_mode:
                 self.filename = os.path.basename(src).split(".")[0]
-                self.save_f = os.path.join(os.path.dirname(src), self.filename + "_result.mp4")
+                self.save_f = os.path.join(
+                    os.path.dirname(src), self.filename + "_result.mp4"
+                )
             else:
                 os.makedirs("results", exist_ok=True)
                 self.save_f = os.path.join("results/webcam_result.mp4")
