@@ -616,6 +616,7 @@ class ImageSourceIter(SourceIter):
             if self.video_mode:
                 self.filename = os.path.basename(src).split(".")[0]
                 self.save_f = os.path.join(os.path.dirname(src), self.filename + ".avi")
+                self.lens = self.video_frame_count
             else:
                 os.makedirs("results", exist_ok=True)
                 self.save_f = os.path.join("results/webcam_result.avi")
