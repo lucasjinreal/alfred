@@ -29,4 +29,6 @@ import importlib
 from .modules import *
 from .vis import *
 from .fusion import *
+from .dl.torch.common import print_shape
+
 globals().update(importlib.import_module('alfred').__dict__)
