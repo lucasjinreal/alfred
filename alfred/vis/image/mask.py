@@ -35,6 +35,7 @@ from .common import get_unique_color_by_id, get_unique_color_by_id2, get_unique_
 from .det import draw_one_bbox
 from PIL import Image
 from .get_dataset_color_map import *
+from .get_dataset_label_map import coco_label_map_list
 
 ALL_COLORS_MAP = {
     "cityscapes": create_cityscapes_label_colormap(),
@@ -208,6 +209,9 @@ def vis_bitmasks(img, bitmasks, classes=None, fill_mask=True, return_combined=Tr
     if isinstance(bitmasks, torch.Tensor):
         bitmasks = bitmasks.cpu().numpy()
 
+    font = cv2.QT_FONT_NORMAL
+    font_scale = 0.4
+    font_thickness = 1
     res_m = np.zeros_like(img).astype(np.uint8)
     assert isinstance(bitmasks, np.ndarray), 'bitmasks must be numpy array'
     bitmasks = bitmasks.astype(np.uint8)
@@ -244,13 +248,20 @@ def vis_bitmasks(img, bitmasks, classes=None, fill_mask=True, return_combined=Tr
         return img
 
 
-def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, mask_border_color=None, draw_contours=False, alpha=0.85, fill_mask=True, return_combined=True, thickness=1):
+def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, scores=None, class_names=None, mask_border_color=None, draw_contours=False, alpha=0.4, fill_mask=True, return_combined=True, thickness=1):
     """
     visualize bitmasks on image
     """
     # need check if img and bitmask with same W,H
     if isinstance(bitmasks, torch.Tensor):
         bitmasks = bitmasks.cpu().numpy()
+
+    if class_names is None or len(class_names) == 0:
+        class_names = coco_label_map_list[1:]
+
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.4
+    font_thickness = 1
 
     res_m = np.zeros_like(img)
     assert isinstance(bitmasks, np.ndarray), 'bitmasks must be numpy array'
@@ -259,7 +270,10 @@ def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, mask_bo
         if m.shape != img.shape:
             m = cv2.resize(m, (img.shape[1], img.shape[0]))
         cts, _ = cv2.findContours(m, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        # inssue this is a unique color
+        if len(cts) != 0:
+            cts = max(cts, key=cv2.contourArea)
+
+        # enssue this is a unique color
         cid = int(classes[i])
         if force_colors:
             c = force_colors[cid]
@@ -267,23 +281,34 @@ def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, mask_bo
             c = get_unique_color_by_id2(cid)
         if return_combined:
             if fill_mask:
-                cv2.drawContours(res_m, cts, -1,  color=c,
+                cv2.drawContours(res_m, [cts], -1,  color=c,
                                  thickness=-1, lineType=cv2.LINE_AA)
                 if draw_contours:
-                    cv2.drawContours(img, cts, -1,  color=c,
+                    if mask_border_color:
+                        c = mask_border_color
+                    cv2.drawContours(img, [cts], -1,  color=c,
                                      thickness=thickness, lineType=cv2.LINE_AA)
             else:
-                cv2.drawContours(res_m, cts, -1,  color=c,
+                cv2.drawContours(res_m, [cts], -1,  color=c,
                                  thickness=thickness, lineType=cv2.LINE_AA)
         else:
             if fill_mask:
-                cv2.drawContours(img, cts, -1,  color=c,
+                cv2.drawContours(img, [cts], -1,  color=c,
                                  thickness=-1, lineType=cv2.LINE_AA)
             else:
-                cv2.drawContours(img, cts, -1,  color=c,
+                cv2.drawContours(img, [cts], -1,  color=c,
                                  thickness=thickness, lineType=cv2.LINE_AA)
+        if classes is not None:
+            txt = f'{class_names[classes[i]]}'
+            if scores is not None:
+                txt += f' {scores[classes[i]]}'
+            M = cv2.moments(cts)
+            cx = int(M["m10"] / M["m00"])
+            cy = int(M["m01"] / M["m00"])
+            # draw labels 
+            cv2.putText(img, txt, (cx, cy), font, font_scale, [255, 255, 255], 1, cv2.LINE_AA)
     if return_combined:
-        img = cv2.addWeighted(img, 0.9, res_m, alpha, 0.5)
+        img = cv2.addWeighted(img, 0.9, res_m, alpha, 0.9)
         return img
     else:
         return img
