@@ -27,8 +27,27 @@ import sys
 
 def init_logger():
     logger.remove()  # Remove the pre-configured handler
-    logger.start(sys.stderr, format="<lvl>{level}</lvl> {time:MM-DD HH:mm:ss} {file}:{line} - {message}")
+    logger.start(
+        sys.stderr,
+        format="<lvl>{level}</lvl> {time:MM-DD HH:mm:ss} {file}:{line} - {message}",
+    )
+
 
 logger.remove()  # Remove the pre-configured handler
-logger.start(sys.stderr, format="<green>{level}</green> <green>{time:MM.DD HH:mm:ss}</green> <blue>{file}:{line}:</blue> <green>{message}</green>")
+logger.start(
+    sys.stderr, format="{time:MM.DD HH:mm:ss} <lvl>{level}</lvl> {file}:{line}]: {message}"
+)
 
+
+def save_log_to_file(f_n):
+    logger.remove(handler_id=None)  # 清除之前的设置
+    # 设置生成日志文件，utf-8编码，每天0点切割，zip压缩，保留3天，异步写入
+    logger.add(
+        sink=f"{f_n}_{time}.log",
+        level="INFO",
+        rotation="00:00",
+        retention="3 days",
+        compression="zip",
+        encoding="utf-8",
+        enqueue=True,
+    )
