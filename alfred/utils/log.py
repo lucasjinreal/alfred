@@ -37,7 +37,7 @@ def formatter(record):
     # package_name = get_package_name()
     filename = record["file"].name
     if len(record['file'].name) > 14:
-        filename = record["file"].name[:6] + '..' + record["file"].name[-6:]
+        filename = record["file"].name[:9] + '..' + record["file"].name[-3:]
     record["extra"].update(filename=filename)
     return "{time:MM.DD HH:mm:ss} <lvl>{level}</lvl> {extra[filename]}]: {message}\n{exception}"
 
