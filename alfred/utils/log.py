@@ -33,9 +33,18 @@ def init_logger():
     )
 
 
+def formatter(record):
+    # package_name = get_package_name()
+    filename = record["file"].name[:13]
+    record["extra"].update(filename=filename)
+    return "{time:MM.DD HH:mm:ss} <lvl>{level}</lvl> {extra[filename]}]: {message}\n{exception}"
+
+
 logger.remove()  # Remove the pre-configured handler
 logger.start(
-    sys.stderr, format="{time:MM.DD HH:mm:ss} <lvl>{level}</lvl> {file}:{line}]: {message}"
+    # sys.stderr, format="{time:MM.DD HH:mm:ss} <lvl>{level}</lvl> {file}:{line}]: {message}"
+    sys.stderr,
+    format=formatter,
 )
 
 
