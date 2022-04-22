@@ -1,46 +1,52 @@
-'''
+"""
 print github trend
-'''
+"""
 
 # Standard library imports
 
 # Third party imports
 
-from rich.logging import RichHandler
-import http.client
-from gtrending import fetch_repos
-import colorama
-from click import secho
-import requests
-import os
-import re
-import json
-from xdg import xdg_cache_home
-from random import randint
-import logging
-from time import sleep
-from datetime import datetime, timedelta
-import textwrap
-import math
-from shutil import get_terminal_size
-from rich.align import Align
-from rich.console import Console
-from rich.console import group as render_group
-from rich.rule import Rule
-from rich.table import Table
-from rich.text import Text
-from rich.panel import Panel
-from rich.columns import Columns
-console = Console()
+try:
+    from rich.logging import RichHandler
+    import http.client
+    from gtrending import fetch_repos
+    import colorama
+    from click import secho
+    import requests
+    import os
+    import re
+    import json
+    from random import randint
+    import logging
+    from time import sleep
+    from datetime import datetime, timedelta
+    import textwrap
+    import math
+    from shutil import get_terminal_size
+    from rich.align import Align
+    from rich.console import Console
+    from rich.console import group as render_group
+    from rich.rule import Rule
+    from rich.table import Table
+    from rich.text import Text
+    from rich.panel import Panel
+    from rich.columns import Columns
+    from xdg import xdg_cache_home
+
+    console = Console()
+except ImportError as e:
+    pass
 
 # could be made into config option in the future
-CACHED_RESULT_PATH = xdg_cache_home() / "starcli.json"
-print(f'temp cached path: {CACHED_RESULT_PATH}')
+try:
+    CACHED_RESULT_PATH = xdg_cache_home() / "starcli.json"
+except Exception as e:
+    CACHED_RESULT_PATH = "/tmp/starcli.json"
+print(f"temp cached path: {CACHED_RESULT_PATH}")
 CACHE_EXPIRATION = 1  # Minutes
 API_URL = "https://api.github.com/search/repositories"
 
-date_range_map = {"today": "daily",
-                  "this-week": "weekly", "this-month": "monthly"}
+date_range_map = {"today": "daily", "this-week": "weekly", "this-month": "monthly"}
 
 status_actions = {
     "retry": "Failed to retrieve data. Retrying in ",
@@ -264,8 +270,7 @@ def search_github_trending(
     for gtrending_repo in gtrending_repo_list:
         repo_dict = convert_repo_dict(gtrending_repo)
         repo_dict["date_range"] = (
-            str(repo_dict["date_range"]) + " stars " +
-            date_range.replace("-", " ")
+            str(repo_dict["date_range"]) + " stars " + date_range.replace("-", " ")
             if date_range
             else None
         )
@@ -351,8 +356,7 @@ def list_layout(repos):
             if "date_range" in repo.keys() and repo["date_range"]
             else Text("")
         )
-        title_table.add_row(title, Text(
-            stats, style="bold blue") + date_range_col)
+        title_table.add_row(title, Text(stats, style="bold blue") + date_range_col)
         title_table.columns[1].no_wrap = True
         title_table.columns[1].justify = "right"
         yield title_table
@@ -409,7 +413,7 @@ def table_layout(repos):
             repo["description"] = "None"
 
         table.add_row(
-            repo["full_name"] + '\n' + repo['html_url'],
+            repo["full_name"] + "\n" + repo["html_url"],
             repo["language"],  # so that it can work here
             repo["description"],
             stats,
@@ -488,19 +492,19 @@ def print_layout(*args, layout="list"):
 
 
 def get_github_trending(
-    lang='',
-    spoken_language='',
-    created='',
+    lang="",
+    spoken_language="",
+    created="",
     topic=[],
-    pushed='',
-    layout='table',
-    stars='>=100',
+    pushed="",
+    layout="table",
+    stars=">=100",
     limit_results=50,
-    order='desc',
+    order="desc",
     long_stats=True,
     # date_range='today',
-    date_range='this-week',
-    user='',
+    date_range="this-week",
+    user="",
     debug=False,
     auth="",
     pager=False,
@@ -574,8 +578,7 @@ def get_github_trending(
                     result_dict[options_key] = tmp_repos
                     f.truncate(0)
                     f.write(json.dumps(result_dict, indent=4))
-    tmp_repos = [r for r in tmp_repos if 'name' in r.keys()
-                 and 'full_name' in r.keys()]
+    tmp_repos = [r for r in tmp_repos if "name" in r.keys() and "full_name" in r.keys()]
     repos = tmp_repos[0:limit_results]
 
     if not long_stats:  # shorten the stat counts when not --long-stats
@@ -585,8 +588,7 @@ def get_github_trending(
             if "date_range" in repo.keys() and repo["date_range"]:
                 num_stars = repo["date_range"].split()[0]
                 repo["date_range"] = repo["date_range"].replace(
-                    num_stars, str(shorten_count(
-                        int(num_stars.replace(",", ""))))
+                    num_stars, str(shorten_count(int(num_stars.replace(",", ""))))
                 )
 
     print_results(repos, page=pager, layout=layout)
