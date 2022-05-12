@@ -31,5 +31,6 @@ from .vis import *
 from .fusion import *
 from .dl.torch.common import print_shape
 from .utils.log import logger
+from .dl.torch.common import device
 
 globals().update(importlib.import_module('alfred').__dict__)
