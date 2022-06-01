@@ -34,6 +34,9 @@ try:
     from xdg import xdg_cache_home
 
     console = Console()
+
+    FORMAT = "%(message)s"
+    httpclient_logger = logging.getLogger("http.client")
 except ImportError as e:
     pass
 
@@ -57,11 +60,6 @@ status_actions = {
     "unknown": "An unknown error occurred.",
     "valid": "The request returned successfully, but an unknown exception occurred.",
 }
-
-FORMAT = "%(message)s"
-
-
-httpclient_logger = logging.getLogger("http.client")
 
 
 def httpclient_logging_debug(level=logging.DEBUG):

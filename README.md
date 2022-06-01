@@ -44,6 +44,16 @@ A pic visualized from alfred:
 
 To install **alfred**, it is very simple:
 
+requirements:
+
+```
+lxml [optional]
+pycocotools [optional]
+opencv-python [optional]
+
+```
+then:
+
 ```shell
 sudo pip3 install alfred-py
 ```
