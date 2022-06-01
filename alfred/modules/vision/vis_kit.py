@@ -29,9 +29,7 @@ segmentation skillfully
 import numpy as np
 import colorsys
 import cv2
-import time
 import os
-import tensorflow as tf
 from PIL import Image
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
