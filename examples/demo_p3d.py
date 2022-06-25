@@ -59,6 +59,7 @@ wget -P data/cow_mesh https://dl.fbaipublicfiles.com/pytorch3d/data/cow_mesh/cow
 wget -P data/cow_mesh https://dl.fbaipublicfiles.com/pytorch3d/data/cow_mesh/cow.mtl
 wget -P data/cow_mesh https://dl.fbaipublicfiles.com/pytorch3d/data/cow_mesh/cow_texture.png
 '''
+device = torch.device('cpu')
 
 obj_filename = os.path.join('./cow_mesh', "cow.obj")
 
@@ -70,8 +71,8 @@ print(R, T)
 # R = torch.eye(3).unsqueeze(0)
 # R = torch.randn([1, 3, 3])
 R = torch.Tensor(
-    [[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]])
-T = torch.Tensor([[-0.0098, -0.1803,  7.9463]])
+    [[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]]).to(device)
+T = torch.Tensor([[-0.0098, -0.1803,  7.9463]]).to(device)
 print_shape(R, T)
 sfm_camera = PerspectiveCameras(device=device, R=R, T=T, focal_length=1000/224)
 width = 224
@@ -93,6 +94,8 @@ sfm_renderer = MeshRenderer(
         lights=lights
     )
 )
+
+print(mesh)
 images = sfm_renderer(mesh)
 cv2.imshow('aa', images[0, ..., :3].cpu().numpy())
 cv2.waitKey(0)

@@ -35,9 +35,11 @@ import numpy as np
 
 try:
     import torch
+
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 except ImportError:
     device = None
+    torch_installed = False
 
 
 def print_tensor(t, label=None, ignore_value=True):
