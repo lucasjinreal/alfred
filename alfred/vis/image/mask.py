@@ -31,7 +31,11 @@ also this will give options to draw detection or not
 import torch
 import cv2
 import numpy as np
-from .common import get_unique_color_by_id, get_unique_color_by_id2, get_unique_color_by_id_with_dataset
+from .common import (
+    get_unique_color_by_id,
+    get_unique_color_by_id2,
+    get_unique_color_by_id_with_dataset,
+)
 from .det import draw_one_bbox
 from PIL import Image
 from .get_dataset_color_map import *
@@ -46,8 +50,16 @@ ALL_COLORS_MAP = {
 }
 
 
-def draw_masks_maskrcnn(image, boxes, scores, labels, masks, human_label_list=None,
-                        score_thresh=0.6, draw_box=True):
+def draw_masks_maskrcnn(
+    image,
+    boxes,
+    scores,
+    labels,
+    masks,
+    human_label_list=None,
+    score_thresh=0.6,
+    draw_box=True,
+):
     """
     Standared mask drawing function
 
@@ -105,13 +117,20 @@ def draw_masks_maskrcnn(image, boxes, scores, labels, masks, human_label_list=No
                     font_thickness = 1
                     line_thickness = 1
 
-                    txt = '{} {:.2f}'.format(human_label_list[label], score)
-                    cv2.putText(image, txt, (x1, y1), font,
-                                font_scale, cls_color, font_thickness)
+                    txt = "{} {:.2f}".format(human_label_list[label], score)
+                    cv2.putText(
+                        image,
+                        txt,
+                        (x1, y1),
+                        font,
+                        font_scale,
+                        cls_color,
+                        font_thickness,
+                    )
 
             # colorize mask
-            m_w = int(x2-x1)
-            m_h = int(y2-y1)
+            m_w = int(x2 - x1)
+            m_h = int(y2 - y1)
             mask = Image.fromarray(mask).resize((m_w, m_h), Image.LINEAR)
             mask = np.array(mask)
             # cv2.imshow('rr2', mask)
@@ -119,19 +138,34 @@ def draw_masks_maskrcnn(image, boxes, scores, labels, masks, human_label_list=No
 
             mask_flatten = mask.flatten()
             # if pixel value less than 0.5, that's background, min: 0.0009, max: 0.9
-            mask_flatten_color = np.array(list(map(lambda it: instance_color if it > 0.5 else [0, 0, 0],
-                                                   mask_flatten)), dtype=np.uint8)
+            mask_flatten_color = np.array(
+                list(
+                    map(
+                        lambda it: instance_color if it > 0.5 else [0, 0, 0],
+                        mask_flatten,
+                    )
+                ),
+                dtype=np.uint8,
+            )
 
             mask_color = np.resize(mask_flatten_color, (m_h, m_w, 3))
-            empty_image[y1: y2, x1: x2, :] = mask_color
+            empty_image[y1:y2, x1:x2, :] = mask_color
     # combine image and masks
     # now we got mask
     combined = cv2.addWeighted(image, 0.5, empty_image, 0.6, 0)
     return combined
 
 
-def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list=None,
-                           score_thresh=0.6, draw_box=True):
+def draw_masks_maskrcnn_v2(
+    image,
+    boxes,
+    scores,
+    labels,
+    masks,
+    human_label_list=None,
+    score_thresh=0.6,
+    draw_box=True,
+):
     """
     We change way to draw masks on image
 
@@ -178,22 +212,36 @@ def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list
                     font_thickness = 1
                     line_thickness = 1
 
-                    txt = '{} {:.2f}'.format(human_label_list[label], score)
-                    cv2.putText(image, txt, (x1, y1), font,
-                                font_scale, cls_color, font_thickness)
+                    txt = "{} {:.2f}".format(human_label_list[label], score)
+                    cv2.putText(
+                        image,
+                        txt,
+                        (x1, y1),
+                        font,
+                        font_scale,
+                        cls_color,
+                        font_thickness,
+                    )
 
             # colorize mask
-            m_w = int(x2-x1)
-            m_h = int(y2-y1)
+            m_w = int(x2 - x1)
+            m_h = int(y2 - y1)
             mask = Image.fromarray(mask).resize((m_w, m_h), Image.LINEAR)
             mask = np.array(mask)
             mask_flatten = mask.flatten()
             # if pixel value less than 0.5, that's background, min: 0.0009, max: 0.9
-            mask_flatten_color = np.array(list(map(lambda it: instance_color if it > 0.5 else [0, 0, 0],
-                                                   mask_flatten)), dtype=np.uint8)
+            mask_flatten_color = np.array(
+                list(
+                    map(
+                        lambda it: instance_color if it > 0.5 else [0, 0, 0],
+                        mask_flatten,
+                    )
+                ),
+                dtype=np.uint8,
+            )
 
             mask_color = np.resize(mask_flatten_color, (m_h, m_w, 3))
-            empty_image[y1: y2, x1: x2, :] = mask_color
+            empty_image[y1:y2, x1:x2, :] = mask_color
     # combine image and masks
     # now we got mask
     combined = cv2.addWeighted(image, 0.5, empty_image, 0.6, 0)
@@ -201,7 +249,15 @@ def draw_masks_maskrcnn_v2(image, boxes, scores, labels, masks, human_label_list
 
 
 # more fast mask drawing here
-def vis_bitmasks(img, bitmasks, classes=None, fill_mask=True, return_combined=True, thickness=1, draw_contours=True):
+def vis_bitmasks(
+    img,
+    bitmasks,
+    classes=None,
+    fill_mask=True,
+    return_combined=True,
+    thickness=1,
+    draw_contours=True,
+):
     """
     visualize bitmasks on image
     """
@@ -213,7 +269,7 @@ def vis_bitmasks(img, bitmasks, classes=None, fill_mask=True, return_combined=Tr
     font_scale = 0.4
     font_thickness = 1
     res_m = np.zeros_like(img).astype(np.uint8)
-    assert isinstance(bitmasks, np.ndarray), 'bitmasks must be numpy array'
+    assert isinstance(bitmasks, np.ndarray), "bitmasks must be numpy array"
     bitmasks = bitmasks.astype(np.uint8)
     for i, m in enumerate(bitmasks):
         if m.shape != img.shape:
@@ -226,21 +282,26 @@ def vis_bitmasks(img, bitmasks, classes=None, fill_mask=True, return_combined=Tr
             c = get_unique_color_by_id2(i)
         if return_combined:
             if fill_mask:
-                cv2.drawContours(res_m, cts, -1,  color=c,
-                                 thickness=-1, lineType=cv2.LINE_AA)
+                cv2.drawContours(
+                    res_m, cts, -1, color=c, thickness=-1, lineType=cv2.LINE_AA
+                )
                 if draw_contours:
-                    cv2.drawContours(img, cts, -1,  color=c,
-                                     thickness=thickness, lineType=cv2.LINE_AA)
+                    cv2.drawContours(
+                        img, cts, -1, color=c, thickness=thickness, lineType=cv2.LINE_AA
+                    )
             else:
-                cv2.drawContours(res_m, cts, -1,  color=c,
-                                 thickness=thickness, lineType=cv2.LINE_AA)
+                cv2.drawContours(
+                    res_m, cts, -1, color=c, thickness=thickness, lineType=cv2.LINE_AA
+                )
         else:
             if fill_mask:
-                cv2.drawContours(img, cts, -1,  color=c,
-                                 thickness=-1, lineType=cv2.LINE_AA)
+                cv2.drawContours(
+                    img, cts, -1, color=c, thickness=-1, lineType=cv2.LINE_AA
+                )
             else:
-                cv2.drawContours(img, cts, -1,  color=c,
-                                 thickness=thickness, lineType=cv2.LINE_AA)
+                cv2.drawContours(
+                    img, cts, -1, color=c, thickness=thickness, lineType=cv2.LINE_AA
+                )
     if return_combined:
         img = cv2.addWeighted(img, 0.6, res_m, 0.7, 0.8)
         return img
@@ -248,7 +309,20 @@ def vis_bitmasks(img, bitmasks, classes=None, fill_mask=True, return_combined=Tr
         return img
 
 
-def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, scores=None, class_names=None, mask_border_color=None, draw_contours=False, alpha=0.4, fill_mask=True, return_combined=True, thickness=1):
+def vis_bitmasks_with_classes(
+    img,
+    classes,
+    bitmasks,
+    force_colors=None,
+    scores=None,
+    class_names=None,
+    mask_border_color=None,
+    draw_contours=False,
+    alpha=0.5,
+    fill_mask=True,
+    return_combined=True,
+    thickness=2,
+):
     """
     visualize bitmasks on image
     """
@@ -264,12 +338,19 @@ def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, scores=
     font_thickness = 1
 
     res_m = np.zeros_like(img)
-    assert isinstance(bitmasks, np.ndarray), 'bitmasks must be numpy array'
+    assert isinstance(bitmasks, np.ndarray), "bitmasks must be numpy array"
     bitmasks = bitmasks.astype(np.uint8)
     for i, m in enumerate(bitmasks):
-        if m.shape != img.shape:
-            m = cv2.resize(m, (img.shape[1], img.shape[0]))
+        # if m.shape != img.shape:
+        #     m = cv2.resize(m, (img.shape[1], img.shape[0]))
         cts, _ = cv2.findContours(m, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        if m.shape != img.shape:
+            coef_y = img.shape[0] / m.shape[0]
+            coef_x = img.shape[1] / m.shape[1]
+            for contour in cts:
+                contour[:, :, 0] = contour[:, :, 0] * coef_x
+                contour[:, :, 1] = contour[:, :, 1] * coef_y
+
         if len(cts) != 0:
             cts = max(cts, key=cv2.contourArea)
 
@@ -281,32 +362,44 @@ def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, scores=
             c = get_unique_color_by_id2(cid)
         if return_combined:
             if fill_mask:
-                cv2.drawContours(res_m, [cts], -1,  color=c,
-                                 thickness=-1, lineType=cv2.LINE_AA)
+                cv2.drawContours(
+                    res_m, [cts], -1, color=c, thickness=-1, lineType=cv2.LINE_AA
+                )
                 if draw_contours:
                     if mask_border_color:
                         c = mask_border_color
-                    cv2.drawContours(img, [cts], -1,  color=c,
-                                     thickness=thickness, lineType=cv2.LINE_AA)
+                    cv2.drawContours(
+                        img,
+                        [cts],
+                        -1,
+                        color=c,
+                        thickness=thickness,
+                        lineType=cv2.LINE_AA,
+                    )
             else:
-                cv2.drawContours(res_m, [cts], -1,  color=c,
-                                 thickness=thickness, lineType=cv2.LINE_AA)
+                cv2.drawContours(
+                    res_m, [cts], -1, color=c, thickness=thickness, lineType=cv2.LINE_AA
+                )
         else:
             if fill_mask:
-                cv2.drawContours(img, [cts], -1,  color=c,
-                                 thickness=-1, lineType=cv2.LINE_AA)
+                cv2.drawContours(
+                    img, [cts], -1, color=c, thickness=-1, lineType=cv2.LINE_AA
+                )
             else:
-                cv2.drawContours(img, [cts], -1,  color=c,
-                                 thickness=thickness, lineType=cv2.LINE_AA)
+                cv2.drawContours(
+                    img, [cts], -1, color=c, thickness=thickness, lineType=cv2.LINE_AA
+                )
         if classes is not None:
-            txt = f'{class_names[classes[i]]}'
+            txt = f"{class_names[classes[i]]}"
             if scores is not None:
-                txt += f' {scores[classes[i]]}'
+                txt += f" {scores[classes[i]]}"
             M = cv2.moments(cts)
             cx = int(M["m10"] / M["m00"])
             cy = int(M["m01"] / M["m00"])
-            # draw labels 
-            cv2.putText(img, txt, (cx, cy), font, font_scale, [255, 255, 255], 1, cv2.LINE_AA)
+            # draw labels
+            cv2.putText(
+                img, txt, (cx, cy), font, font_scale, [255, 255, 255], 1, cv2.LINE_AA
+            )
     if return_combined:
         img = cv2.addWeighted(img, 0.9, res_m, alpha, 0.9)
         return img
@@ -315,24 +408,38 @@ def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, scores=
 
 
 # helper functions
-def label2color_mask(cls_id_mask, max_classes=90, override_id_clr_map=None, color_suit='cityscapes'):
+def label2color_mask(
+    cls_id_mask, max_classes=90, override_id_clr_map=None, color_suit="cityscapes"
+):
     """
     cls_id_mask is your segmentation output
     override_id_clr_map: {2: [0, 0, 0]} used to override color
     """
-    assert color_suit in ALL_COLORS_MAP.keys(
-    ), 'avaiable keys: {}'.format(ALL_COLORS_MAP.keys())
+    assert color_suit in ALL_COLORS_MAP.keys(), "avaiable keys: {}".format(
+        ALL_COLORS_MAP.keys()
+    )
     colors = ALL_COLORS_MAP[color_suit]
     if override_id_clr_map != None:
         if isinstance(override_id_clr_map, dict):
-            colors = np.array([get_unique_color_by_id_with_dataset(i) if i not in override_id_clr_map.keys(
-            ) else override_id_clr_map[i] for i in range(max_classes)])
+            colors = np.array(
+                [
+                    get_unique_color_by_id_with_dataset(i)
+                    if i not in override_id_clr_map.keys()
+                    else override_id_clr_map[i]
+                    for i in range(max_classes)
+                ]
+            )
         else:
-            colors = np.array([override_id_clr_map[i % len(
-                override_id_clr_map)] for i in range(max_classes)])
+            colors = np.array(
+                [
+                    override_id_clr_map[i % len(override_id_clr_map)]
+                    for i in range(max_classes)
+                ]
+            )
     if len(colors) < max_classes:
         colors = np.append(
-            colors, ALL_COLORS_MAP['cityscapes'][:max_classes-len(colors)], axis=0)
+            colors, ALL_COLORS_MAP["cityscapes"][: max_classes - len(colors)], axis=0
+        )
 
     s = cls_id_mask.shape
     if len(s) > 1:
