@@ -64,32 +64,37 @@ def vis_pose_by_joints(
     color=colors(np.random.randint(30)),
     point_color=[252, 219, 3],
     point_size=6,
-):
-    N, num_kps, _ = poses.shape
+):  
+    if len(poses.shape) == 2:
+        poses = np.array([poses])
+        N, num_kps, _ = poses.shape
+    else:
+        N, num_kps, _ = poses.shape
+    
+    if len(joints.shape) == 3:
+        joints = joints[0]
+    
     for pose in poses:
         # for part_id in range(num_kps - 1):
         for part_id in range(len(joints)):
             # if num_kps is 18, then 0 ... 17
             kpt_a_id = joints[part_id][0] - 1
-            global_kpt_a_id = pose[kpt_a_id, 0]
-            if global_kpt_a_id != -1:
-                if len(pose[kpt_a_id].shape) == 2:
-                    x_a, y_a = pose[kpt_a_id]
-                elif len(pose[kpt_a_id].shape) == 3:
-                    x_a, y_a, _ = pose[kpt_a_id]
+            global_kpt_a = pose[kpt_a_id].tolist()
+            x_a, y_a, _ = global_kpt_a
+            if x_a > 0 and y_a > 0:
                 cv2.circle(img, (int(x_a), int(y_a)), 3, color, -1, cv2.LINE_AA)
 
             kpt_b_id = joints[part_id][1] - 1
-            global_kpt_b_id = pose[kpt_b_id, 0]
-            if global_kpt_b_id != -1:
-                if len(pose[kpt_b_id].shape) == 2:
-                    x_b, y_b = pose[kpt_b_id]
-                elif len(pose[kpt_b_id].shape) == 3:
-                    x_b, y_b = pose[kpt_b_id]
+            global_kpt_b = pose[kpt_b_id].tolist()
+            x_b, y_b, _ = global_kpt_b
+            if x_b > 0 and y_b > 0:
+                x_b, y_b, _ = global_kpt_b
                 cv2.circle(
                     img, (int(x_b), int(y_b)), point_size, point_color, -1, cv2.LINE_AA
                 )
-            if global_kpt_a_id != -1 and global_kpt_b_id != -1:
+            if (
+                x_a > 0 and y_a > 0 and x_b > 0 and y_b > 0
+            ):
                 cv2.line(
                     img,
                     (int(x_a), int(y_a)),
