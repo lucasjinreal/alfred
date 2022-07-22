@@ -142,7 +142,7 @@ A glance of alfred, after you installed above package, you will have `alfred`:
   if __name__ == "__main__":
       main()
   ```
-  Then, you just need setup an client, send keypoints3d to server, and it will automatically visualized out.
+  Then, you just need setup a client, send keypoints3d to server, and it will automatically visualized out.
   Here is what it looks like:
   ![](https://s4.ax1x.com/2022/01/18/7BDUZn.gif)
 
@@ -286,7 +286,7 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 
     By this, you can convert any labeling format of each other.
 - **2020.09.08**: After a long time past, **alfred** got some updates:
-    We providing `coco2yolo` ability inside it. Users can run this command convert your data to yolo format:
+    We providing `coco2yolo` ability inside it. Users can run this command to convert your data to yolo format:
 
     ```
     alfred data coco2yolo -i images/ -j annotations/val_split_2020.json
