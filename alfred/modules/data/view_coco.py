@@ -73,7 +73,7 @@ def showAnns(ori_img, anns, draw_bbox=False, cats=None):
         for ann in anns:
             c = np.array((np.random.random((1, 3)) * 0.6 +
                           0.4)[0]*255).astype(int).tolist()
-            if 'segmentation' in ann:
+            if 'segmentation' in ann.keys():
                 if type(ann['segmentation']) == list:
                     # polygon
                     for seg in ann['segmentation']:
@@ -121,11 +121,12 @@ def showAnns(ori_img, anns, draw_bbox=False, cats=None):
                 kp = np.array(ann['keypoints']).reshape(-1, 3)
                 vis_pose_by_joints(ori_img, kp, sks)
 
-        if type(ann['segmentation']) == list:
+        if 'segmentation' in ann.keys() and type(ann['segmentation']) == list:
             ori_img = cv2.addWeighted(ori_img, 0.7, mask, 0.6, 0.7)
         else:
             print('[WARN] you are using RLE mask encode format.')
-            ori_img = cv2.addWeighted(ori_img, 0.7, mask, 0.6, 0.7)
+            if not np.sum(mask) == 0:
+                ori_img = cv2.addWeighted(ori_img, 0.7, mask, 0.6, 0.7)
     elif datasetType == 'captions':
         for ann in anns:
             print(ann['caption'])
@@ -166,7 +167,7 @@ def vis_coco(coco_img_root, ann_f):
         annos = coco.loadAnns(anno_ids)
 
         logging.info('showing anno: {} objects. '.format(len(annos)))
-        if len(annos) > 0 and len(annos[0]['segmentation']) == 0:
+        if len(annos) > 0 and 'segmentation' in annos[0].keys() and len(annos[0]['segmentation']) == 0:
             logging.info('no segmentation found, using opencv vis.')
             img = cv2.imread(img_f)
 
@@ -201,10 +202,6 @@ def vis_coco(coco_img_root, ann_f):
             cv2.waitKey(0)
         else:
             im = cv2.imread(img_f)
-            # plt.imshow(I)
-            # plt.axis('off')
-            # coco.showAnns(annos, True)
-            # plt.show()
             ori_im = showAnns(im, annos, True, cats)
             if ori_im is not None:
                 cv2.imshow('aa', ori_im)
