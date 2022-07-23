@@ -30,32 +30,31 @@ this contains code that frequently used while writing torch applications
 import itertools
 import inspect
 from json.tool import main
-import torch
 from colorama import Fore, Back, Style
 import numpy as np
 
+try:
+    import torch
 
-device = torch.device(
-    'cuda') if torch.cuda.is_available() else torch.device('cpu')
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+except ImportError:
+    device = None
+    torch_installed = False
 
 
 def print_tensor(t, label=None, ignore_value=True):
     if isinstance(t, torch.Tensor):
         if label:
-            print(Fore.YELLOW + Style.BRIGHT +
-                  "-> {}".format(label) + Style.RESET_ALL)
+            print(Fore.YELLOW + Style.BRIGHT + "-> {}".format(label) + Style.RESET_ALL)
         else:
             print(Fore.YELLOW + Style.BRIGHT + "tensor: " + Style.RESET_ALL)
         if ignore_value:
-            print('shape: {}\ndtype: {} {}\n'.format(
-                t.shape, t.dtype, t.device))
+            print("shape: {}\ndtype: {} {}\n".format(t.shape, t.dtype, t.device))
         else:
-            print('value: {}\nshape: {}\ndtype: {}\n'.format(
-                t, t.shape, t.dtype
-            ))
+            print("value: {}\nshape: {}\ndtype: {}\n".format(t, t.shape, t.dtype))
 
     else:
-        print('{} is not a tensor.'.format(t))
+        print("{} is not a tensor.".format(t))
 
 
 def decorator(f):
@@ -66,22 +65,23 @@ def decorator(f):
         frame = inspect.currentframe()
         frame = inspect.getouterframes(frame)[1]
         string = inspect.getframeinfo(frame[0]).code_context[0].strip()
-        args_ori_names = string[string.find('(') + 1:-1].split(',')
+        args_ori_names = string[string.find("(") + 1 : -1].split(",")
 
         names = []
         for i in args_ori_names:
-            if i.find('=') != -1:
-                names.append(i.split('=')[1].strip())
+            if i.find("=") != -1:
+                names.append(i.split("=")[1].strip())
             else:
                 names.append(i)
         args_dict = dict(zip(names, args))
         for k, v in args_dict.items():
             k = k.strip()
             if isinstance(v, torch.Tensor):
-                print(f'[{k}]: ', v.shape, v.device, v.dtype)
+                print(f"[{k}]: ", v.shape, v.device, v.dtype)
             else:
-                print(f'[{k}]: ', v.shape)
+                print(f"[{k}]: ", v.shape)
         return f(*args, **kwargs)
+
     return wrapper
 
 
@@ -90,7 +90,7 @@ def print_shape(*vs):
     pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cam = torch.randn([4, 5, 300])
     pose = torch.randn([1, 44, 55])
     # print_shape(locals(), cam, pose)

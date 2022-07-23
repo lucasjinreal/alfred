@@ -47,6 +47,7 @@ from alfred.vis.image.det import visualize_det_cv2_part
 from alfred.vis.image.common import get_unique_color_by_id
 import numpy as np
 from pprint import pprint
+from alfred.vis.image.pose import vis_pose_by_joints
 
 
 # USED_CATEGORIES_IDS = [i for i in range(1, 16)]
@@ -55,7 +56,7 @@ def get_random_color():
     return list(np.array(np.random.random(size=3) * 256).astype(np.uint8))
 
 
-def showAnns(ori_img, anns, draw_bbox=False):
+def showAnns(ori_img, anns, draw_bbox=False, cats=None):
     h, w, c = ori_img.shape
     if len(anns) == 0:
         return ori_img
@@ -65,6 +66,7 @@ def showAnns(ori_img, anns, draw_bbox=False):
         datasetType = 'captions'
     else:
         raise Exception('datasetType not supported')
+    print(anns)
     if datasetType == 'instances':
         mask = np.zeros_like(ori_img).astype(np.uint8)
 
@@ -114,17 +116,10 @@ def showAnns(ori_img, anns, draw_bbox=False):
 
             if 'keypoints' in ann and type(ann['keypoints']) == list:
                 # turn skeleton into zero-based index
-                # sks = np.array(
-                #     self.loadCats(ann['category_id'])[0]['skeleton']) - 1
-                kp = np.array(ann['keypoints'])
-                x = kp[0::3]
-                y = kp[1::3]
-                v = kp[2::3]
-                # for sk in sks:
-                #     if np.all(v[sk] > 0):
-                #         cv2.line(ori_img, x[sk], y[sk], color=c)
-                print(kp)
-                print('keypoint vis not supported')
+                cat_skln = [c['skeleton'] for c in cats if c['id'] == ann['category_id']]
+                sks = np.array(cat_skln)
+                kp = np.array(ann['keypoints']).reshape(-1, 3)
+                vis_pose_by_joints(ori_img, kp, sks)
 
         if type(ann['segmentation']) == list:
             ori_img = cv2.addWeighted(ori_img, 0.7, mask, 0.6, 0.7)
@@ -210,7 +205,7 @@ def vis_coco(coco_img_root, ann_f):
             # plt.axis('off')
             # coco.showAnns(annos, True)
             # plt.show()
-            ori_im = showAnns(im, annos, True)
+            ori_im = showAnns(im, annos, True, cats)
             if ori_im is not None:
                 cv2.imshow('aa', ori_im)
                 cv2.waitKey(0)

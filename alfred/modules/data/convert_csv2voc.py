@@ -35,7 +35,10 @@ import sys
 import glob
 import numpy as np
 from PIL import Image
-from lxml.etree import Element, SubElement, tostring, ElementTree, tostring
+try:
+    from lxml.etree import Element, SubElement, tostring, ElementTree, tostring
+except ImportError:
+    pass
 
 
 

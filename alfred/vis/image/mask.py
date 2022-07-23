@@ -309,20 +309,7 @@ def vis_bitmasks(
         return img
 
 
-def vis_bitmasks_with_classes(
-    img,
-    classes,
-    bitmasks,
-    force_colors=None,
-    scores=None,
-    class_names=None,
-    mask_border_color=None,
-    draw_contours=False,
-    alpha=0.5,
-    fill_mask=True,
-    return_combined=True,
-    thickness=2,
-):
+def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, scores=None, class_names=None, mask_border_color=None, draw_contours=False, alpha=0.4, fill_mask=True, return_combined=True, thickness=2):
     """
     visualize bitmasks on image
     """
@@ -344,64 +331,46 @@ def vis_bitmasks_with_classes(
         # if m.shape != img.shape:
         #     m = cv2.resize(m, (img.shape[1], img.shape[0]))
         cts, _ = cv2.findContours(m, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        if m.shape != img.shape:
-            coef_y = img.shape[0] / m.shape[0]
-            coef_x = img.shape[1] / m.shape[1]
-            for contour in cts:
-                contour[:, :, 0] = contour[:, :, 0] * coef_x
-                contour[:, :, 1] = contour[:, :, 1] * coef_y
-
-        if len(cts) != 0:
+        if len(cts) > 0:
             cts = max(cts, key=cv2.contourArea)
-
         # enssue this is a unique color
         cid = int(classes[i])
         if force_colors:
             c = force_colors[cid]
         else:
             c = get_unique_color_by_id2(cid)
-        if return_combined:
-            if fill_mask:
-                cv2.drawContours(
-                    res_m, [cts], -1, color=c, thickness=-1, lineType=cv2.LINE_AA
-                )
-                if draw_contours:
-                    if mask_border_color:
-                        c = mask_border_color
-                    cv2.drawContours(
-                        img,
-                        [cts],
-                        -1,
-                        color=c,
-                        thickness=thickness,
-                        lineType=cv2.LINE_AA,
-                    )
+        if len(cts) > 0:
+            if return_combined:
+                if fill_mask:
+                    cv2.drawContours(res_m, [cts], -1,  color=c,
+                                    thickness=-1, lineType=cv2.LINE_AA)
+                    if draw_contours:
+                        if mask_border_color:
+                            c = mask_border_color
+                        cv2.drawContours(img, [cts], -1,  color=c,
+                                        thickness=thickness, lineType=cv2.LINE_AA)
+                else:
+                    cv2.drawContours(res_m, [cts], -1,  color=c,
+                                    thickness=thickness, lineType=cv2.LINE_AA)
             else:
-                cv2.drawContours(
-                    res_m, [cts], -1, color=c, thickness=thickness, lineType=cv2.LINE_AA
-                )
-        else:
-            if fill_mask:
-                cv2.drawContours(
-                    img, [cts], -1, color=c, thickness=-1, lineType=cv2.LINE_AA
-                )
-            else:
-                cv2.drawContours(
-                    img, [cts], -1, color=c, thickness=thickness, lineType=cv2.LINE_AA
-                )
+                if fill_mask:
+                    cv2.drawContours(img, [cts], -1,  color=c,
+                                    thickness=-1, lineType=cv2.LINE_AA)
+                else:
+                    cv2.drawContours(img, [cts], -1,  color=c,
+                                    thickness=thickness, lineType=cv2.LINE_AA)
         if classes is not None:
             txt = f"{class_names[classes[i]]}"
             if scores is not None:
-                txt += f" {scores[classes[i]]}"
-            M = cv2.moments(cts)
-            cx = int(M["m10"] / M["m00"])
-            cy = int(M["m01"] / M["m00"])
-            # draw labels
-            cv2.putText(
-                img, txt, (cx, cy), font, font_scale, [255, 255, 255], 1, cv2.LINE_AA
-            )
+                txt += f' {scores[classes[i]]}'
+            if len(cts) > 0:
+                M = cv2.moments(cts)
+                cx = int(M["m10"] / M["m00"])
+                cy = int(M["m01"] / M["m00"])
+                # draw labels 
+                cv2.putText(img, txt, (cx, cy), font, font_scale, [255, 255, 255], 1, cv2.LINE_AA)
     if return_combined:
-        img = cv2.addWeighted(img, 0.9, res_m, alpha, 0.9)
+        img = cv2.addWeighted(img, 0.7, res_m, alpha, 0.4)
         return img
     else:
         return img

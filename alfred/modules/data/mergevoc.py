@@ -37,7 +37,6 @@ import sys
 import cv2
 from alfred.utils.log import logger as logging
 from pascal_voc_writer import Writer
-from lxml import etree
 
 
 def get_and_check(root, name, length):

@@ -52,9 +52,13 @@ import os
 import json
 import glob
 import sys
-from lxml.etree import Element, SubElement, tostring, ElementTree, tostring
-from lxml import etree
 from PIL import Image
+
+try:
+  from lxml.etree import Element, SubElement, tostring, ElementTree, tostring
+  from lxml import etree
+except ImportError:
+  pass
 
 
 def convert_one(a):

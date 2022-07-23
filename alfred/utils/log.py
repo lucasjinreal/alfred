@@ -23,6 +23,7 @@
 #
 from loguru import logger
 import sys
+import time
 
 
 def init_logger():
@@ -36,10 +37,10 @@ def init_logger():
 def formatter(record):
     # package_name = get_package_name()
     filename = record["file"].name
-    if len(record['file'].name) > 14:
-        filename = record["file"].name[:9] + '..' + record["file"].name[-3:]
+    if len(record['file'].name) > 17:
+        filename = record["file"].name[:12] + '..' + record["file"].name[-3:]
     record["extra"].update(filename=filename)
-    return "{time:MM.DD HH:mm:ss} <lvl>{level}</lvl> {extra[filename]}]: {message}\n{exception}"
+    return "{time:HH:mm:ss MM.DD} <lvl>{level}</lvl> {extra[filename]}:{line}]: {message}\n{exception}"
 
 
 logger.remove()  # Remove the pre-configured handler
