@@ -730,7 +730,7 @@ def visualize_det_cv2_part(
         )
 
     if transparent:
-        img = cv2.addWeighted(img_mask, 0.99, img, 0.7, 0.9)
+        img = cv2.addWeighted(img_mask, 0.5, img, 0.9, 0.1)
 
     if is_show:
         cv2.imshow("image", img)

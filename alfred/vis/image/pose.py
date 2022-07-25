@@ -64,16 +64,19 @@ def vis_pose_by_joints(
     color=colors(np.random.randint(30)),
     point_color=[252, 219, 3],
     point_size=6,
-):  
+    line_width=2,
+    face_connect=False,
+    aa=False,
+):
     if len(poses.shape) == 2:
         poses = np.array([poses])
         N, num_kps, _ = poses.shape
     else:
         N, num_kps, _ = poses.shape
-    
+    assert isinstance(joints, np.ndarray), "joints must be numpy array!"
     if len(joints.shape) == 3:
         joints = joints[0]
-    
+
     for pose in poses:
         # for part_id in range(num_kps - 1):
         for part_id in range(len(joints)):
@@ -89,20 +92,54 @@ def vis_pose_by_joints(
             x_b, y_b, _ = global_kpt_b
             if x_b > 0 and y_b > 0:
                 x_b, y_b, _ = global_kpt_b
-                cv2.circle(
-                    img, (int(x_b), int(y_b)), point_size, point_color, -1, cv2.LINE_AA
-                )
-            if (
-                x_a > 0 and y_a > 0 and x_b > 0 and y_b > 0
-            ):
-                cv2.line(
-                    img,
-                    (int(x_a), int(y_a)),
-                    (int(x_b), int(y_b)),
-                    color,
-                    2,
-                    cv2.LINE_AA,
-                )
+                if (
+                    kpt_a_id not in [0, 1, 2, 3, 4]
+                    and kpt_b_id not in [0, 1, 2, 3, 4]
+                    and not face_connect
+                ):
+                    cv2.circle(
+                        img,
+                        (int(x_b), int(y_b)),
+                        point_size + 1,
+                        point_color,
+                        -1,
+                        cv2.LINE_AA if aa else cv2.LINE_8,
+                    )
+                else:
+                    cv2.circle(
+                        img,
+                        (int(x_b), int(y_b)),
+                        point_size,
+                        point_color,
+                        -1,
+                        cv2.LINE_AA if aa else cv2.LINE_8,
+                    )
+            if x_a > 0 and y_a > 0 and x_b > 0 and y_b > 0:
+                if face_connect:
+                    cv2.line(
+                        img,
+                        (int(x_a), int(y_a)),
+                        (int(x_b), int(y_b)),
+                        color,
+                        line_width,
+                        cv2.LINE_AA if aa else cv2.LINE_8,
+                    )
+                else:
+                    if kpt_a_id not in [0, 1, 2, 3, 4] and kpt_b_id not in [
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                    ]:
+                        cv2.line(
+                            img,
+                            (int(x_a), int(y_a)),
+                            (int(x_b), int(y_b)),
+                            color,
+                            line_width,
+                            cv2.LINE_AA if aa else cv2.LINE_8,
+                        )
     return img
 
 
