@@ -62,7 +62,7 @@ def vis_pose_by_joints(
     poses,
     joints,
     color=colors(np.random.randint(30)),
-    point_color=[252, 219, 3],
+    point_color=None,
     point_size=6,
     line_width=2,
     face_connect=False,
@@ -78,6 +78,9 @@ def vis_pose_by_joints(
     if len(joints.shape) == 3:
         joints = joints[0]
 
+    if point_color is None:
+        point_color = color
+        
     for pose in poses:
         # for part_id in range(num_kps - 1):
         for part_id in range(len(joints)):
