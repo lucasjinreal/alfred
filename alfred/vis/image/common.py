@@ -52,7 +52,7 @@ class Colors:
 
 
 colors = Colors()  # create instance for 'from utils.plots import colors'
-
+global_random_choices_for_u = [np.random.randint(len(light_colors)) for i in range(200)]
 
 def create_unique_color_float(tag, hue_step=0.41, alpha=0.7):
     h, v = (tag * hue_step) % 1, 1. - (int(tag * hue_step) % 4) / 5.
@@ -84,6 +84,14 @@ def get_unique_color_by_id2(idx, dark=False):
         idx = idx % len(light_colors)
         return light_colors[idx]
 
+def get_unique_color_by_id3(idx, dark=False):
+    color_idx = global_random_choices_for_u[idx]
+    if dark:
+        idx = idx % len(dark_colors)
+        return dark_colors[color_idx]
+    else:
+        idx = idx % len(light_colors)
+        return light_colors[color_idx]
 
 def get_unique_color_by_id_with_dataset(idx):
     colors = create_cityscapes_label_colormap()

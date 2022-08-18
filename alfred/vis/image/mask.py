@@ -34,6 +34,7 @@ import numpy as np
 from .common import (
     get_unique_color_by_id,
     get_unique_color_by_id2,
+    get_unique_color_by_id3,
     get_unique_color_by_id_with_dataset,
 )
 from .det import draw_one_bbox
@@ -309,7 +310,7 @@ def vis_bitmasks(
         return img
 
 
-def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, scores=None, class_names=None, mask_border_color=None, draw_contours=False, alpha=0.4, fill_mask=True, return_combined=True, thickness=2):
+def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, scores=None, class_names=None, mask_border_color=None, draw_contours=False, alpha=0.8, fill_mask=True, return_combined=True, thickness=2):
     """
     visualize bitmasks on image
     """
@@ -338,7 +339,7 @@ def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, scores=
         if force_colors:
             c = force_colors[cid]
         else:
-            c = get_unique_color_by_id2(cid)
+            c = get_unique_color_by_id3(cid)
         if len(cts) > 0:
             if return_combined:
                 if fill_mask:
@@ -370,7 +371,7 @@ def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, scores=
                 # draw labels 
                 cv2.putText(img, txt, (cx, cy), font, font_scale, [255, 255, 255], 1, cv2.LINE_AA)
     if return_combined:
-        img = cv2.addWeighted(img, 0.7, res_m, alpha, 0.4)
+        img = cv2.addWeighted(img, 0.9, res_m, alpha, 0.8)
         return img
     else:
         return img
