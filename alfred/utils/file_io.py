@@ -14,8 +14,7 @@ import logging
 import shutil
 from typing import Callable, Optional
 from urllib import request
-import cv2 as cv
-from natsort import natsorted
+
 
 __all__ = ["PathManager", "get_cache_dir", "file_lock"]
 
@@ -601,6 +600,8 @@ class ImageSourceIter(SourceIter):
     def __init__(self, src, exit_auto=True):
         super(ImageSourceIter, self).__init__(src, exit_auto)
 
+        import cv2 as cv
+
         self._index_sources()
         self.is_written = False
         self.save_f = None
@@ -676,6 +677,8 @@ class ImageSourceIter(SourceIter):
             return NotImplementedError
 
     def _index_sources(self):
+        from natsort import natsorted
+
         if str(self.src).isdigit():
             self.webcam_mode = True
             self.video_mode = True
@@ -719,7 +722,8 @@ class ImageSourceIterAsync(SourceIter):
 
     def __init__(self, src, exit_auto=True):
         super(ImageSourceIter, self).__init__(src, exit_auto)
-
+        import cv2 as cv
+        
         self._index_sources()
         self.is_written = False
         self.save_f = None
@@ -794,6 +798,8 @@ class ImageSourceIterAsync(SourceIter):
             return NotImplementedError
 
     def _index_sources(self):
+        from natsort import natsorted
+
         if str(self.src).isdigit():
             self.webcam_mode = True
             self.video_mode = True
