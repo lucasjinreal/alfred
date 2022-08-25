@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from typing import OrderedDict
 import numpy as np
 import tensorrt as trt
 from .calibrator import Calibrator
@@ -507,7 +508,7 @@ def build_engine_onnx_v3(
 
 
 def check_engine(engine, input_shape=(608, 608), do_print=False):
-    tensor_names_shape_dict = {}
+    tensor_names_shape_dict = OrderedDict()
     for binding in engine:
         dims = engine.get_binding_shape(binding)
         if dims[-1] == -1:
