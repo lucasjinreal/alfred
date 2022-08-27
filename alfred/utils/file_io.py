@@ -15,6 +15,11 @@ import shutil
 from typing import Callable, Optional
 from urllib import request
 
+try:
+    import cv2 as cv
+except ImportError as e:
+    cv = None
+
 
 __all__ = ["PathManager", "get_cache_dir", "file_lock"]
 
@@ -599,8 +604,6 @@ class SourceIter:
 class ImageSourceIter(SourceIter):
     def __init__(self, src, exit_auto=True):
         super(ImageSourceIter, self).__init__(src, exit_auto)
-
-        import cv2 as cv
 
         self._index_sources()
         self.is_written = False
