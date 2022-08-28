@@ -716,6 +716,11 @@ class ImageSourceIter(SourceIter):
                     # clean up remove saved file.
                     os.remove(self.save_f)
 
+    def waitKey(self):
+        if self.video_mode:
+            cv.waitKey(1)
+        else:
+            cv.waitKey(0)
 
 class ImageSourceIterAsync(SourceIter):
     """
