@@ -19,6 +19,11 @@ try:
 except ImportError as e:
     cv = None
 
+try:
+    import cv2 as cv
+except ImportError as e:
+    cv = None
+
 
 __all__ = ["PathManager", "get_cache_dir", "file_lock"]
 
@@ -715,6 +720,11 @@ class ImageSourceIter(SourceIter):
                     # clean up remove saved file.
                     os.remove(self.save_f)
 
+    def waitKey(self):
+        if self.video_mode:
+            cv.waitKey(1)
+        else:
+            cv.waitKey(0)
 
 class ImageSourceIterAsync(SourceIter):
     """

@@ -5,6 +5,12 @@ print github trend
 # Standard library imports
 
 # Third party imports
+import requests
+import os
+import re
+import json
+from random import randint
+import logging
 
 try:
     from rich.logging import RichHandler
@@ -12,12 +18,6 @@ try:
     from gtrending import fetch_repos
     import colorama
     from click import secho
-    import requests
-    import os
-    import re
-    import json
-    from random import randint
-    import logging
     from time import sleep
     from datetime import datetime, timedelta
     import textwrap
