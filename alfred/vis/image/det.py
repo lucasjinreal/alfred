@@ -39,6 +39,7 @@ from collections import Counter, OrderedDict
 from .common import put_txt_with_newline
 from .get_dataset_label_map import coco_label_map_list
 from .constants import light_colors
+from .common import global_random_choices_for_u, dynamic_cls_name_color_map
 
 
 def _draw_round_dot_border(img, pt1, pt2, color, thickness, r=2, d=5):
@@ -520,11 +521,22 @@ def visualize_det_cv2_part(
         print("boxes with unsupported type, boxes must be ndarray or list.")
 
     if class_names is None or len(class_names) == 0:
-        # not using background
         class_names = coco_label_map_list[1:]
-
+    else:
+        if cls_ids is None:
+            # not class id, using default name, assue only 1 class
+            if class_names is None:
+                class_names = ['object']
+            if class_names[0] not in dynamic_cls_name_color_map.keys():
+                dynamic_cls_name_color_map[class_names[0]] = colors(np.random.choice(global_random_choices_for_u))
+            force_color = [dynamic_cls_name_color_map[class_names[0]]]
+            # class_names.insert(0, 'none')
+    
     for i in range(n_boxes):
-        cls_id = int(cls_ids[i])
+        if cls_ids is not None:
+            cls_id = int(cls_ids[i])
+        else:
+            cls_id = 0 # fake id, assume just one class
         if cls_id != background_id:
             if scores is not None:
                 if scores[i] > thresh:
@@ -730,7 +742,7 @@ def visualize_det_cv2_part(
         )
 
     if transparent:
-        img = cv2.addWeighted(img_mask, 0.5, img, 0.9, 0.1)
+        img = cv2.addWeighted(img_mask, 0.8, img, 0.9, 0.6)
 
     if is_show:
         cv2.imshow("image", img)

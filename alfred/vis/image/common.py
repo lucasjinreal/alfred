@@ -53,6 +53,7 @@ class Colors:
 
 colors = Colors()  # create instance for 'from utils.plots import colors'
 global_random_choices_for_u = [np.random.randint(len(light_colors)) for i in range(200)]
+dynamic_cls_name_color_map = dict()
 
 def create_unique_color_float(tag, hue_step=0.41, alpha=0.7):
     h, v = (tag * hue_step) % 1, 1. - (int(tag * hue_step) % 4) / 5.
