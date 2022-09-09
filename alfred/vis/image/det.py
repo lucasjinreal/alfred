@@ -476,10 +476,11 @@ def visualize_det_cv2_part(
     style="none",
     force_color=None,
     line_thickness=2,
-    font_scale=0.58,
+    font_scale=0.41,
     show_time=0,
     wait_t=0,
     transparent=False,
+    score_percent=False,
 ):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
@@ -505,7 +506,7 @@ def visualize_det_cv2_part(
             force_color, np.ndarray
         ), "force_color must be list or numpy array"
 
-    font = cv2.FONT_HERSHEY_SIMPLEX
+    font = cv2.QT_FONT_NORMAL
     font_thickness = 1
     line_thickness = line_thickness
 
@@ -599,20 +600,27 @@ def visualize_det_cv2_part(
                             n = class_names[min(cls_id, len(force_color) - 1)]
                         else:
                             n = class_names[cls_id]
-                        text_label = "{} {:.1f}%".format(n, scores[i] * 100)
+                        if score_percent:
+                            text_label = "{} {:.1f}%".format(n, scores[i] * 100)
+                        else:
+                            text_label = "{} {:.2f}".format(n, scores[i])
                     else:
-                        text_label = "{} {:.1f}%".format(cls_id, scores[i] * 100)
+                        if score_percent:
+                            text_label = "{} {:.1f}%".format(cls_id, scores[i] * 100)
+                        else:
+                            text_label = "{} {:.2f}".format(n, scores[i])
 
                     (ret_val, _) = cv2.getTextSize(
                         text_label, font, font_scale, font_thickness
                     )
                     # txt_bottom_left = (x1+4, y1-4)
-                    txt_bottom_left = (x1, y1 - 6)  # make text a little higher
+                    delta = 4
+                    txt_bottom_left = (x1, y1 - delta)  # make text a little higher
                     if transparent:
                         cv2.rectangle(
                             img_mask,
-                            (txt_bottom_left[0], txt_bottom_left[1] - ret_val[1] - 6),
-                            (txt_bottom_left[0] + ret_val[0], txt_bottom_left[1] + 6),
+                            (txt_bottom_left[0], txt_bottom_left[1] - ret_val[1] - delta),
+                            (txt_bottom_left[0] + ret_val[0], txt_bottom_left[1] + delta),
                             unique_color,
                             -1,
                             cv2.LINE_AA,
@@ -620,8 +628,8 @@ def visualize_det_cv2_part(
                     else:
                         cv2.rectangle(
                             img,
-                            (txt_bottom_left[0], txt_bottom_left[1] - ret_val[1] - 6),
-                            (txt_bottom_left[0] + ret_val[0], txt_bottom_left[1] + 6),
+                            (txt_bottom_left[0], txt_bottom_left[1] - ret_val[1] - delta),
+                            (txt_bottom_left[0] + ret_val[0], txt_bottom_left[1] + delta),
                             unique_color,
                             -1,
                             cv2.LINE_AA,
@@ -742,7 +750,7 @@ def visualize_det_cv2_part(
         )
 
     if transparent:
-        img = cv2.addWeighted(img_mask, 0.8, img, 0.9, 0.6)
+        img = cv2.addWeighted(img_mask, 0.9, img, 0.9, 0.9)
 
     if is_show:
         cv2.imshow("image", img)
