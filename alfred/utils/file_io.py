@@ -726,6 +726,13 @@ class ImageSourceIter(SourceIter):
         else:
             cv.waitKey(0)
 
+
+def next_item(iter):
+    itm = next(iter)
+    if isinstance(itm, str):
+        itm = cv.imread(itm)
+    return itm
+
 class ImageSourceIterAsync(SourceIter):
     """
     reading frames in threads if on video mode
