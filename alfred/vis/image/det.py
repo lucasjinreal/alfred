@@ -509,7 +509,7 @@ def visualize_det_cv2_part(
     font = cv2.QT_FONT_NORMAL
     font_thickness = 1
     line_thickness = line_thickness
-
+    font_color = (3, 3, 3)
     if transparent:
         img_mask = np.zeros_like(img)
 
@@ -640,7 +640,7 @@ def visualize_det_cv2_part(
                         txt_bottom_left,
                         font,
                         font_scale,
-                        (237, 237, 237),
+                        font_color,
                         font_thickness,
                         cv2.LINE_AA,
                     )
@@ -733,7 +733,7 @@ def visualize_det_cv2_part(
                     txt_bottom_left,
                     font,
                     font_scale,
-                    (237, 237, 237),
+                    font_color,
                     font_thickness,
                     cv2.LINE_AA,
                 )
@@ -750,7 +750,7 @@ def visualize_det_cv2_part(
         )
 
     if transparent:
-        img = cv2.addWeighted(img_mask, 0.9, img, 0.9, 0.9)
+        img = cv2.addWeighted(img_mask, 1, img, 0.99, 0.7)
 
     if is_show:
         cv2.imshow("image", img)
