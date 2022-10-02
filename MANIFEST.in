@@ -1,5 +1,5 @@
 include LICENSE
 include README.md
 include alfred/modules/cabinet/templates/*.tmpl
-include data/FZSSJW.TTF
+include alfred/fonts/FZSSJW.TTF
 include alfred/vis/mesh3d/assets/
