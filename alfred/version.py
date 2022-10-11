@@ -1,18 +1,23 @@
 # Copyright (c) Lucas Jin. All rights reserved.
+from datetime import datetime
 
-__version__ = '2.12.6'
+major_num = 2
+
+__version__ = (
+    f"{major_num}.{datetime.now().year}.{datetime.now().month}.{datetime.now().day}"
+)
 short_version = __version__
 
 
 def parse_version_info(version_str):
     version_info = []
-    for x in version_str.split('.'):
+    for x in version_str.split("."):
         if x.isdigit():
             version_info.append(int(x))
-        elif x.find('rc') != -1:
-            patch_version = x.split('rc')
+        elif x.find("rc") != -1:
+            patch_version = x.split("rc")
             version_info.append(int(patch_version[0]))
-            version_info.append(f'rc{patch_version[1]}')
+            version_info.append(f"rc{patch_version[1]}")
     return tuple(version_info)
 
 
