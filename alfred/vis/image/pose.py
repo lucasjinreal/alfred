@@ -80,7 +80,7 @@ def vis_pose_by_joints(
 
     if point_color is None:
         point_color = color
-        
+
     for pose in poses:
         # for part_id in range(num_kps - 1):
         for part_id in range(len(joints)):
@@ -314,7 +314,7 @@ def imshow_keypoints(
                                 (int(x_coord), int(y_coord)),
                                 radius,
                                 (int(r), int(g), int(b)),
-                                -1,
+                                2,
                                 cv2.LINE_AA,
                             )
                             transparency = max(0, min(1, kpt_score))
@@ -332,8 +332,9 @@ def imshow_keypoints(
                                 img,
                                 (int(x_coord), int(y_coord)),
                                 radius,
-                                (int(r), int(g), int(b)),
-                                -1,
+                                # (int(r), int(g), int(b)),
+                                (255, 255, 255),
+                                2,
                                 cv2.LINE_AA,
                             )
                 else:
@@ -359,8 +360,9 @@ def imshow_keypoints(
                             img,
                             (int(x_coord), int(y_coord)),
                             radius,
-                            (int(r), int(g), int(b)),
-                            -1,
+                            # (int(r), int(g), int(b)),
+                            (255, 255, 255),
+                            2,
                             cv2.LINE_AA,
                         )
 
