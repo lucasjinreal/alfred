@@ -80,7 +80,6 @@ setup(name='alfred-py',
       packages=[
           'alfred',
           'alfred.dl',
-          'alfred.modules.cabinet.templates',
           'alfred.dl.inference',
           'alfred.dl.data',
           'alfred.dl.data.common',
