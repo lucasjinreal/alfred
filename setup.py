@@ -79,7 +79,6 @@ setup(name='alfred-py',
       find_packages='',
       packages=[
           'alfred',
-          'alfred.fonts',
           'alfred.dl',
           'alfred.modules.cabinet.templates',
           'alfred.dl.inference',
