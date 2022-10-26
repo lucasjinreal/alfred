@@ -3,9 +3,7 @@ from datetime import datetime
 
 major_num = 2
 
-__version__ = (
-    f"{major_num}.{datetime.now().year}.{datetime.now().month}.{datetime.now().day}.01"
-)
+__version__ = '2.11.1'
 short_version = __version__
 
 
