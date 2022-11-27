@@ -310,7 +310,20 @@ def vis_bitmasks(
         return img
 
 
-def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, scores=None, class_names=None, mask_border_color=None, draw_contours=False, alpha=0.8, fill_mask=True, return_combined=True, thickness=2):
+def vis_bitmasks_with_classes(
+    img,
+    classes,
+    bitmasks,
+    force_colors=None,
+    scores=None,
+    class_names=None,
+    mask_border_color=None,
+    draw_contours=False,
+    alpha=0.8,
+    fill_mask=True,
+    return_combined=True,
+    thickness=2,
+):
     """
     visualize bitmasks on image
     """
@@ -343,33 +356,62 @@ def vis_bitmasks_with_classes(img, classes, bitmasks, force_colors=None, scores=
         if len(cts) > 0:
             if return_combined:
                 if fill_mask:
-                    cv2.drawContours(res_m, [cts], -1,  color=c,
-                                    thickness=-1, lineType=cv2.LINE_AA)
+                    cv2.drawContours(
+                        res_m, [cts], -1, color=c, thickness=-1, lineType=cv2.LINE_AA
+                    )
                     if draw_contours:
                         if mask_border_color:
                             c = mask_border_color
-                        cv2.drawContours(img, [cts], -1,  color=c,
-                                        thickness=thickness, lineType=cv2.LINE_AA)
+                        cv2.drawContours(
+                            img,
+                            [cts],
+                            -1,
+                            color=c,
+                            thickness=thickness,
+                            lineType=cv2.LINE_AA,
+                        )
                 else:
-                    cv2.drawContours(res_m, [cts], -1,  color=c,
-                                    thickness=thickness, lineType=cv2.LINE_AA)
+                    cv2.drawContours(
+                        res_m,
+                        [cts],
+                        -1,
+                        color=c,
+                        thickness=thickness,
+                        lineType=cv2.LINE_AA,
+                    )
             else:
                 if fill_mask:
-                    cv2.drawContours(img, [cts], -1,  color=c,
-                                    thickness=-1, lineType=cv2.LINE_AA)
+                    cv2.drawContours(
+                        img, [cts], -1, color=c, thickness=-1, lineType=cv2.LINE_AA
+                    )
                 else:
-                    cv2.drawContours(img, [cts], -1,  color=c,
-                                    thickness=thickness, lineType=cv2.LINE_AA)
+                    cv2.drawContours(
+                        img,
+                        [cts],
+                        -1,
+                        color=c,
+                        thickness=thickness,
+                        lineType=cv2.LINE_AA,
+                    )
         if classes is not None:
             txt = f"{class_names[classes[i]]}"
             if scores is not None:
-                txt += f' {scores[classes[i]]}'
+                txt += f" {scores[classes[i]]}"
             if len(cts) > 0:
                 M = cv2.moments(cts)
                 cx = int(M["m10"] / M["m00"])
                 cy = int(M["m01"] / M["m00"])
-                # draw labels 
-                cv2.putText(img, txt, (cx, cy), font, font_scale, [255, 255, 255], 1, cv2.LINE_AA)
+                # draw labels
+                cv2.putText(
+                    img,
+                    txt,
+                    (cx, cy),
+                    font,
+                    font_scale,
+                    [255, 255, 255],
+                    1,
+                    cv2.LINE_AA,
+                )
     if return_combined:
         img = cv2.addWeighted(img, 0.9, res_m, alpha, 0.8)
         return img
@@ -417,3 +459,58 @@ def label2color_mask(
     mask = colors[cls_id_mask]
     mask = np.reshape(mask, (*s, 3)).astype(np.uint8)
     return mask
+
+
+def vis_segments_mask(
+    img,
+    segments,
+    classes=None,
+    fill_mask=True,
+    return_combined=True,
+    thickness=1,
+    draw_contours=True,
+):
+    font = cv2.QT_FONT_NORMAL
+    font_scale = 0.4
+    font_thickness = 1
+    res_m = np.zeros_like(img).astype(np.uint8)
+
+    for i, segm in enumerate(segments):
+        segm = segm.reshape((-1, 1, 2)).astype(np.int32)
+        segm = [segm]
+        if classes is not None:
+            c = get_unique_color_by_id2(classes[i])
+        else:
+            c = get_unique_color_by_id2(i)
+        if return_combined:
+            if fill_mask:
+                cv2.drawContours(
+                    res_m, segm, -1, color=c, thickness=-1, lineType=cv2.LINE_AA
+                )
+                if draw_contours:
+                    cv2.drawContours(
+                        img,
+                        segm,
+                        -1,
+                        color=c,
+                        thickness=thickness,
+                        lineType=cv2.LINE_AA,
+                    )
+            else:
+                cv2.drawContours(
+                    res_m, segm, -1, color=c, thickness=thickness, lineType=cv2.LINE_AA
+                )
+        else:
+            if fill_mask:
+                cv2.drawContours(
+                    img, segm, -1, color=c, thickness=-1, lineType=cv2.LINE_AA
+                )
+            else:
+                cv2.drawContours(
+                    img, segm, -1, color=c, thickness=thickness, lineType=cv2.LINE_AA
+                )
+    if return_combined:
+        img = cv2.addWeighted(img, 0.6, res_m, 0.7, 0.8)
+        return img
+    else:
+        return img
