@@ -70,7 +70,9 @@ def coco2yolo(img_r, j_f):
         anno_ids = coco.getAnnIds(imgIds=img['id'])
         annos = coco.loadAnns(anno_ids)
 
-        out_file = open(os.path.join(target_txt_r, os.path.basename(img_f).split('.')[0] + '.txt'), 'w')
+        img_root, img_ext = os.path.splitext(img_f)
+        out_file = open(os.path.join(target_txt_r, os.path.basename(img_root) + '.txt'), 'w')
+        # out_file = open(os.path.join(target_txt_r, os.path.basename(img_f).split('.')[0] + '.txt'), 'w')
         img = cv2.imread(img_f)
         h, w, _ = img.shape
         shutil.copy(img_f, os.path.join(target_img_r, os.path.basename(img_f)))
