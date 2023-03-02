@@ -263,7 +263,6 @@ def vis_coco(coco_img_root, ann_f):
                     cv2.LINE_AA,
                 )
             cv2.imshow("rr", img)
-            cv2.waitKey(0)
             ch = cv2.waitKey(0)
             if ch == 27:
                 exit()
@@ -272,7 +271,6 @@ def vis_coco(coco_img_root, ann_f):
             ori_im = showAnns(im, annos, True, cats)
             if ori_im is not None:
                 cv2.imshow("aa", ori_im)
-                cv2.waitKey(0)
                 ch = cv2.waitKey(0)
                 if ch == 27:
                     exit()
