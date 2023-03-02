@@ -264,12 +264,18 @@ def vis_coco(coco_img_root, ann_f):
                 )
             cv2.imshow("rr", img)
             cv2.waitKey(0)
+            ch = cv2.waitKey(0)
+            if ch == 27:
+                exit()
         else:
             im = cv2.imread(img_f)
             ori_im = showAnns(im, annos, True, cats)
             if ori_im is not None:
                 cv2.imshow("aa", ori_im)
                 cv2.waitKey(0)
+                ch = cv2.waitKey(0)
+                if ch == 27:
+                    exit()
             else:
                 I = Image.open(img_f)
                 plt.imshow(I)

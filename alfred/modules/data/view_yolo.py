@@ -66,7 +66,9 @@ def vis_det_yolo(img_root, label_root):
                         cv2.putText(img, category, (xmin, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.7, (255, 255, 255))
                         cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2, 1)
                 cv2.imshow('yolo check', img)
-                cv2.waitKey(0)
+                ch = cv2.waitKey(0)
+                if ch == 27:
+                    exit()
             else:
                 logging.warning('xxxx image: {} not found.'.format(img_f))
 
