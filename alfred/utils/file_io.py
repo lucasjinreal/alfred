@@ -852,3 +852,10 @@ class ImageSourceIterAsync(SourceIter):
                 if self.save_f and os.path.exists(self.save_f):
                     # clean up remove saved file.
                     os.remove(self.save_f)
+
+
+def get_next_frame(iter):
+    itm = next(iter)
+    if os.path.isfile(itm):
+        itm = cv.imread(itm)
+    return itm
