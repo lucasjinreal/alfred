@@ -567,6 +567,7 @@ class SourceIter:
         self.src = src
         self.srcs = []
         self.crt_index = 0
+        self.crt_filename = ''
         self.video_mode = False
         self.webcam_mode = False
         self.cap = None
@@ -595,6 +596,7 @@ class SourceIter:
             if self.crt_index < len(self.srcs):
                 p = self.srcs[self.crt_index]
                 self.crt_index += 1
+                self.crt_filename = os.path.basename(p)
                 return p
             else:
                 if self.exit_auto:
@@ -725,6 +727,9 @@ class ImageSourceIter(SourceIter):
             cv.waitKey(1)
         else:
             cv.waitKey(0)
+    
+    def show(self, winname, img):
+        cv.imshow(winname, img)
 
 
 def next_item(iter):
