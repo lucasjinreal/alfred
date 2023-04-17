@@ -598,6 +598,7 @@ class SourceIter:
                 p = self.srcs[self.crt_index]
                 self.crt_filename = os.path.basename(p)
                 self.crt_index += 1
+                self.crt_filename = os.path.basename(p)
                 return p
             else:
                 if self.exit_auto:
@@ -747,6 +748,9 @@ class ImageSourceIter(SourceIter):
                 # exit(0)
         else:
             cv.waitKey(0)
+    
+    def show(self, winname, img):
+        cv.imshow(winname, img)
 
     def show(self, winname, mat):
         cv.imshow(winname, mat)
