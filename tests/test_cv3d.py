@@ -1,6 +1,13 @@
 import cv2
 import numpy as np
-from transformations import reflection_from_matrix, identity_matrix, reflection_matrix, scale_from_matrix, scale_matrix, rotation_matrix
+from transformations import (
+    reflection_from_matrix,
+    identity_matrix,
+    reflection_matrix,
+    scale_from_matrix,
+    scale_matrix,
+    rotation_matrix,
+)
 
 
 class Camera:
@@ -33,8 +40,12 @@ class Camera:
         new_cx = cx * (new_width / width)
         new_cy = cy * (new_height / height)
 
-        self.K[0, 0], self.K[1, 1], self.K[0, 2], self.K[1,
-                                                         2] = new_fx, new_fy, new_cx, new_cy
+        self.K[0, 0], self.K[1, 1], self.K[0, 2], self.K[1, 2] = (
+            new_fx,
+            new_fy,
+            new_cx,
+            new_cy,
+        )
 
     @property
     def projection(self):
@@ -84,8 +95,12 @@ def homogeneous_to_euclidean(points):
 
 def projection_to_2d_plane(vertices, projection_matrix, view_matrix=None, scale=None):
     if view_matrix is not None:
-        vertices = (homogeneous_to_euclidean(
-            (euclidean_to_homogeneous(vertices) @ view_matrix.T) @ projection_matrix.T)[:, :2]) * scale
+        vertices = (
+            homogeneous_to_euclidean(
+                (euclidean_to_homogeneous(vertices) @ view_matrix.T)
+                @ projection_matrix.T
+            )[:, :2]
+        ) * scale
 
         vertices[:, 1] = scale - vertices[:, 1]
         vertices[:, 0] = vertices[:, 0] + scale
@@ -126,22 +141,57 @@ def update_camera_vectors():
     right = unit_vector(np.cross(front, world_up))
 
 
-camera_vertices = np.array([[0, 0, 0], [-1, -1, 2],
-                            [0, 0, 0], [1, 1, 2],
-                            [0, 0, 0], [1, -1, 2],
-                            [0, 0, 0], [-1, 1, 2],
-                            [-1, 1, 2], [-1, -1, 2],
-                            [-1, -1, 2], [1, -1, 2],
-                            [1, -1, 2], [1, 1, 2],
-                            [1, 1, 2], [-1, 1, 2]], dtype=np.float32)
+camera_vertices = np.array(
+    [
+        [0, 0, 0],
+        [-1, -1, 2],
+        [0, 0, 0],
+        [1, 1, 2],
+        [0, 0, 0],
+        [1, -1, 2],
+        [0, 0, 0],
+        [-1, 1, 2],
+        [-1, 1, 2],
+        [-1, -1, 2],
+        [-1, -1, 2],
+        [1, -1, 2],
+        [1, -1, 2],
+        [1, 1, 2],
+        [1, 1, 2],
+        [-1, 1, 2],
+    ],
+    dtype=np.float32,
+)
 
-human36m_connectivity_dict = [(0, 1), (1, 2), (2, 6), (5, 4), (4, 3), (3, 6), (6, 7), (7, 8), (8, 16), (9, 16), (8, 12),
-                              (11, 12), (10, 11), (8, 13), (13, 14), (14, 15)]
+human36m_connectivity_dict = [
+    (0, 1),
+    (1, 2),
+    (2, 6),
+    (5, 4),
+    (4, 3),
+    (3, 6),
+    (6, 7),
+    (7, 8),
+    (8, 16),
+    (9, 16),
+    (8, 12),
+    (11, 12),
+    (10, 11),
+    (8, 13),
+    (13, 14),
+    (14, 15),
+]
 
 multiview_data = np.load(
-    "D:/Downloads/3D_sence_multiview.npy", allow_pickle=True).tolist()
-subject_name, camera_name, action_name, camera_configs, labels = multiview_data['subject_names'], multiview_data[
-    'camera_names'], multiview_data['action_names'], multiview_data['cameras'], multiview_data['table']
+    "D:/Downloads/3D_sence_multiview.npy", allow_pickle=True
+).tolist()
+subject_name, camera_name, action_name, camera_configs, labels = (
+    multiview_data["subject_names"],
+    multiview_data["camera_names"],
+    multiview_data["action_names"],
+    multiview_data["cameras"],
+    multiview_data["table"],
+)
 print(subject_name, camera_name)
 
 camera_name = [str(i) for i, c in enumerate(camera_name)]
@@ -152,19 +202,24 @@ camera_name = [str(i) for i, c in enumerate(camera_name)]
 
 specific_subject = "S9"
 specific_action = "WalkingDog-2"
-mask_subject = labels['subject_idx'] == subject_name.index(specific_subject)
+mask_subject = labels["subject_idx"] == subject_name.index(specific_subject)
 actions = [action_name.index(specific_action)]
-mask_actions = np.isin(labels['action_idx'], actions)
+mask_actions = np.isin(labels["action_idx"], actions)
 mask_subject = mask_subject & mask_actions
 indices = []
 indices.append(np.nonzero(mask_subject)[0])
 specific_label = labels[np.concatenate(indices)]
-specific_3d_skeleton = specific_label['keypoints']
+specific_3d_skeleton = specific_label["keypoints"]
 
 specific_camera_config = camera_configs[subject_name.index(specific_subject)]
 specific_camera_config = [
-    Camera(specific_camera_config["R"][i], specific_camera_config["t"][i], specific_camera_config["K"][i]) for i in
-    range(len(camera_name))]
+    Camera(
+        specific_camera_config["R"][i],
+        specific_camera_config["t"][i],
+        specific_camera_config["K"][i],
+    )
+    for i in range(len(camera_name))
+]
 
 # first person setup
 yaw = -125
@@ -184,17 +239,18 @@ original_video_frame_size = 1000
 frame = np.zeros([frame_size, frame_size])
 
 for i in range(len(camera_name)):
-    specific_camera_config[i].update_after_resize((original_video_frame_size,) * 2,
-                                                  (frame_size,) * 2)
+    specific_camera_config[i].update_after_resize(
+        (original_video_frame_size,) * 2, (frame_size,) * 2
+    )
 
 update_camera_vectors()
 view_matrix = look_at(position, position + front, world_up)
 print(view_matrix)
 
-projection_matrix = np.array([[2.41421, 0, 0, 0],
-                              [0, 2.41421, 0, 0],
-                              [0, 0, -1, -0.2],
-                              [0, 0, -1, 0]], dtype=np.float32)
+projection_matrix = np.array(
+    [[2.41421, 0, 0, 0], [0, 2.41421, 0, 0], [0, 0, -1, -0.2], [0, 0, -1, 0]],
+    dtype=np.float32,
+)
 
 o_view_matrix = view_matrix.copy()
 o_projection_matrix = projection_matrix.copy()
@@ -216,17 +272,19 @@ while True:
     print(projection_matrix)
 
     grid_vertices_project = grid_vertices @ (
-        np.eye(3) if view_matrix is None else rorate_x_90[:3, :3].T)
+        np.eye(3) if view_matrix is None else rorate_x_90[:3, :3].T
+    )
     print(grid_vertices_project)
-    grid_vertices_project = grid_vertices_project @ scale_matrix(650)[
-        :3, :3].T
-    grid_vertices_project = projection_to_2d_plane(grid_vertices_project, projection_matrix, view_matrix,
-                                                   int(frame_size / 2)).reshape(-1, 4)
+    grid_vertices_project = grid_vertices_project @ scale_matrix(650)[:3, :3].T
+    grid_vertices_project = projection_to_2d_plane(
+        grid_vertices_project, projection_matrix, view_matrix, int(frame_size / 2)
+    ).reshape(-1, 4)
     print(grid_vertices_project)
     # draw line
     for index, line in enumerate(grid_vertices_project):
-        cv2.line(frame, (line[0], line[1]),
-                 (line[2], line[3]), grid_color[index].tolist())
+        cv2.line(
+            frame, (line[0], line[1]), (line[2], line[3]), grid_color[index].tolist()
+        )
 
     # draw camera
     for camera_index, conf in enumerate(specific_camera_config):
@@ -241,47 +299,67 @@ while True:
         m_s[3, 3] = 1
 
         camera_vertices_convert = homogeneous_to_euclidean(
-            euclidean_to_homogeneous(camera_vertices) @ (
-                (np.eye(4) if view_matrix is None else rorate_x_90) @ m_rt @ m_s).T)
+            euclidean_to_homogeneous(camera_vertices)
+            @ ((np.eye(4) if view_matrix is None else rorate_x_90) @ m_rt @ m_s).T
+        )
 
-        camera_vertices_convert = projection_to_2d_plane(camera_vertices_convert, projection_matrix, view_matrix,
-                                                         int(frame_size / 2))
+        camera_vertices_convert = projection_to_2d_plane(
+            camera_vertices_convert, projection_matrix, view_matrix, int(frame_size / 2)
+        )
         camera_vertices_convert = camera_vertices_convert.reshape(-1, 4)
         for index, line in enumerate(camera_vertices_convert):
-            cv2.line(frame, (line[0], line[1]), (line[2],
-                     line[3]), (0, 153, 255), thickness=1)
-        cv2.putText(frame, camera_name[camera_index],
-                    (camera_vertices_convert[1, 0],
-                     camera_vertices_convert[1, 1] - 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255))
+            cv2.line(
+                frame,
+                (line[0], line[1]),
+                (line[2], line[3]),
+                (0, 153, 255),
+                thickness=1,
+            )
+        cv2.putText(
+            frame,
+            camera_name[camera_index],
+            (camera_vertices_convert[1, 0], camera_vertices_convert[1, 1] - 30),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.4,
+            (255, 255, 255),
+        )
 
-    specific_3d_skeleton_project = specific_3d_skeleton[frame_index].reshape(
-        -1, 3)
-    specific_3d_skeleton_project = specific_3d_skeleton_project @ (
-        np.eye(3) if view_matrix is None else rorate_x_90[:3, :3]).T
-    specific_3d_skeleton_project = specific_3d_skeleton_project @ np.eye(
-        3, dtype=np.float32) * 1
-    specific_3d_skeleton_project = projection_to_2d_plane(specific_3d_skeleton_project, projection_matrix, view_matrix,
-                                                          int(frame_size / 2)).reshape(17, 2)
+    specific_3d_skeleton_project = specific_3d_skeleton[frame_index].reshape(-1, 3)
+    specific_3d_skeleton_project = (
+        specific_3d_skeleton_project
+        @ (np.eye(3) if view_matrix is None else rorate_x_90[:3, :3]).T
+    )
+    specific_3d_skeleton_project = (
+        specific_3d_skeleton_project @ np.eye(3, dtype=np.float32) * 1
+    )
+    specific_3d_skeleton_project = projection_to_2d_plane(
+        specific_3d_skeleton_project,
+        projection_matrix,
+        view_matrix,
+        int(frame_size / 2),
+    ).reshape(17, 2)
 
     print(specific_3d_skeleton_project)
     for c in human36m_connectivity_dict:
-        cv2.line(frame, (*specific_3d_skeleton_project[c[0]],), (*specific_3d_skeleton_project[c[1]],),
-                 (100, 155, 255), thickness=2)
-        cv2.circle(
-            frame, (*specific_3d_skeleton_project[c[0]],), 3, (0, 0, 255), -1)
-        cv2.circle(
-            frame, (*specific_3d_skeleton_project[c[1]],), 3, (0, 0, 255), -1)
+        cv2.line(
+            frame,
+            (*specific_3d_skeleton_project[c[0]],),
+            (*specific_3d_skeleton_project[c[1]],),
+            (100, 155, 255),
+            thickness=2,
+        )
+        cv2.circle(frame, (*specific_3d_skeleton_project[c[0]],), 3, (0, 0, 255), -1)
+        cv2.circle(frame, (*specific_3d_skeleton_project[c[1]],), 3, (0, 0, 255), -1)
 
     frame_index += 1
     print(frame_index)
     cv2.imshow(specific_action, frame)
-    if cv2.waitKey(6) & 0xFF == ord('1'):
+    if cv2.waitKey(6) & 0xFF == ord("1"):
         view_camera_index += 1
         if view_camera_index == 4:
             view_camera_index = -1
 
-    if cv2.waitKey(2) & 0xFF == ord('q'):
+    if cv2.waitKey(2) & 0xFF == ord("q"):
         break
 
 cv2.destroyAllWindows()

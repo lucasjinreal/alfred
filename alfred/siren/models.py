@@ -1,5 +1,3 @@
-
-
 """
 
 contains all models used in Siren chatbot API
@@ -49,7 +47,6 @@ class MessageOriginality:
 
 
 class PresenceSession:
-
     def __init__(self) -> None:
         self.id = None
         self.user_id = None
@@ -58,7 +55,6 @@ class PresenceSession:
 
 
 class BaseMessage:
-
     def __init__(self) -> None:
         self.id = None
         self.type: MessageType = MessageType.ChatText
@@ -67,14 +63,13 @@ class BaseMessage:
 
 
 class PresenceMessage(BaseMessage):
-
     def __init__(self) -> None:
         super().__init__()
 
         self.presenceType: PresenceType = PresenceType.Available
 
-class ChatMessage(BaseMessage):
 
+class ChatMessage(BaseMessage):
     def __init__(self) -> None:
         super().__init__()
 
@@ -96,7 +91,6 @@ class ChatMessage(BaseMessage):
 
 @dataclass
 class Invitation:
-
     def __init__(self) -> None:
         self.id = None
         self.from_id = None
@@ -106,7 +100,6 @@ class Invitation:
 
 
 class Room:
-
     def __init__(self) -> None:
         self.id = None
         self.name = None
@@ -115,7 +108,6 @@ class Room:
 
 
 class RoomMembership:
-
     def __init__(self) -> None:
         self.room_id = None
         self.user_id = None
@@ -124,7 +116,6 @@ class RoomMembership:
 
 @dataclass
 class InvitationMessage:
-
     def __init__(self) -> None:
         self.id = None
         self.type: MessageType = MessageType.EventInvitationRequest
@@ -139,7 +130,6 @@ class InvitationMessage:
 
 @dataclass
 class ContactChat:
-
     def __init__(self) -> None:
         self.firstName = None
         self.lastName = None
@@ -150,13 +140,11 @@ class ContactChat:
         self.isGroup = None
 
     def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__,
-                          sort_keys=True, indent=4)
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 
 @dataclass
 class User:
-
     def __init__(self) -> None:
         self.user_addr = None
         self.user_acc = None

@@ -44,24 +44,25 @@ from pytorch3d.renderer import (
     MeshRasterizer,
     SoftPhongShader,
     TexturesUV,
-    TexturesVertex
+    TexturesVertex,
 )
 
 import numpy as np
 from alfred.dl.torch.common import device, print_shape
+
 # add path for demo utils functions
 import sys
 import os
 
 
-'''
+"""
 wget -P data/cow_mesh https://dl.fbaipublicfiles.com/pytorch3d/data/cow_mesh/cow.obj
 wget -P data/cow_mesh https://dl.fbaipublicfiles.com/pytorch3d/data/cow_mesh/cow.mtl
 wget -P data/cow_mesh https://dl.fbaipublicfiles.com/pytorch3d/data/cow_mesh/cow_texture.png
-'''
-device = torch.device('cpu')
+"""
+device = torch.device("cpu")
 
-obj_filename = os.path.join('./cow_mesh', "cow.obj")
+obj_filename = os.path.join("./cow_mesh", "cow.obj")
 
 # Load obj file
 mesh = load_objs_as_meshes([obj_filename], device=device)
@@ -70,11 +71,10 @@ R, T = look_at_view_transform(2.7, 0, 180)
 print(R, T)
 # R = torch.eye(3).unsqueeze(0)
 # R = torch.randn([1, 3, 3])
-R = torch.Tensor(
-    [[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]]).to(device)
-T = torch.Tensor([[-0.0098, -0.1803,  7.9463]]).to(device)
+R = torch.Tensor([[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]]).to(device)
+T = torch.Tensor([[-0.0098, -0.1803, 7.9463]]).to(device)
 print_shape(R, T)
-sfm_camera = PerspectiveCameras(device=device, R=R, T=T, focal_length=1000/224)
+sfm_camera = PerspectiveCameras(device=device, R=R, T=T, focal_length=1000 / 224)
 width = 224
 height = 224
 raster_settings = RasterizationSettings(
@@ -84,18 +84,11 @@ raster_settings = RasterizationSettings(
 )
 lights = PointLights(device=device, location=[[0.0, 0.0, -3.0]])
 sfm_renderer = MeshRenderer(
-    rasterizer=MeshRasterizer(
-        cameras=sfm_camera,
-        raster_settings=raster_settings
-    ),
-    shader=SoftPhongShader(
-        device=device,
-        cameras=sfm_camera,
-        lights=lights
-    )
+    rasterizer=MeshRasterizer(cameras=sfm_camera, raster_settings=raster_settings),
+    shader=SoftPhongShader(device=device, cameras=sfm_camera, lights=lights),
 )
 
 print(mesh)
 images = sfm_renderer(mesh)
-cv2.imshow('aa', images[0, ..., :3].cpu().numpy())
+cv2.imshow("aa", images[0, ..., :3].cpu().numpy())
 cv2.waitKey(0)

@@ -11,7 +11,7 @@ class PDFFormatter:
     Writes lines, into the PDF.
     """
 
-    format = 'pdf'
+    format = "pdf"
 
     @staticmethod
     def _fetcher(url):
@@ -19,8 +19,10 @@ class PDFFormatter:
 
     @staticmethod
     def write(lines):
-        return weasyprint.HTML(string=markdown(''.join(lines), output_format='html'),
-                               url_fetcher=PDFFormatter._fetcher).write_pdf()
+        return weasyprint.HTML(
+            string=markdown("".join(lines), output_format="html"),
+            url_fetcher=PDFFormatter._fetcher,
+        ).write_pdf()
 
         # with BytesIO() as result:
         #     pisa.pisaDocument(markdown(''.join(lines), output_format='html'), dest=result,

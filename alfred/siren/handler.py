@@ -61,16 +61,14 @@ class SirenClient:
         data = {"user_acc": self.user_acc, "user_password": self.user_password}
         # data = {"user_acc": 'jintian', "user_password": '1195889656'}
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        rep = requests.post(
-            url=self.uranus_login_url, headers=headers, data=data
-        )
+        rep = requests.post(url=self.uranus_login_url, headers=headers, data=data)
         print(data)
         rep = json.loads(rep.text)
         print(rep)
         if rep["status"] == "error":
             pass
         else:
-            token = rep['data']["token"]
+            token = rep["data"]["token"]
             with open(global_config.token_config_f, "wb") as f:
                 pickle.dump(token, f)
                 logger.info(f"requested uranus token for robot: {token}")

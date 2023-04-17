@@ -15,60 +15,67 @@ except ImportError:
 
 
 class COCOInstancesBaseDataset(GetterDataset):
-
-    def __init__(self, data_dir='auto', split='train', year='2017',
-                 use_crowded=False, read_img_with='pil'):
-        if year == '2017' and split in ['minival', 'valminusminival']:
+    def __init__(
+        self,
+        data_dir="auto",
+        split="train",
+        year="2017",
+        use_crowded=False,
+        read_img_with="pil",
+    ):
+        if year == "2017" and split in ["minival", "valminusminival"]:
             raise ValueError(
-                'coco2017 dataset does not support given split: {}'
-                .format(split))
+                "coco2017 dataset does not support given split: {}".format(split)
+            )
 
         super(COCOInstancesBaseDataset, self).__init__()
         self.use_crowded = use_crowded
         self.read_img_with = read_img_with
 
-        if split in ['val', 'minival', 'valminusminival']:
-            img_split = 'val'
+        if split in ["val", "minival", "valminusminival"]:
+            img_split = "val"
         else:
-            img_split = 'train'
+            img_split = "train"
 
-        self.img_root = os.path.join(
-            data_dir, '{}{}'.format(img_split, year))
+        self.img_root = os.path.join(data_dir, "{}{}".format(img_split, year))
         tmp = self.img_root
         if not os.path.exists(self.img_root):
-            self.img_root = os.path.join(data_dir, 'images')
+            self.img_root = os.path.join(data_dir, "images")
         assert os.path.exists(
-            self.img_root), 'we have tried img_root: {} and {}, either found, did u make sure it exists?'.format(tmp, self.img_root)
+            self.img_root
+        ), "we have tried img_root: {} and {}, either found, did u make sure it exists?".format(
+            tmp, self.img_root
+        )
         anno_path = os.path.join(
-            data_dir, 'annotations', 'instances_{}{}.json'.format(split, year))
+            data_dir, "annotations", "instances_{}{}.json".format(split, year)
+        )
 
         self.data_dir = data_dir
-        annos = json.load(open(anno_path, 'r'))
+        annos = json.load(open(anno_path, "r"))
 
         self.id_to_prop = {}
-        for prop in annos['images']:
-            self.id_to_prop[prop['id']] = prop
+        for prop in annos["images"]:
+            self.id_to_prop[prop["id"]] = prop
         self.ids = sorted(list(self.id_to_prop.keys()))
 
-        self.cat_ids = [cat['id'] for cat in annos['categories']]
+        self.cat_ids = [cat["id"] for cat in annos["categories"]]
 
         self.id_to_anno = defaultdict(list)
-        for anno in annos['annotations']:
-            self.id_to_anno[anno['image_id']].append(anno)
+        for anno in annos["annotations"]:
+            self.id_to_anno[anno["image_id"]].append(anno)
 
-        self.add_getter('img', self._get_image)
-        self.add_getter('mask', self._get_mask)
-        self.add_getter(
-            ['bbox', 'label', 'area', 'crowded'],
-            self._get_annotations)
+        self.add_getter("img", self._get_image)
+        self.add_getter("mask", self._get_mask)
+        self.add_getter(["bbox", "label", "area", "crowded"], self._get_annotations)
 
     def __len__(self):
         return len(self.ids)
 
     def _get_image(self, i):
         img_path = os.path.join(
-            self.img_root, self.id_to_prop[self.ids[i]]['file_name'])
-        if self.read_img_with == 'cv2':
+            self.img_root, self.id_to_prop[self.ids[i]]["file_name"]
+        )
+        if self.read_img_with == "cv2":
             img = cv2.imread(img_path)
         else:
             img = PIL.Image.open(img_path)
@@ -78,18 +85,18 @@ class COCOInstancesBaseDataset(GetterDataset):
         # List[{'segmentation', 'area', 'iscrowd',
         #       'image_id', 'bbox', 'category_id', 'id'}]
         annotation = self.id_to_anno[self.ids[i]]
-        H = self.id_to_prop[self.ids[i]]['height']
-        W = self.id_to_prop[self.ids[i]]['width']
+        H = self.id_to_prop[self.ids[i]]["height"]
+        W = self.id_to_prop[self.ids[i]]["width"]
 
         mask = []
         crowded = []
         for anno in annotation:
-            msk = self._segm_to_mask(anno['segmentation'], (H, W))
+            msk = self._segm_to_mask(anno["segmentation"], (H, W))
             # FIXME: some of minival annotations are malformed.
             if msk.shape != (H, W):
                 continue
             mask.append(msk)
-            crowded.append(anno['iscrowd'])
+            crowded.append(anno["iscrowd"])
         mask = np.array(mask, dtype=np.bool)
         crowded = np.array(crowded, dtype=np.bool)
         if len(mask) == 0:
@@ -104,8 +111,7 @@ class COCOInstancesBaseDataset(GetterDataset):
         # List[{'segmentation', 'area', 'iscrowd',
         #       'image_id', 'bbox', 'category_id', 'id'}]
         annotation = self.id_to_anno[self.ids[i]]
-        bbox = np.array([ann['bbox'] for ann in annotation],
-                        dtype=np.float32)
+        bbox = np.array([ann["bbox"] for ann in annotation], dtype=np.float32)
         if len(bbox) == 0:
             bbox = np.zeros((0, 4), dtype=np.float32)
         # (x, y, width, height)  -> (x_min, y_min, x_max, y_max)
@@ -114,19 +120,18 @@ class COCOInstancesBaseDataset(GetterDataset):
         # (x_min, y_min, x_max, y_max) -> (y_min, x_min, y_max, x_max)
         bbox = bbox[:, [1, 0, 3, 2]]
 
-        label = np.array([self.cat_ids.index(ann['category_id'])
-                          for ann in annotation], dtype=np.int32)
+        label = np.array(
+            [self.cat_ids.index(ann["category_id"]) for ann in annotation],
+            dtype=np.int32,
+        )
 
-        area = np.array([ann['area']
-                         for ann in annotation], dtype=np.float32)
+        area = np.array([ann["area"] for ann in annotation], dtype=np.float32)
 
-        crowded = np.array([ann['iscrowd']
-                            for ann in annotation], dtype=np.bool)
+        crowded = np.array([ann["iscrowd"] for ann in annotation], dtype=np.bool)
 
         # Remove invalid boxes
         bbox_area = np.prod(bbox[:, 2:] - bbox[:, :2], axis=1)
-        keep_mask = np.logical_and(bbox[:, 0] <= bbox[:, 2],
-                                   bbox[:, 1] <= bbox[:, 3])
+        keep_mask = np.logical_and(bbox[:, 0] <= bbox[:, 2], bbox[:, 1] <= bbox[:, 3])
         keep_mask = np.logical_and(keep_mask, bbox_area > 0)
 
         if not self.use_crowded:
@@ -151,7 +156,7 @@ class COCOInstancesBaseDataset(GetterDataset):
                 xy = [tuple(xy_i) for xy_i in xy]
                 PIL.ImageDraw.Draw(mask).polygon(xy=xy, outline=1, fill=1)
             mask = np.asarray(mask)
-        elif isinstance(segm['counts'], list):
+        elif isinstance(segm["counts"], list):
             rle = coco_mask.frPyObjects(segm, H, W)
             mask = coco_mask.decode(rle)
         else:
@@ -160,14 +165,22 @@ class COCOInstancesBaseDataset(GetterDataset):
 
 
 class COCOBboxDataset(COCOInstancesBaseDataset):
-
-    def __init__(self, data_dir='auto', split='train', year='2017',
-                 use_crowded=False, read_img_with='pil', return_area=False, return_crowded=False):
+    def __init__(
+        self,
+        data_dir="auto",
+        split="train",
+        year="2017",
+        use_crowded=False,
+        read_img_with="pil",
+        return_area=False,
+        return_crowded=False,
+    ):
         super(COCOBboxDataset, self).__init__(
-            data_dir, split, year, use_crowded, read_img_with)
-        keys = ('img', 'bbox', 'label')
+            data_dir, split, year, use_crowded, read_img_with
+        )
+        keys = ("img", "bbox", "label")
         if return_area:
-            keys += ('area',)
+            keys += ("area",)
         if return_crowded:
-            keys += ('crowded',)
+            keys += ("crowded",)
         self.keys = keys

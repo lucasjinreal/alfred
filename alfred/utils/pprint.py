@@ -1,5 +1,6 @@
 from pprint import pprint, pformat
 
+
 def _highlight(code, filename):
     try:
         import pygments

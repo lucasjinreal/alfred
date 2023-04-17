@@ -40,8 +40,9 @@ def draw_box_without_score(img, boxes, classes=None, is_show=False):
     """
     Draw boxes on image, the box mostly are annotations, not the model predict box
     """
-    assert isinstance(boxes,
-                      np.ndarray), 'boxes must nump array, with shape of (None, 5)\nevery element contains (x1,y1,x2,y2, label)'
+    assert isinstance(
+        boxes, np.ndarray
+    ), "boxes must nump array, with shape of (None, 5)\nevery element contains (x1,y1,x2,y2, label)"
     if classes:
         pass
     else:
@@ -67,24 +68,45 @@ def draw_box_without_score(img, boxes, classes=None, is_show=False):
 
             cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness)
 
-            text_label = '{}'.format(cls)
-            (ret_val, base_line) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
+            text_label = "{}".format(cls)
+            (ret_val, base_line) = cv2.getTextSize(
+                text_label, font, font_scale, font_thickness
+            )
             text_org = (x1, y1 - 0)
 
-            cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
-                          (text_org[0] + ret_val[0] + 5, text_org[1] - ret_val[1] - 2), unique_color, line_thickness)
+            cv2.rectangle(
+                img,
+                (text_org[0] - 5, text_org[1] + base_line + 2),
+                (text_org[0] + ret_val[0] + 5, text_org[1] - ret_val[1] - 2),
+                unique_color,
+                line_thickness,
+            )
             # this rectangle for fill text rect
-            cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
-                          (text_org[0] + ret_val[0] + 4, text_org[1] - ret_val[1] - 2),
-                          unique_color, -1)
-            cv2.putText(img, text_label, text_org, font, font_scale, (255, 255, 255), font_thickness)
+            cv2.rectangle(
+                img,
+                (text_org[0] - 5, text_org[1] + base_line + 2),
+                (text_org[0] + ret_val[0] + 4, text_org[1] - ret_val[1] - 2),
+                unique_color,
+                -1,
+            )
+            cv2.putText(
+                img,
+                text_label,
+                text_org,
+                font,
+                font_scale,
+                (255, 255, 255),
+                font_thickness,
+            )
         if is_show:
-            cv2.imshow('image', img)
+            cv2.imshow("image", img)
             cv2.waitKey(0)
         return img
 
 
-def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, background_id=-1):
+def visualize_det_cv2(
+    img, detections, classes=None, thresh=0.6, is_show=False, background_id=-1
+):
     """
     visualize detection on image using cv2, this is the standard way to visualize detections
     :param img:
@@ -96,9 +118,13 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
     :param background_id: -1
     :return:
     """
-    assert classes, 'from visualize_det_cv2, classes must be provided, each class in a list with' \
-                    'certain order.'
-    assert isinstance(img, np.ndarray), 'from visualize_det_cv2, img must be a numpy array object.'
+    assert classes, (
+        "from visualize_det_cv2, classes must be provided, each class in a list with"
+        "certain order."
+    )
+    assert isinstance(
+        img, np.ndarray
+    ), "from visualize_det_cv2, img must be a numpy array object."
 
     height = img.shape[0]
     width = img.shape[1]
@@ -128,25 +154,51 @@ def visualize_det_cv2(img, detections, classes=None, thresh=0.6, is_show=False, 
 
                 cv2.rectangle(img, (x1, y1), (x2, y2), unique_color, line_thickness)
 
-                text_label = '{} {:.2f}'.format(classes[cls_id], score)
-                (ret_val, base_line) = cv2.getTextSize(text_label, font, font_scale, font_thickness)
+                text_label = "{} {:.2f}".format(classes[cls_id], score)
+                (ret_val, base_line) = cv2.getTextSize(
+                    text_label, font, font_scale, font_thickness
+                )
                 text_org = (x1, y1 - 0)
 
-                cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
-                              (text_org[0] + ret_val[0] + 5, text_org[1] - ret_val[1] - 2), unique_color,
-                              line_thickness)
+                cv2.rectangle(
+                    img,
+                    (text_org[0] - 5, text_org[1] + base_line + 2),
+                    (text_org[0] + ret_val[0] + 5, text_org[1] - ret_val[1] - 2),
+                    unique_color,
+                    line_thickness,
+                )
                 # this rectangle for fill text rect
-                cv2.rectangle(img, (text_org[0] - 5, text_org[1] + base_line + 2),
-                              (text_org[0] + ret_val[0] + 4, text_org[1] - ret_val[1] - 2),
-                              unique_color, -1)
-                cv2.putText(img, text_label, text_org, font, font_scale, (255, 255, 255), font_thickness)
+                cv2.rectangle(
+                    img,
+                    (text_org[0] - 5, text_org[1] + base_line + 2),
+                    (text_org[0] + ret_val[0] + 4, text_org[1] - ret_val[1] - 2),
+                    unique_color,
+                    -1,
+                )
+                cv2.putText(
+                    img,
+                    text_label,
+                    text_org,
+                    font,
+                    font_scale,
+                    (255, 255, 255),
+                    font_thickness,
+                )
     if is_show:
-        cv2.imshow('image', img)
+        cv2.imshow("image", img)
         cv2.waitKey(0)
     return img
 
 
-def visualize_det_mask_cv2(img, detections, masks, classes=None, is_show=False, background_id=-1, is_video=False):
+def visualize_det_mask_cv2(
+    img,
+    detections,
+    masks,
+    classes=None,
+    is_show=False,
+    background_id=-1,
+    is_video=False,
+):
     """
     this method using for display detections and masks on image
     :param img:
@@ -160,15 +212,20 @@ def visualize_det_mask_cv2(img, detections, masks, classes=None, is_show=False, 
     :param is_video
     :return:
     """
-    assert isinstance(img, np.ndarray) and isinstance(detections, np.ndarray) and isinstance(masks, np.ndarray), \
-        'images and detections and masks must be numpy array'
-    assert detections.shape[0] == masks.shape[-1], 'detections nums and masks nums are not equal'
-    assert is_show != is_video, 'you can not set is_show and is_video at the same time.'
+    assert (
+        isinstance(img, np.ndarray)
+        and isinstance(detections, np.ndarray)
+        and isinstance(masks, np.ndarray)
+    ), "images and detections and masks must be numpy array"
+    assert (
+        detections.shape[0] == masks.shape[-1]
+    ), "detections nums and masks nums are not equal"
+    assert is_show != is_video, "you can not set is_show and is_video at the same time."
     # draw detections first
     img = visualize_det_cv2(img, detections, classes=classes, is_show=False)
 
     masked_image = img
-    print('masked image shape: ', masked_image.shape)
+    print("masked image shape: ", masked_image.shape)
     num_instances = detections.shape[0]
     for i in range(num_instances):
         cls_id = int(detections[i, 0])
@@ -178,15 +235,23 @@ def visualize_det_mask_cv2(img, detections, masks, classes=None, is_show=False, 
             masked_image = _apply_mask2(masked_image, mask, unique_color)
     # masked_image = masked_image.astype(int)
     if is_video:
-        cv2.imshow('image', masked_image)
+        cv2.imshow("image", masked_image)
         cv2.waitKey(1)
     elif is_show:
-        cv2.imshow('image', masked_image)
+        cv2.imshow("image", masked_image)
         cv2.waitKey(0)
     return masked_image
 
 
-def draw_masks(img, masks, cls_color_list, is_show=False, background_id=-1, is_video=False, convert_bgr=False):
+def draw_masks(
+    img,
+    masks,
+    cls_color_list,
+    is_show=False,
+    background_id=-1,
+    is_video=False,
+    convert_bgr=False,
+):
     """
     draw masks pure on an image, the mask format is something like this:
     [[[1], [1], [1], .., [2]],
@@ -211,7 +276,7 @@ def draw_masks(img, masks, cls_color_list, is_show=False, background_id=-1, is_v
     mask_flatten = masks[0].flatten()
     mask_color = np.array(list(map(lambda i: cls_color_list[i], mask_flatten)))
     # reshape to normal image shape,
-    mask_color = np.reshape(mask_color, (h, w, 3)).astype('float32')
+    mask_color = np.reshape(mask_color, (h, w, 3)).astype("float32")
 
     # add this mask on img
     # img = cv2.add(img, mask_color)
@@ -219,22 +284,23 @@ def draw_masks(img, masks, cls_color_list, is_show=False, background_id=-1, is_v
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = cv2.addWeighted(img, 0.6, mask_color, 0.4, 0)
     if is_show:
-        cv2.imshow('img', img)
-        cv2.imwrite('test_res.jpg', img)
+        cv2.imshow("img", img)
+        cv2.imwrite("test_res.jpg", img)
         cv2.waitKey(0)
     return img
 
 
 def _apply_mask2(image, mask, color, alpha=0.5):
     for c in range(3):
-        image[:, :, c] = np.where(mask == 1, image[:, :, c] * (1 - alpha) + alpha * color[c],
-                                  image[:, :, c])
+        image[:, :, c] = np.where(
+            mask == 1, image[:, :, c] * (1 - alpha) + alpha * color[c], image[:, :, c]
+        )
     return image
 
 
 def create_unique_color_float(tag, hue_step=0.41, alpha=0.7):
-    h, v = (tag * hue_step) % 1, 1. - (int(tag * hue_step) % 4) / 5.
-    r, g, b = colorsys.hsv_to_rgb(h, 1., v)
+    h, v = (tag * hue_step) % 1, 1.0 - (int(tag * hue_step) % 4) / 5.0
+    r, g, b = colorsys.hsv_to_rgb(h, 1.0, v)
     return r, g, b, alpha
 
 
@@ -244,4 +310,3 @@ def create_unique_color_uchar(tag, hue_step=0.41, alpha=0.7):
 
 
 # ----------------------- 3D drawing functionality ----------------------
-

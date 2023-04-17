@@ -9,7 +9,7 @@ import shutil
 from tqdm import tqdm
 
 
-__all__ = ['YoloEvaluator']
+__all__ = ["YoloEvaluator"]
 
 
 """
@@ -18,21 +18,29 @@ Parsing any dataset in Yolo format.
 You can simply change classes names to yours.
 """
 
-img_formats = ['bmp', 'jpg', 'jpeg', 'png', 'tif',
-               'tiff', 'dng']  # acceptable image suffixes
+img_formats = [
+    "bmp",
+    "jpg",
+    "jpeg",
+    "png",
+    "tif",
+    "tiff",
+    "dng",
+]  # acceptable image suffixes
 
 
 class YoloEvaluator:
-
-    def __init__(self,
-                 imgs_root,
-                 labels_root,
-                 infer_func,
-                 model=None,
-                 prep_func=None,
-                 posp_func=None,
-                 conf_thr=0.4,
-                 iou_thr=0.5):
+    def __init__(
+        self,
+        imgs_root,
+        labels_root,
+        infer_func,
+        model=None,
+        prep_func=None,
+        posp_func=None,
+        conf_thr=0.4,
+        iou_thr=0.5,
+    ):
         assert os.path.exists(imgs_root)
         assert os.path.exists(labels_root)
 
@@ -45,49 +53,57 @@ class YoloEvaluator:
         self.iou_thr = iou_thr
 
         self._data_root = imgs_root
-        logger.info('data_root: {}'.format(self._data_root))
+        logger.info("data_root: {}".format(self._data_root))
 
         self.img_files = []
         self.label_files = []
         self.load_combined_imgs_and_labels(imgs_root, labels_root)
 
         self.hold_vis = True
-        logger.info(
-            'Press space to vis image, press q to skip and continue eval.')
+        logger.info("Press space to vis image, press q to skip and continue eval.")
 
     def load_combined_imgs_and_labels(self, imgs_root, labels_root):
-        logger.info('labels root path: {}, img root: {}, pls check it they right or not.'.format(
-            imgs_root, labels_root))
+        logger.info(
+            "labels root path: {}, img root: {}, pls check it they right or not.".format(
+                imgs_root, labels_root
+            )
+        )
         self.label_files = glob.glob(os.path.join(labels_root, "*.txt"))
         for ext in img_formats:
             self.img_files.extend(
-                glob.glob(os.path.join(imgs_root, '*.{}'.format(ext))))
+                glob.glob(os.path.join(imgs_root, "*.{}".format(ext)))
+            )
         if len(self.img_files) != len(self.label_files):
-            imgs_names = [os.path.basename(i).split('.')[0]
-                          for i in self.img_files]
-            labels_names = [os.path.basename(i).split(
-                '.')[0] for i in self.label_files]
+            imgs_names = [os.path.basename(i).split(".")[0] for i in self.img_files]
+            labels_names = [os.path.basename(i).split(".")[0] for i in self.label_files]
             valid_files = [i for i in imgs_names if i in labels_names]
-            logger.info('original imgs: {}, original labels: {}, valid num: {}'.format(
-                len(self.img_files), len(self.label_files), len(valid_files)))
+            logger.info(
+                "original imgs: {}, original labels: {}, valid num: {}".format(
+                    len(self.img_files), len(self.label_files), len(valid_files)
+                )
+            )
             # labels is more than images
-            self.label_files = [os.path.join(
-                labels_root, i + '.txt') for i in valid_files]
-            self.img_files = [os.path.join(
-                imgs_root, i + '.jpg') for i in valid_files]
+            self.label_files = [
+                os.path.join(labels_root, i + ".txt") for i in valid_files
+            ]
+            self.img_files = [os.path.join(imgs_root, i + ".jpg") for i in valid_files]
         self.img_files = sorted(self.img_files)
         self.label_files = sorted(self.label_files)
-        logger.info('img num: {}, label num: {}'.format(
-            len(self.img_files), len(self.label_files)))
+        logger.info(
+            "img num: {}, label num: {}".format(
+                len(self.img_files), len(self.label_files)
+            )
+        )
         logger.info(self.img_files[89])
         logger.info(self.label_files[89])
-        logger.info('Please check if images and labels are paired properly.')
+        logger.info("Please check if images and labels are paired properly.")
 
     def _load_yolo_boxes_and_labels(self, lb_file, ori_w, ori_h):
-        with open(lb_file, 'r') as f:
-            l = np.array([x.split() for x in f.read().strip(
-            ).splitlines()], dtype=np.float32)  # labels
-            l = np.clip(l, 0, 1.)
+        with open(lb_file, "r") as f:
+            l = np.array(
+                [x.split() for x in f.read().strip().splitlines()], dtype=np.float32
+            )  # labels
+            l = np.clip(l, 0, 1.0)
         res_boxes = []
         res_labels = []
         if len(l):
@@ -100,11 +116,11 @@ class YoloEvaluator:
                 cy *= ori_h
                 w *= ori_w
                 h *= ori_h
-                x = cx - w/2
-                y = cy - h/2
+                x = cx - w / 2
+                y = cy - h / 2
                 if x < 0 or y < 0 or w <= 2 or h <= 2:
                     continue
-                res_boxes.append(np.array([x, y, x+w, y+h]).astype(np.int))
+                res_boxes.append(np.array([x, y, x + w, y + h]).astype(np.int))
                 res_labels.append(labels[i])
         return res_boxes, res_labels
 
@@ -148,7 +164,7 @@ class YoloEvaluator:
             return 0
         else:
             intersect = (right_line - left_line) * (bottom_line - top_line)
-            return (intersect / (sum_area - intersect))*1.0
+            return (intersect / (sum_area - intersect)) * 1.0
 
     def recall_precision(self, gt, pre, iou_thr=0.5):
         # recall
@@ -178,7 +194,7 @@ class YoloEvaluator:
         return (recall_sum, recall_cnt, precision_sum, precision_cnt)
 
     def eval_precisely(self):
-        recall_sum, recall_cnt, precision_sum, precision_cnt = 0., 0., 0., 0.
+        recall_sum, recall_cnt, precision_sum, precision_cnt = 0.0, 0.0, 0.0, 0.0
         mAPs = []
         mrecall = []
         pic_cnt = 0
@@ -216,8 +232,7 @@ class YoloEvaluator:
                     cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
             pic_cnt += 1
-            eval_list = self.recall_precision(
-                gt_list, pre_list, iou_thr=self.iou_thr)
+            eval_list = self.recall_precision(gt_list, pre_list, iou_thr=self.iou_thr)
             # logger.info(eval_list)
 
             recall_sum += eval_list[0]
@@ -227,28 +242,41 @@ class YoloEvaluator:
             # print('{} {} {} {}'.format(recall_sum, recall_cnt, precision_sum, precision_cnt))
             if (recall_sum > 0) and (precision_sum > 0):
                 if eval_list[2] > 0:
-                    mAPs.append(eval_list[3]/eval_list[2])
+                    mAPs.append(eval_list[3] / eval_list[2])
                 else:
                     if eval_list[0] > 0:
                         mAPs.append(0)
                 if eval_list[0] > 0:
-                    mrecall.append(eval_list[1]/eval_list[0])
+                    mrecall.append(eval_list[1] / eval_list[0])
                 # print(recall_cnt,recall_sum,precision_cnt,precision_sum)
 
-            tbar.set_postfix(recall='{:.3f}'.format(recall_cnt/recall_sum), precision='{:.3f}'.format(
-                precision_cnt/precision_sum), mAP='{:.3f}'.format(np.mean(mAPs)), refresh=True)
+            tbar.set_postfix(
+                recall="{:.3f}".format(recall_cnt / recall_sum),
+                precision="{:.3f}".format(precision_cnt / precision_sum),
+                mAP="{:.3f}".format(np.mean(mAPs)),
+                refresh=True,
+            )
 
             if self.hold_vis:
-                cv2.imshow('aa', img)
-                if cv2.waitKey(0) & 0xFF == ord('q'):
-                    print('Pressed Q, continue eval without vis.')
+                cv2.imshow("aa", img)
+                if cv2.waitKey(0) & 0xFF == ord("q"):
+                    print("Pressed Q, continue eval without vis.")
                     self.hold_vis = False
                     cv2.destroyAllWindows()
-        print("[\n{:6d}] conf_thr: {:.2f}, iou_thr: {:.2f}, recall: {:.5f}, precision: {:.5f}, mrecall: {:.3f}, map: {:.3f}".
-              format(pic_cnt, self.conf_thr, self.iou_thr, recall_cnt/recall_sum, precision_cnt/precision_sum, np.mean(mrecall), np.mean(mAPs)))
+        print(
+            "[\n{:6d}] conf_thr: {:.2f}, iou_thr: {:.2f}, recall: {:.5f}, precision: {:.5f}, mrecall: {:.3f}, map: {:.3f}".format(
+                pic_cnt,
+                self.conf_thr,
+                self.iou_thr,
+                recall_cnt / recall_sum,
+                precision_cnt / precision_sum,
+                np.mean(mrecall),
+                np.mean(mAPs),
+            )
+        )
 
     def eval(self):
-        recall_sum, recall_cnt, precision_sum, precision_cnt = 0., 0., 0., 0.
+        recall_sum, recall_cnt, precision_sum, precision_cnt = 0.0, 0.0, 0.0, 0.0
         mAPs = []
         mrecall = []
         pic_cnt = 0
@@ -278,8 +306,7 @@ class YoloEvaluator:
                     pre_list.append((y1, x1, y2, x2))
 
             pic_cnt += 1
-            eval_list = self.recall_precision(
-                gt_list, pre_list, iou_thr=self.iou_thr)
+            eval_list = self.recall_precision(gt_list, pre_list, iou_thr=self.iou_thr)
 
             recall_sum += eval_list[0]
             recall_cnt += eval_list[1]
@@ -287,14 +314,23 @@ class YoloEvaluator:
             precision_cnt += eval_list[3]
             if (recall_sum > 0) and (precision_sum > 0):
                 if eval_list[2] > 0:
-                    mAPs.append(eval_list[3]/eval_list[2])
+                    mAPs.append(eval_list[3] / eval_list[2])
                 else:
                     if eval_list[0] > 0:
                         mAPs.append(0)
                 if eval_list[0] > 0:
-                    mrecall.append(eval_list[1]/eval_list[0])
+                    mrecall.append(eval_list[1] / eval_list[0])
                 # print(recall_cnt,recall_sum,precision_cnt,precision_sum)
-                print("  {:6d}>  -->>conf_thr :{:.2f} , iou_thr :{:.2f} , recall :{:.5f} , precision :{:.5f}, mrecall :{:.3f}, map :{:.3f}".
-                      format(pic_cnt, self.conf_thr, self.iou_thr, recall_cnt/recall_sum, precision_cnt/precision_sum, np.mean(mrecall), np.mean(map)), end='\r')
-            print('all recall: {}, all precision: {}'.format(
-                recall_sum, precision_sum))
+                print(
+                    "  {:6d}>  -->>conf_thr :{:.2f} , iou_thr :{:.2f} , recall :{:.5f} , precision :{:.5f}, mrecall :{:.3f}, map :{:.3f}".format(
+                        pic_cnt,
+                        self.conf_thr,
+                        self.iou_thr,
+                        recall_cnt / recall_sum,
+                        precision_cnt / precision_sum,
+                        np.mean(mrecall),
+                        np.mean(map),
+                    ),
+                    end="\r",
+                )
+            print("all recall: {}, all precision: {}".format(recall_sum, precision_sum))

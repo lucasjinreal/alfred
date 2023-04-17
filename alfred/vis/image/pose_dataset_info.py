@@ -73,7 +73,6 @@ class DatasetInfo:
         self.flip_pairs_name = []
 
         for kid in self.keypoint_info.keys():
-
             keypoint_name = self.keypoint_info[kid]["name"]
             self.keypoint_id2name[kid] = keypoint_name
             self.keypoint_name2id[keypoint_name] = kid

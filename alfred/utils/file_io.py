@@ -14,6 +14,7 @@ import logging
 import shutil
 from typing import Callable, Optional
 from urllib import request
+
 try:
     import cv2 as cv
 except ImportError as e:
@@ -567,6 +568,7 @@ class SourceIter:
         self.src = src
         self.srcs = []
         self.crt_index = 0
+        self.crt_filename = ""
         self.video_mode = False
         self.webcam_mode = False
         self.cap = None
@@ -594,6 +596,7 @@ class SourceIter:
         else:
             if self.crt_index < len(self.srcs):
                 p = self.srcs[self.crt_index]
+                self.crt_filename = os.path.basename(p)
                 self.crt_index += 1
                 return p
             else:
@@ -738,13 +741,13 @@ class ImageSourceIter(SourceIter):
     def waitKey(self):
         if self.video_mode:
             if cv.waitKey(1) > 0:
-                print('key pressed, exit show..')
+                print("key pressed, exit show..")
                 self.ok = False
                 self.clear_early_quit()
                 # exit(0)
         else:
             cv.waitKey(0)
-    
+
     def show(self, winname, mat):
         cv.imshow(winname, mat)
 
@@ -755,6 +758,7 @@ def next_item(iter):
         itm = cv.imread(itm)
     return itm
 
+
 class ImageSourceIterAsync(SourceIter):
     """
     reading frames in threads if on video mode
@@ -764,7 +768,7 @@ class ImageSourceIterAsync(SourceIter):
     def __init__(self, src, exit_auto=True):
         super(ImageSourceIter, self).__init__(src, exit_auto)
         import cv2 as cv
-        
+
         self._index_sources()
         self.is_written = False
         self.save_f = None

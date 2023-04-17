@@ -31,7 +31,6 @@ from colorama import Fore, Back, Style
 
 
 class ImageScraper(object):
-
     def __init__(self):
         pass
 
@@ -41,18 +40,32 @@ class ImageScraper(object):
             os.mkdir(save_dir)
         if save_prefix:
             if index:
-                save_file = os.path.join(save_dir, save_prefix + '_' + str(index) + '.jpg')
+                save_file = os.path.join(
+                    save_dir, save_prefix + "_" + str(index) + ".jpg"
+                )
             else:
-                file_name = ''.join(random.sample('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789', 16))
-                save_file = os.path.join(save_dir, save_prefix + '_' + file_name + '.jpg')
+                file_name = "".join(
+                    random.sample(
+                        "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789",
+                        16,
+                    )
+                )
+                save_file = os.path.join(
+                    save_dir, save_prefix + "_" + file_name + ".jpg"
+                )
         else:
             if index:
-                save_file = os.path.join(save_dir, '_' + str(index) + '.jpg')
+                save_file = os.path.join(save_dir, "_" + str(index) + ".jpg")
             else:
-                file_name = ''.join(random.sample('AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789', 16))
-                save_file = os.path.join(save_dir, '_' + file_name + '.jpg')
-        with open(save_file, 'wb') as f:
-            print('-- image saved into {}'.format(os.path.basename(save_file)))
+                file_name = "".join(
+                    random.sample(
+                        "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789",
+                        16,
+                    )
+                )
+                save_file = os.path.join(save_dir, "_" + file_name + ".jpg")
+        with open(save_file, "wb") as f:
+            print("-- image saved into {}".format(os.path.basename(save_file)))
             f.write(image_data)
 
     @staticmethod
@@ -68,16 +81,27 @@ class ImageScraper(object):
 
     def scrap(self, query_words, save_dir=None, max_count=5000):
         print(Fore.BLUE)
-        print('-- scrap images of: ' + Fore.YELLOW + Style.BRIGHT + ' '.join(query_words) + Style.RESET_ALL)
+        print(
+            "-- scrap images of: "
+            + Fore.YELLOW
+            + Style.BRIGHT
+            + " ".join(query_words)
+            + Style.RESET_ALL
+        )
         if save_dir:
             root_path = save_dir
         else:
             root_path = os.getcwd()
         for k, query_word in enumerate(query_words):
-            url_pattern = "https://image.baidu.com/search/acjson?tn=resultjson_com&ipn=rj&" \
-                          "ct=201326592&fp=result&queryWord={word}&cl=2&lm=-1&ie=utf-8&oe=utf-8&st=-1&ic=0" \
-                          "&word={word}&face=0&istype=2nc=1&pn={pn}&rn=60"
-            urls = (url_pattern.format(word=query_word, pn=p) for p in range(0, max_count, 30))
+            url_pattern = (
+                "https://image.baidu.com/search/acjson?tn=resultjson_com&ipn=rj&"
+                "ct=201326592&fp=result&queryWord={word}&cl=2&lm=-1&ie=utf-8&oe=utf-8&st=-1&ic=0"
+                "&word={word}&face=0&istype=2nc=1&pn={pn}&rn=60"
+            )
+            urls = (
+                url_pattern.format(word=query_word, pn=p)
+                for p in range(0, max_count, 30)
+            )
             for i_u, url in enumerate(urls):
                 try:
                     html = requests.get(url).text
@@ -85,15 +109,24 @@ class ImageScraper(object):
                     for i, image_url in enumerate(image_urls):
                         try:
                             image_url = self.decode_url(image_url)
-                            print('-- decoding url.. : {}'.format(image_url))
-                            print('-- solving %d image' % i)
-                            image = requests.get(image_url, stream=False, timeout=10).content
-                            save_dir = os.path.join(os.path.abspath(root_path), query_words[k])
-                            self.save_image(image, query_word.replace(' ', ''), save_dir, str(i_u) + str(i))
+                            print("-- decoding url.. : {}".format(image_url))
+                            print("-- solving %d image" % i)
+                            image = requests.get(
+                                image_url, stream=False, timeout=10
+                            ).content
+                            save_dir = os.path.join(
+                                os.path.abspath(root_path), query_words[k]
+                            )
+                            self.save_image(
+                                image,
+                                query_word.replace(" ", ""),
+                                save_dir,
+                                str(i_u) + str(i),
+                            )
                         except requests.exceptions.ConnectionError:
-                            print('-- url: %s can not found image.' % image_url)
+                            print("-- url: %s can not found image." % image_url)
                             continue
                 except Exception as e:
                     print(e)
-                    print('-- pass this url.')
+                    print("-- pass this url.")
                     pass

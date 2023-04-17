@@ -67,6 +67,7 @@ def change_default_args(**kwargs):
 
     return layer_wrapper
 
+
 def torch_to_np_dtype(ttype):
     type_map = {
         torch.float16: np.dtype(np.float16),
@@ -94,11 +95,11 @@ def torch_load_state_dict_without_module(ckp_file):
     this function using for load a model without module
     """
     checkpoint = torch.load(ckp_file)
-    state_dict =checkpoint['state_dict']
+    state_dict = checkpoint["state_dict"]
 
     new_state_dict = OrderedDict()
     for k, v in state_dict.items():
-        if 'module.' in k:
-            k = k[7:] # remove 'module.' of dataparallel
-        new_state_dict[k]=v
+        if "module." in k:
+            k = k[7:]  # remove 'module.' of dataparallel
+        new_state_dict[k] = v
     return new_state_dict

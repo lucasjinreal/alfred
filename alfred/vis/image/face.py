@@ -30,4 +30,3 @@ def draw_face_landmarks(img, pts, box=None, color=(255, 147, 23), size=8):
             cv2.line(img, right_bottom, left_bottom, line_color, 1, cv2.LINE_AA)
             cv2.line(img, left_bottom, left_top, line_color, 1, cv2.LINE_AA)
     return img
-

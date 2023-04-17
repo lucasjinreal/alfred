@@ -22,7 +22,7 @@ class LocalSocketExchanger:
             self.socket.bind((self.ip, self.port))
             self.socket.listen(3)
             self.conn, addr = self.socket.accept()
-            print('Server is ready. ', addr)
+            print("Server is ready. ", addr)
         else:
             self.socket.connect((self.ip, self.port))
 
@@ -33,7 +33,7 @@ class LocalSocketExchanger:
         if not self.is_server:
             self.socket.send(data)
         else:
-            print('server can not send data for now.')
+            print("server can not send data for now.")
 
     def did_received_data(self, func):
         self.did_received_data_func = func

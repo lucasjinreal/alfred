@@ -1,4 +1,3 @@
-
 from alfred.deploy.tensorrt.common import (
     do_inference_v2,
     build_engine_onnx_v2,
@@ -27,8 +26,7 @@ class TensorRTInferencer:
     def _init_engine(self):
         self.engine = load_engine_from_local(self.engine_f)
         sps = check_engine(self.engine)
-        self.input_shapes = [sps[i]["shape"]
-                             for i in sps.keys() if sps[i]["is_input"]]
+        self.input_shapes = [sps[i]["shape"] for i in sps.keys() if sps[i]["is_input"]]
         self.output_shapes = [
             sps[i]["shape"] for i in sps.keys() if not sps[i]["is_input"]
         ]
@@ -51,8 +49,7 @@ class TensorRTInferencer:
                     self.bindings,
                     self.stream,
                 ) = allocate_buffers_v2_dynamic(self.engine)
-                self.context.set_optimization_profile_async(
-                    0, self.stream.handle)
+                self.context.set_optimization_profile_async(0, self.stream.handle)
             else:
                 (
                     self.inputs,

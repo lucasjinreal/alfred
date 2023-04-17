@@ -103,7 +103,6 @@ def draw_masks_maskrcnn(
         instance_color = get_unique_color_by_id(i)[:-1]
         # now adding masks to image, and colorize it
         if score >= score_thresh:
-
             x1 = int(box[0])
             y1 = int(box[1])
             x2 = int(box[2])
@@ -198,7 +197,6 @@ def draw_masks_maskrcnn_v2(
         instance_color = get_unique_color_by_id(i)[:-1]
         # now adding masks to image, and colorize it
         if score >= score_thresh:
-
             x1 = int(box[0])
             y1 = int(box[1])
             x2 = int(box[2])
