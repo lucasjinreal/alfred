@@ -62,7 +62,7 @@ wget -P data/cow_mesh https://dl.fbaipublicfiles.com/pytorch3d/data/cow_mesh/cow
 """
 device = torch.device("cpu")
 
-obj_filename = os.path.join("./cow_mesh", "cow.obj")
+obj_filename = os.path.join("./data/cow_mesh", "cow.obj")
 
 # Load obj file
 mesh = load_objs_as_meshes([obj_filename], device=device)

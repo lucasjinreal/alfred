@@ -85,7 +85,7 @@ def encode_image(image):
 
 
 class BaseSocketClient:
-    def __init__(self, host, port) -> None:
+    def __init__(self, host='127.0.0.1', port=9999) -> None:
         if host == "auto":
             host = socket.gethostname()
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

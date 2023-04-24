@@ -39,13 +39,19 @@ class VisOpen3DSocket(BaseSocket):
         self.out = cfg.out
         self.cfg = cfg
         if self.write:
-            logger.info('[Info] capture the screen to {}'.format(self.out))
+            logger.info("[Info] capture the screen to {}".format(self.out))
             os.makedirs(self.out, exist_ok=True)
         # scene
         vis = o3d.visualization.VisualizerWithKeyCallback()
-        vis.register_key_callback(ord('A'), o3d_callback_rotate)
-        vis.create_window(window_name='Alfred Open3D 3D Keypoints Visualizer',
-                          width=cfg.width, height=cfg.height)
+        vis.register_key_callback(ord("r"), o3d_callback_rotate)
+        vis.create_window(
+            window_name="alfred-py Open3D 3D Keypoints Visualizer",
+            width=cfg.width,
+            height=cfg.height,
+        )
+        opt = vis.get_render_option()
+        opt.show_coordinate_frame = True
+
         self.vis = vis
         # load the scene
         for sc in cfg.scene:
@@ -54,11 +60,11 @@ class VisOpen3DSocket(BaseSocket):
             mesh = load_object(key, mesh_args)
             self.vis.add_geometry(mesh)
 
-        for key, val in cfg.extra.items():
-            mesh = load_mesh(val["path"])
-            trans = np.array(val["transform"]).reshape(4, 4)
-            mesh.transform(trans)
-            self.vis.add_geometry(mesh)
+        # for key, val in cfg.extra.items():
+        #     mesh = load_mesh(val["path"])
+        #     trans = np.array(val["transform"]).reshape(4, 4)
+        #     mesh.transform(trans)
+        #     self.vis.add_geometry(mesh)
         # create vis => update => super() init
         super().__init__(host, port, debug=cfg.debug)
         self.block = cfg.block
@@ -84,7 +90,7 @@ class VisOpen3DSocket(BaseSocket):
         self.previous = {}
         self.critrange = CritRange(**cfg.range)
         self.new_frames = cfg.new_frames
-    
+
     def close(self):
         self.vis.close()
         self.close_conn()
@@ -201,7 +207,7 @@ class VisOpen3DSocket(BaseSocket):
             self.previous.clear()
         if not self.queue.empty():
             if self.debug:
-                logger.info('Update' + str(self.queue.qsize()))
+                logger.info("Update" + str(self.queue.qsize()))
             datas = self.queue.get()
             if not self.block:
                 while self.queue.qsize() > 0:

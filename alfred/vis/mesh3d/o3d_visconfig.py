@@ -26,6 +26,7 @@ class Config(BaseConfig):
         # scene:
         cfg.scene_module = "alfred.vis.mesh3d.o3dwrapper"
         cfg.scene = []
+        cfg.show_coordinate_frame = False
 
         cfg.extra = CN()
         cfg.range = CN()
