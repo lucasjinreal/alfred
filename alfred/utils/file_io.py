@@ -14,6 +14,7 @@ import logging
 import shutil
 from typing import Callable, Optional
 from urllib import request
+
 try:
     import cv2 as cv
 except ImportError as e:
@@ -567,7 +568,7 @@ class SourceIter:
         self.src = src
         self.srcs = []
         self.crt_index = 0
-        self.crt_filename = ''
+        self.crt_filename = ""
         self.video_mode = False
         self.webcam_mode = False
         self.cap = None
@@ -595,6 +596,7 @@ class SourceIter:
         else:
             if self.crt_index < len(self.srcs):
                 p = self.srcs[self.crt_index]
+                self.crt_filename = os.path.basename(p)
                 self.crt_index += 1
                 self.crt_filename = os.path.basename(p)
                 return p
@@ -608,11 +610,11 @@ class SourceIter:
 
 
 class ImageSourceIter(SourceIter):
-    def __init__(self, src, exit_auto=True):
+    def __init__(self, src, exit_auto=True, save_res_video=False):
         super(ImageSourceIter, self).__init__(src, exit_auto)
 
         self._index_sources()
-        self.is_written = False
+        self.is_written = save_res_video
         self.save_f = None
         assert len(self.srcs) > 0, "srcs indexed empty: {}".format(self.srcs)
         self.lens = len(self.srcs)
@@ -628,7 +630,7 @@ class ImageSourceIter(SourceIter):
                     os.path.dirname(src), self.filename + "_result.mp4"
                 )
                 self.lens = self.video_frame_count
-            else:
+            elif self.webcam_mode:
                 os.makedirs("results", exist_ok=True)
                 self.save_f = os.path.join("results/webcam_result.mp4")
             self.video_writter = cv.VideoWriter(
@@ -718,18 +720,40 @@ class ImageSourceIter(SourceIter):
             if self.is_written and self.is_save_video_called:
                 print("your wrote video result file should saved into: ", self.save_f)
             else:
-                if self.save_f and os.path.exists(self.save_f):
-                    # clean up remove saved file.
-                    os.remove(self.save_f)
+                if self.save_f is not None:
+                    pass
+                    # if os.path.exists(self.save_f):
+                    #     # clean up remove saved file.
+                    #     os.remove(self.save_f)
+
+    def clear_early_quit(self):
+        if self.video_mode:
+            self.cap.release()
+            if not self.webcam_mode:
+                self.video_writter.release()
+            if self.is_written and self.is_save_video_called:
+                print("your wrote video result file should saved into: ", self.save_f)
+            else:
+                if self.save_f is not None:
+                    if os.path.exists(self.save_f):
+                        # clean up remove saved file.
+                        os.remove(self.save_f)
 
     def waitKey(self):
         if self.video_mode:
-            cv.waitKey(1)
+            if cv.waitKey(1) > 0:
+                print("key pressed, exit show..")
+                self.ok = False
+                self.clear_early_quit()
+                # exit(0)
         else:
             cv.waitKey(0)
     
     def show(self, winname, img):
         cv.imshow(winname, img)
+
+    def show(self, winname, mat):
+        cv.imshow(winname, mat)
 
 
 def next_item(iter):
@@ -737,6 +761,7 @@ def next_item(iter):
     if isinstance(itm, str):
         itm = cv.imread(itm)
     return itm
+
 
 class ImageSourceIterAsync(SourceIter):
     """
@@ -747,7 +772,7 @@ class ImageSourceIterAsync(SourceIter):
     def __init__(self, src, exit_auto=True):
         super(ImageSourceIter, self).__init__(src, exit_auto)
         import cv2 as cv
-        
+
         self._index_sources()
         self.is_written = False
         self.save_f = None

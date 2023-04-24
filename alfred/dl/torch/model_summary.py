@@ -46,7 +46,7 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
             try:
                 summary[m_key]["input_shape"] = list(input[0].size())
             except Exception as e:
-                print('error when fetching input shape: ', e)
+                print("error when fetching input shape: ", e)
                 summary[m_key]["input_shape"] = [2, -1, -1]
             summary[m_key]["input_shape"][0] = batch_size
             if isinstance(output, (list, tuple)):
@@ -66,9 +66,9 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
             summary[m_key]["nb_params"] = params
 
         if (
-                not isinstance(module, nn.Sequential)
-                and not isinstance(module, nn.ModuleList)
-                and not (module == model)
+            not isinstance(module, nn.Sequential)
+            and not isinstance(module, nn.ModuleList)
+            and not (module == model)
         ):
             hooks.append(module.register_forward_hook(hook))
 
@@ -84,12 +84,18 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
         dtype = torch.FloatTensor
 
     # multiple inputs to the network
-    if isinstance(input_size, tuple) or isinstance(input_size, list) and input_size[0] <= 3:
+    if (
+        isinstance(input_size, tuple)
+        or isinstance(input_size, list)
+        and input_size[0] <= 3
+    ):
         # batch_size of 2 for batchnorm
         x = torch.rand(2, *input_size).type(dtype)
     else:
         x = torch.rand(2, *input_size).type(dtype)
-        print('[WARNING] channel more than 3, this may cause some errors. or you does not put channel as first dim.')
+        print(
+            "[WARNING] channel more than 3, this may cause some errors. or you does not put channel as first dim."
+        )
         # print('Wrong! you should send input size specific without batch size, etc: (3, 64, 64), channel first.')
         # exit(0)
     # create properties
@@ -101,13 +107,15 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
 
     # make a forward pass
     try:
-        print('[INFO] fake data input: ', x.size())
+        print("[INFO] fake data input: ", x.size())
         model(x)
     except Exception as e:
-        print('[ERROR] summary failed. error: {}'.format(e))
-        print('[TIPS] make sure your called model.to(device) ')
-        print('also possibly error is input size should specific without batch, and using channel first, etc: (3, 128, 128)')
-        print('full trace back: ', e.with_traceback(0))
+        print("[ERROR] summary failed. error: {}".format(e))
+        print("[TIPS] make sure your called model.to(device) ")
+        print(
+            "also possibly error is input size should specific without batch, and using channel first, etc: (3, 128, 128)"
+        )
+        print("full trace back: ", e.with_traceback(0))
         exit(0)
 
     # remove these hooks
@@ -136,9 +144,11 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
         print(line_new)
 
     # assume 4 bytes/number (float on cuda).
-    total_input_size = abs(np.prod(input_size) * batch_size * 4. / (1024 ** 2.))
-    total_output_size = abs(2. * total_output * 4. / (1024 ** 2.))  # x2 for gradients
-    total_params_size = abs(total_params.numpy() * 4. / (1024 ** 2.))
+    total_input_size = abs(np.prod(input_size) * batch_size * 4.0 / (1024**2.0))
+    total_output_size = abs(
+        2.0 * total_output * 4.0 / (1024**2.0)
+    )  # x2 for gradients
+    total_params_size = abs(total_params.numpy() * 4.0 / (1024**2.0))
     total_size = total_params_size + total_output_size + total_input_size
 
     print("================================================================")

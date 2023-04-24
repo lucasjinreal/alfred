@@ -30,8 +30,8 @@ from torch import nn
 class Scalar(nn.Module):
     def __init__(self):
         super().__init__()
-        self.register_buffer('total', torch.FloatTensor([0.0]))
-        self.register_buffer('count', torch.FloatTensor([0.0]))
+        self.register_buffer("total", torch.FloatTensor([0.0]))
+        self.register_buffer("count", torch.FloatTensor([0.0]))
 
     def forward(self, scalar):
         if not scalar.eq(0.0):
@@ -47,15 +47,14 @@ class Scalar(nn.Module):
         self.total.zero_()
         self.count.zero_()
 
+
 class Accuracy(nn.Module):
-    def __init__(self,
-                 dim=1,
-                 ignore_idx=-1,
-                 threshold=0.5,
-                 encode_background_as_zeros=True):
+    def __init__(
+        self, dim=1, ignore_idx=-1, threshold=0.5, encode_background_as_zeros=True
+    ):
         super().__init__()
-        self.register_buffer('total', torch.FloatTensor([0.0]))
-        self.register_buffer('count', torch.FloatTensor([0.0]))
+        self.register_buffer("total", torch.FloatTensor([0.0]))
+        self.register_buffer("count", torch.FloatTensor([0.0]))
         self._ignore_idx = ignore_idx
         self._dim = dim
         self._threshold = threshold
@@ -67,9 +66,11 @@ class Accuracy(nn.Module):
         if self._encode_background_as_zeros:
             scores = torch.sigmoid(preds)
             labels_pred = torch.max(preds, dim=self._dim)[1] + 1
-            pred_labels = torch.where((scores > self._threshold).any(self._dim),
-                                      labels_pred,
-                                      torch.tensor(0).type_as(labels_pred))
+            pred_labels = torch.where(
+                (scores > self._threshold).any(self._dim),
+                labels_pred,
+                torch.tensor(0).type_as(labels_pred),
+            )
         else:
             pred_labels = torch.max(preds, dim=self._dim)[1]
         N, *Ds = labels.shape
@@ -87,6 +88,7 @@ class Accuracy(nn.Module):
         self.total += total
         return self.value.cpu()
         # return (total /  num_examples.data).cpu()
+
     @property
     def value(self):
         return self.total / self.count
@@ -99,8 +101,8 @@ class Accuracy(nn.Module):
 class Precision(nn.Module):
     def __init__(self, dim=1, ignore_idx=-1, threshold=0.5):
         super().__init__()
-        self.register_buffer('total', torch.FloatTensor([0.0]))
-        self.register_buffer('count', torch.FloatTensor([0.0]))
+        self.register_buffer("total", torch.FloatTensor([0.0]))
+        self.register_buffer("count", torch.FloatTensor([0.0]))
         self._ignore_idx = ignore_idx
         self._dim = dim
         self._threshold = threshold
@@ -109,11 +111,11 @@ class Precision(nn.Module):
         # labels: [N, ...]
         # preds: [N, C, ...]
         if preds.shape[self._dim] == 1:  # BCE
-            pred_labels = (torch.sigmoid(preds) >
-                           self._threshold).long().squeeze(self._dim)
+            pred_labels = (
+                (torch.sigmoid(preds) > self._threshold).long().squeeze(self._dim)
+            )
         else:
-            assert preds.shape[
-                self._dim] == 2, "precision only support 2 class"
+            assert preds.shape[self._dim] == 2, "precision only support 2 class"
             pred_labels = torch.max(preds, dim=self._dim)[1]
         N, *Ds = labels.shape
         labels = labels.view(N, int(np.prod(Ds)))
@@ -138,9 +140,11 @@ class Precision(nn.Module):
             self.total += true_positives
         return self.value.cpu()
         # return (total /  num_examples.data).cpu()
+
     @property
     def value(self):
         return self.total / self.count
+
     def clear(self):
         self.total.zero_()
         self.count.zero_()
@@ -149,8 +153,8 @@ class Precision(nn.Module):
 class Recall(nn.Module):
     def __init__(self, dim=1, ignore_idx=-1, threshold=0.5):
         super().__init__()
-        self.register_buffer('total', torch.FloatTensor([0.0]))
-        self.register_buffer('count', torch.FloatTensor([0.0]))
+        self.register_buffer("total", torch.FloatTensor([0.0]))
+        self.register_buffer("count", torch.FloatTensor([0.0]))
         self._ignore_idx = ignore_idx
         self._dim = dim
         self._threshold = threshold
@@ -159,11 +163,11 @@ class Recall(nn.Module):
         # labels: [N, ...]
         # preds: [N, C, ...]
         if preds.shape[self._dim] == 1:  # BCE
-            pred_labels = (torch.sigmoid(preds) >
-                           self._threshold).long().squeeze(self._dim)
+            pred_labels = (
+                (torch.sigmoid(preds) > self._threshold).long().squeeze(self._dim)
+            )
         else:
-            assert preds.shape[
-                self._dim] == 2, "precision only support 2 class"
+            assert preds.shape[self._dim] == 2, "precision only support 2 class"
             pred_labels = torch.max(preds, dim=self._dim)[1]
         N, *Ds = labels.shape
         labels = labels.view(N, int(np.prod(Ds)))
@@ -186,20 +190,17 @@ class Recall(nn.Module):
             self.total += true_positives
         return self.value.cpu()
         # return (total /  num_examples.data).cpu()
+
     @property
     def value(self):
         return self.total / self.count
+
     def clear(self):
         self.total.zero_()
         self.count.zero_()
 
 
-def _calc_binary_metrics(labels,
-                         scores,
-                         weights=None,
-                         ignore_idx=-1,
-                         threshold=0.5):
-
+def _calc_binary_metrics(labels, scores, weights=None, ignore_idx=-1, threshold=0.5):
     pred_labels = (scores > threshold).long()
     N, *Ds = labels.shape
     labels = labels.view(N, int(np.prod(Ds)))
@@ -216,24 +217,22 @@ def _calc_binary_metrics(labels,
 
 
 class PrecisionRecall(nn.Module):
-    def __init__(self,
-                 dim=1,
-                 ignore_idx=-1,
-                 thresholds=0.5,
-                 use_sigmoid_score=False,
-                 encode_background_as_zeros=True):
+    def __init__(
+        self,
+        dim=1,
+        ignore_idx=-1,
+        thresholds=0.5,
+        use_sigmoid_score=False,
+        encode_background_as_zeros=True,
+    ):
         super().__init__()
         if not isinstance(thresholds, (list, tuple)):
             thresholds = [thresholds]
 
-        self.register_buffer('prec_total',
-                             torch.FloatTensor(len(thresholds)).zero_())
-        self.register_buffer('prec_count',
-                             torch.FloatTensor(len(thresholds)).zero_())
-        self.register_buffer('rec_total',
-                             torch.FloatTensor(len(thresholds)).zero_())
-        self.register_buffer('rec_count',
-                             torch.FloatTensor(len(thresholds)).zero_())
+        self.register_buffer("prec_total", torch.FloatTensor(len(thresholds)).zero_())
+        self.register_buffer("prec_count", torch.FloatTensor(len(thresholds)).zero_())
+        self.register_buffer("rec_total", torch.FloatTensor(len(thresholds)).zero_())
+        self.register_buffer("rec_count", torch.FloatTensor(len(thresholds)).zero_())
 
         self._ignore_idx = ignore_idx
         self._dim = dim
@@ -273,8 +272,9 @@ class PrecisionRecall(nn.Module):
         else:
             weights = weights.float()
         for i, thresh in enumerate(self._thresholds):
-            tp, tn, fp, fn = _calc_binary_metrics(labels, scores, weights,
-                                                  self._ignore_idx, thresh)
+            tp, tn, fp, fn = _calc_binary_metrics(
+                labels, scores, weights, self._ignore_idx, thresh
+            )
             rec_count = tp + fn
             prec_count = tp + fp
             if rec_count > 0:
@@ -286,12 +286,15 @@ class PrecisionRecall(nn.Module):
 
         return self.value
         # return (total /  num_examples.data).cpu()
+
     @property
     def value(self):
         prec_count = torch.clamp(self.prec_count, min=1.0)
         rec_count = torch.clamp(self.rec_count, min=1.0)
-        return ((self.prec_total / prec_count).cpu(),
-                (self.rec_total / rec_count).cpu())
+        return (
+            (self.prec_total / prec_count).cpu(),
+            (self.rec_total / rec_count).cpu(),
+        )
 
     @property
     def thresholds(self):

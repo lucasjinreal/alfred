@@ -34,8 +34,13 @@ from .get_dataset_color_map import _ADE20K, _CITYSCAPES, _MAPILLARY_VISTAS, _PAS
 
 from .mask import label2color_mask
 
-def vis_semantic_seg(img, seg, alpha=0.7, override_colormap=None, color_suite='cityscapes', is_show=False):
-    mask_color = label2color_mask(seg, override_id_clr_map=override_colormap, color_suit=color_suite)
+
+def vis_semantic_seg(
+    img, seg, alpha=0.7, override_colormap=None, color_suite="cityscapes", is_show=False
+):
+    mask_color = label2color_mask(
+        seg, override_id_clr_map=override_colormap, color_suit=color_suite
+    )
     img_shape = img.shape
     mask_shape = mask_color.shape
     if img_shape != mask_shape:
@@ -44,13 +49,18 @@ def vis_semantic_seg(img, seg, alpha=0.7, override_colormap=None, color_suite='c
 
     res = cv2.addWeighted(img, 0.5, mask_color, alpha, 0.4)
     if is_show:
-        cv2.imshow('result', res)
+        cv2.imshow("result", res)
         cv2.waitKey(0)
     return res, mask_color
 
 
 def draw_seg_by_dataset(img, seg, dataset, alpha=0.7, is_show=False, bgr_in=False):
-    assert dataset in [_PASCAL, _CITYSCAPES, _MAPILLARY_VISTAS, _ADE20K], 'dataset not support yet.'
+    assert dataset in [
+        _PASCAL,
+        _CITYSCAPES,
+        _MAPILLARY_VISTAS,
+        _ADE20K,
+    ], "dataset not support yet."
     img = np.asarray(img, dtype=np.uint8)
     if bgr_in:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -64,6 +74,6 @@ def draw_seg_by_dataset(img, seg, dataset, alpha=0.7, is_show=False, bgr_in=Fals
 
     res = cv2.addWeighted(img, 0.3, mask_color, alpha, 0.6)
     if is_show:
-        cv2.imshow('result', res)
+        cv2.imshow("result", res)
         cv2.waitKey(0)
     return res, mask_color

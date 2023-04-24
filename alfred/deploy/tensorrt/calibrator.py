@@ -22,34 +22,32 @@ import ctypes
 try:
     import pycuda.driver as cuda
 except ImportError as e:
-    print('pycuda not installed, calibrator will be disabled.')
-
+    print("pycuda not installed, calibrator will be disabled.")
 
 
 class Calibrator(trt.IInt8EntropyCalibrator2):
-    '''calibrator
-        IInt8EntropyCalibrator2
-        IInt8LegacyCalibrator
-        IInt8EntropyCalibrator
-        IInt8MinMaxCalibrator
+    """calibrator
+    IInt8EntropyCalibrator2
+    IInt8LegacyCalibrator
+    IInt8EntropyCalibrator
+    IInt8MinMaxCalibrator
 
-    '''
+    """
+
     def __init__(self, stream, cache_file=""):
-        trt.IInt8EntropyCalibrator2.__init__(self)       
+        trt.IInt8EntropyCalibrator2.__init__(self)
         self.stream = stream
         self.d_input = cuda.mem_alloc(self.stream.calibration_data.nbytes)
         self.cache_file = cache_file
         # print(self.cache_file)
         stream.reset()
-        
 
     def get_batch_size(self):
         return self.stream.batch_size
 
     def get_batch(self, names):
-
         batch = self.stream.next_batch()
-        if not batch.size:  
+        if not batch.size:
             return None
 
         cuda.memcpy_htod(self.d_input, batch)
@@ -62,7 +60,7 @@ class Calibrator(trt.IInt8EntropyCalibrator2):
                 print(f"[INFO] Using calibration cache to save time: {self.cache_file}")
                 return f.read()
 
-    def write_calibration_cache(self, cache): 
+    def write_calibration_cache(self, cache):
         with open(self.cache_file, "wb") as f:
             print(f"[INFO] Caching calibration data for future use: {self.cache_file}")
             f.write(cache)

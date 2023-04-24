@@ -18,9 +18,10 @@ A torch process group which only includes processes that on the same machine as 
 This variable is set when processes are spawned by `launch()` in "engine/launch.py".
 """
 
+
 # function ported from mmcv
 def get_dist_info():
-    if torch.__version__ < '1.0':
+    if torch.__version__ < "1.0":
         initialized = dist._initialized
     else:
         if dist.is_available():
@@ -115,11 +116,11 @@ def _serialize_to_tensor(data, group):
     device = torch.device("cpu" if backend == "gloo" else "cuda")
 
     buffer = pickle.dumps(data)
-    if len(buffer) > 1024 ** 3:
+    if len(buffer) > 1024**3:
         logger = logging.getLogger(__name__)
         logger.warning(
             "Rank {} trying to all-gather {:.2f} GB of data on device {}".format(
-                get_rank(), len(buffer) / (1024 ** 3), device
+                get_rank(), len(buffer) / (1024**3), device
             )
         )
     storage = torch.ByteStorage.from_buffer(buffer)
@@ -139,7 +140,8 @@ def _pad_to_largest_tensor(tensor, group):
     ), "comm.gather/all_gather must be called from ranks within the given group!"
     local_size = torch.tensor([tensor.numel()], dtype=torch.int64, device=tensor.device)
     size_list = [
-        torch.zeros([1], dtype=torch.int64, device=tensor.device) for _ in range(world_size)
+        torch.zeros([1], dtype=torch.int64, device=tensor.device)
+        for _ in range(world_size)
     ]
     dist.all_gather(size_list, local_size, group=group)
     size_list = [int(size.item()) for size in size_list]
@@ -149,7 +151,9 @@ def _pad_to_largest_tensor(tensor, group):
     # we pad the tensor because torch all_gather does not support
     # gathering tensors of different shapes
     if local_size != max_size:
-        padding = torch.zeros((max_size - local_size,), dtype=torch.uint8, device=tensor.device)
+        padding = torch.zeros(
+            (max_size - local_size,), dtype=torch.uint8, device=tensor.device
+        )
         tensor = torch.cat((tensor, padding), dim=0)
     return size_list, tensor
 
@@ -180,7 +184,8 @@ def all_gather(data, group=None):
 
     # receiving Tensor from all ranks
     tensor_list = [
-        torch.empty((max_size,), dtype=torch.uint8, device=tensor.device) for _ in size_list
+        torch.empty((max_size,), dtype=torch.uint8, device=tensor.device)
+        for _ in size_list
     ]
     dist.all_gather(tensor_list, tensor, group=group)
 
@@ -221,7 +226,8 @@ def gather(data, dst=0, group=None):
     if rank == dst:
         max_size = max(size_list)
         tensor_list = [
-            torch.empty((max_size,), dtype=torch.uint8, device=tensor.device) for _ in size_list
+            torch.empty((max_size,), dtype=torch.uint8, device=tensor.device)
+            for _ in size_list
         ]
         dist.gather(tensor, tensor_list, dst=dst, group=group)
 
@@ -244,7 +250,7 @@ def shared_random_seed():
 
     All workers must call this function, otherwise it will deadlock.
     """
-    ints = np.random.randint(2 ** 31)
+    ints = np.random.randint(2**31)
     all_ints = all_gather(ints)
     return all_ints[0]
 

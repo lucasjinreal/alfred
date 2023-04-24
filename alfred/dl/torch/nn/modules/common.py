@@ -27,6 +27,7 @@ from collections import OrderedDict
 import torch
 from torch.nn import functional as F
 
+
 class Empty(torch.nn.Module):
     def __init__(self, *args, **kwargs):
         super(Empty, self).__init__()
@@ -37,6 +38,7 @@ class Empty(torch.nn.Module):
         elif len(args) == 0:
             return None
         return args
+
 
 class Sequential(torch.nn.Module):
     r"""A sequential container.
@@ -60,7 +62,7 @@ class Sequential(torch.nn.Module):
                   ('conv2', nn.Conv2d(20,64,5)),
                   ('relu2', nn.ReLU())
                 ]))
-        
+
         # Example of using Sequential with kwargs(python 3.6+)
         model = Sequential(
                   conv1=nn.Conv2d(1,20,5),
@@ -87,7 +89,7 @@ class Sequential(torch.nn.Module):
 
     def __getitem__(self, idx):
         if not (-len(self) <= idx < len(self)):
-            raise IndexError('index {} is out of range'.format(idx))
+            raise IndexError("index {} is out of range".format(idx))
         if idx < 0:
             idx += len(self)
         it = iter(self._modules.values())

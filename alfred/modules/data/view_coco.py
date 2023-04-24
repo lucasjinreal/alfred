@@ -165,12 +165,12 @@ def get_coco_info(ann_f):
     cats = coco.loadCats(coco.getCatIds())
 
     res = {}
-    res["class_names"] = [i['name'] for i in cats]
+    res["class_names"] = [i["name"] for i in cats]
 
     skeleton_dict = {}
     for c in cats:
         if "skeleton" in c.keys():
-            skeleton_dict[c['name']] = c["skeleton"]
+            skeleton_dict[c["name"]] = c["skeleton"]
     res["skeleton_dict"] = skeleton_dict
     return res
 

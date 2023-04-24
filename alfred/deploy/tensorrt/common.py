@@ -28,11 +28,13 @@ import ctypes
 
 try:
     import pycuda.driver as cuda
+
     # https://documen.tician.de/pycuda/driver.html
     import pycuda.autoinit
 except ImportError as e:
     print(
-        f'pycuda not installed, or import failed. inference on trt will be disabled. error: {e}')
+        f"pycuda not installed, or import failed. inference on trt will be disabled. error: {e}"
+    )
 
 TRT8 = 8
 TRT7 = 7
@@ -83,8 +85,9 @@ def allocate_buffers_v2(engine):
     bindings = []
     stream = cuda.Stream()
     for binding in engine:
-        size = abs(trt.volume(engine.get_binding_shape(binding))) * \
-            engine.max_batch_size
+        size = (
+            abs(trt.volume(engine.get_binding_shape(binding))) * engine.max_batch_size
+        )
         dtype = trt.nptype(engine.get_binding_dtype(binding))
         # Allocate host and device buffers
         host_mem = cuda.pagelocked_empty(size, dtype)
@@ -196,15 +199,13 @@ def build_engine_onnx(
     chw_shape=None,
 ):
     def get_engine():
-        EXPLICIT_BATCH = 1 << (int)(
-            trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
+        EXPLICIT_BATCH = 1 << (int)(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
         # with trt.Builder(TRT_LOGGER) as builder, builder.create_network(EXPLICIT_BATCH) as network,builder.create_builder_config() as config, trt.OnnxParser(network,TRT_LOGGER) as parser:
         with trt.Builder(TRT_LOGGER) as builder, builder.create_network(
             EXPLICIT_BATCH
         ) as network, builder.create_builder_config() as config, trt.OnnxParser(
             network, TRT_LOGGER
         ) as parser:
-
             trt_version = int(trt.__version__[0])
             # Workspace size is the maximum amount of memory available to the builder while building an engine.
 
@@ -233,8 +234,7 @@ def build_engine_onnx(
             if dynamic_input:
                 profile = builder.create_optimization_profile()
                 profile.set_shape(
-                    "inputs", (1, 3, 800, 800), (8, 3,
-                                                 800, 800), (64, 3, 800, 800)
+                    "inputs", (1, 3, 800, 800), (8, 3, 800, 800), (64, 3, 800, 800)
                 )
                 config.add_optimization_profile(profile)
 
@@ -283,13 +283,11 @@ def build_engine_onnx_v2(
         ) as network, builder.create_builder_config() as config, trt.OnnxParser(
             network, TRT_LOGGER
         ) as parser, builder.create_builder_config() as trt_config:
-
             trt_version = int(trt.__version__[0])
             # parse onnx model file
             if not os.path.exists(onnx_file_path):
                 quit(f"[Error]ONNX file {onnx_file_path} not found")
-            logger.info(
-                f"[INFO] Loading ONNX file from path {onnx_file_path}...")
+            logger.info(f"[INFO] Loading ONNX file from path {onnx_file_path}...")
             with open(onnx_file_path, "rb") as model:
                 logger.info("[INFO] Beginning ONNX file parsing")
                 parser.parse(model.read())
@@ -316,7 +314,7 @@ def build_engine_onnx_v2(
                     ]
                 }
                 """
-                logger.info('using opt_params: {}'.format(opt_params))
+                logger.info("using opt_params: {}".format(opt_params))
                 for input_index, input_tensor_name in enumerate(opt_params.keys()):
                     min_shape = tuple(opt_params[input_tensor_name][0][:])
                     opt_shape = tuple(opt_params[input_tensor_name][1][:])
@@ -337,16 +335,16 @@ def build_engine_onnx_v2(
             if trt_version == TRT8:
                 if fp16_mode:
                     trt_config.set_flag(trt.BuilderFlag.FP16)
-                    logger.info('enabled fp16 mode.')
+                    logger.info("enabled fp16 mode.")
             else:
                 if fp16_mode:
                     builder.fp16_mode = fp16_mode
-                    logger.info('enabled fp16 mode.')
+                    logger.info("enabled fp16 mode.")
 
             if int8_mode:
                 if trt_version == TRT8:
                     trt_config.set_flag(trt.BuilderFlag.INT8)
-                    logger.info('enabled int8 mode.')
+                    logger.info("enabled int8 mode.")
                 else:
                     builder.fp16_mode = fp16_mode
 
@@ -398,10 +396,9 @@ def load_torchtrt_plugins():
     # ctypes.CDLL(osp.join(dir_path, 'libamirstan_plugin.so'))
     # suppose plugins lib installed into HOME
     lib_path = osp.join(
-        osp.expanduser(
-            "~"), "torchtrt_plugins/build/lib/libtorchtrt_plugins.so"
+        osp.expanduser("~"), "torchtrt_plugins/build/lib/libtorchtrt_plugins.so"
     )
-    lib_path2 = '/usr/local/lib/libtorchtrt_plugins.so'
+    lib_path2 = "/usr/local/lib/libtorchtrt_plugins.so"
     if os.path.exists(lib_path):
         ctypes.CDLL(lib_path)
     elif os.path.exists(lib_path2):
@@ -435,7 +432,6 @@ def build_engine_onnx_v3(
         ) as network, builder.create_builder_config() as config, trt.OnnxParser(
             network, TRT_LOGGER
         ) as parser, builder.create_builder_config() as trt_config:
-
             trt_version = int(trt.__version__[0])
             # parse onnx model file
             if not os.path.exists(onnx_file_path):

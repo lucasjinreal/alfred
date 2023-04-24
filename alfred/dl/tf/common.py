@@ -30,4 +30,4 @@ def mute_tf():
     disable tensorflow logging information
     call this before you import tensorflow
     """
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"

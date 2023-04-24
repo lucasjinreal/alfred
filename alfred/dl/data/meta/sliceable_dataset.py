@@ -8,14 +8,14 @@ from .dataset_mixin import DatasetMixin
 def _is_iterable(x):
     if isinstance(x, str):
         return False
-    return hasattr(x, '__iter__')
+    return hasattr(x, "__iter__")
 
 
 def _as_tuple(t):
     if _is_iterable(t):
         return tuple(t)
     else:
-        return t,
+        return (t,)
 
 
 def _bool_to_indices(indices, len_):
@@ -29,7 +29,8 @@ def _bool_to_indices(indices, len_):
 
     if not len(indices) == len_:
         raise ValueError(
-            'The number of booleans is different from the length of dataset')
+            "The number of booleans is different from the length of dataset"
+        )
     return true_indices
 
 
@@ -44,13 +45,15 @@ def _as_key_indices(keys, key_names):
                 key_index += len(key_names)
             if key_index not in range(0, len(key_names)):
                 raise IndexError(
-                    'index {} is out of bounds for keys with size {}'.format(
-                        key, len(key_names)))
+                    "index {} is out of bounds for keys with size {}".format(
+                        key, len(key_names)
+                    )
+                )
         else:
             try:
                 key_index = key_names.index(key)
             except ValueError:
-                raise KeyError('{} does not exists'.format(key))
+                raise KeyError("{} does not exists".format(key))
         yield key_index
 
 
@@ -94,8 +97,7 @@ class SliceableDataset(DatasetMixin):
 
     def get_example(self, index):
         if isinstance(self.keys, tuple):
-            return self.get_example_by_keys(
-                index, tuple(range(len(self.keys))))
+            return self.get_example_by_keys(index, tuple(range(len(self.keys))))
         else:
             return self.get_example_by_keys(index, (0,))[0]
 
@@ -126,8 +128,10 @@ class SliceHelper(object):
         return_tuple = _is_iterable(keys)
 
         return SlicedDataset(
-            self._dataset, indices,
-            tuple(key_indices) if return_tuple else key_indices[0])
+            self._dataset,
+            indices,
+            tuple(key_indices) if return_tuple else key_indices[0],
+        )
 
 
 class SlicedDataset(SliceableDataset):
@@ -156,15 +160,13 @@ class SlicedDataset(SliceableDataset):
     def get_example_by_keys(self, index, key_indices):
         if isinstance(key_indices, tuple):
             key_indices = tuple(
-                _as_tuple(self._key_indices)[key_index]
-                for key_index in key_indices)
+                _as_tuple(self._key_indices)[key_index] for key_index in key_indices
+            )
         else:
             key_indices = _as_tuple(self._key_indices)[key_indices]
 
         if isinstance(self._indices, slice):
             start, _, step = self._indices.indices(len(self._dataset))
-            return self._dataset.get_example_by_keys(
-                start + index * step, key_indices)
+            return self._dataset.get_example_by_keys(start + index * step, key_indices)
         else:
-            return self._dataset.get_example_by_keys(
-                self._indices[index], key_indices)
+            return self._dataset.get_example_by_keys(self._indices[index], key_indices)

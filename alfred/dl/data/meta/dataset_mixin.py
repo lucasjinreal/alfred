@@ -3,6 +3,7 @@ import six
 
 # below code from Chianer
 
+
 class DatasetMixin(object):
 
     """Default implementation of dataset indexing.
@@ -60,8 +61,7 @@ class DatasetMixin(object):
         """
         if isinstance(index, slice):
             current, stop, step = index.indices(len(self))
-            return [self.get_example(i) for i in
-                    six.moves.range(current, stop, step)]
+            return [self.get_example(i) for i in six.moves.range(current, stop, step)]
         elif isinstance(index, list) or isinstance(index, numpy.ndarray):
             return [self.get_example(i) for i in index]
         else:

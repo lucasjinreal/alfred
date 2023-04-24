@@ -1,5 +1,3 @@
-
-
 """
 
 Converting standared Yolo format to VOC format
@@ -41,7 +39,7 @@ import glob
 
 
 CLASS_MAPPING = {
-    '0': 'name'
+    "0": "name"
     # Add your remaining classes here.
 }
 
@@ -83,12 +81,11 @@ def read_file(file_path, des_dir, img_dir, classes_names):
     file_prefix = os.path.basename(file_path).split(".txt")[0]
     image_file_name = "{}.jpg".format(file_prefix)
     img_p = os.path.join(img_dir, image_file_name)
-    assert os.path.exists(
-        img_p), 'make sure all images under: {}'.format(img_dir)
+    assert os.path.exists(img_p), "make sure all images under: {}".format(img_dir)
     img = Image.open(img_p)
 
     w, h = img.size
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         lines = file.readlines()
         voc_labels = []
         for line in lines:
@@ -104,8 +101,8 @@ def read_file(file_path, des_dir, img_dir, classes_names):
             bbox_height = float(data[4]) * h
             cx = float(data[1]) * w
             cy = float(data[2]) * h
-            x = cx - bbox_width/2
-            y = cy - bbox_height/2
+            x = cx - bbox_width / 2
+            y = cy - bbox_height / 2
             voc.append(x)
             voc.append(y)
             voc.append(x + (bbox_width))
@@ -119,13 +116,13 @@ def yolo2voc(img_dir, txt_dir, class_txt):
     # TODO: need apply a map to mapping yolo label back
     classes_names = None
     if class_txt:
-        classes_names = [i.strip() for i in open(class_txt, 'r').readlines()]
-    des_d = 'Annotations_yolo_converted_for_voc'
-    des_d = os.path.join(os.path.dirname(txt_dir.rstrip('/')), des_d)
-    print('VOC Annotations will saved into: {}'.format(des_d))
+        classes_names = [i.strip() for i in open(class_txt, "r").readlines()]
+    des_d = "Annotations_yolo_converted_for_voc"
+    des_d = os.path.join(os.path.dirname(txt_dir.rstrip("/")), des_d)
+    print("VOC Annotations will saved into: {}".format(des_d))
     os.makedirs(des_d, exist_ok=True)
-    txts = glob.glob(os.path.join(txt_dir.rstrip('/'), '*.txt'))
-    print('found {} text files in yolo format.'.format(len(txts)))
+    txts = glob.glob(os.path.join(txt_dir.rstrip("/"), "*.txt"))
+    print("found {} text files in yolo format.".format(len(txts)))
     for filename in txts:
         read_file(filename, des_d, img_dir, classes_names)
 

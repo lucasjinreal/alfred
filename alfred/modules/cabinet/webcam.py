@@ -34,8 +34,7 @@ from colorama import Fore, Back, Style
 
 def webcam_test(vf):
     if vf is not None and os.path.isfile(vf):
-        print(Fore.CYAN + 'webcam on: ',
-              Style.RESET_ALL, vf, ' press q to quit.')
+        print(Fore.CYAN + "webcam on: ", Style.RESET_ALL, vf, " press q to quit.")
         cap = cv.VideoCapture(vf)
         while cap.isOpend():
             ret, frame = cap.read()
@@ -50,10 +49,10 @@ def webcam_test(vf):
             counts, objects, peaks = parse_objects(cmap, paf)
             draw_objects(frame, counts, objects, peaks)
 
-            cv.imshow('res', frame)
+            cv.imshow("res", frame)
             cv.waitKey(1)
     else:
-        print(Fore.CYAN + 'test webcam, press q to quit.', Style.RESET_ALL)
+        print(Fore.CYAN + "test webcam, press q to quit.", Style.RESET_ALL)
         cap = cv.VideoCapture(0)
         while cap.isOpened():
             ret, frame = cap.read()
@@ -61,6 +60,6 @@ def webcam_test(vf):
             if not ret:
                 break
 
-            cv.imshow('Webcam', frame)
-            if cv.waitKey(1) == ord('q'):
+            cv.imshow("Webcam", frame)
+            if cv.waitKey(1) == ord("q"):
                 break

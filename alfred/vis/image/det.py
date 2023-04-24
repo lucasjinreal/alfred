@@ -528,17 +528,19 @@ def visualize_det_cv2_part(
         if cls_ids is None:
             # not class id, using default name, assue only 1 class
             if class_names is None:
-                class_names = ['object']
+                class_names = ["object"]
             if class_names[0] not in dynamic_cls_name_color_map.keys():
-                dynamic_cls_name_color_map[class_names[0]] = colors(np.random.choice(global_random_choices_for_u))
+                dynamic_cls_name_color_map[class_names[0]] = colors(
+                    np.random.choice(global_random_choices_for_u)
+                )
             force_color = [dynamic_cls_name_color_map[class_names[0]]]
             # class_names.insert(0, 'none')
-    
+
     for i in range(n_boxes):
         if cls_ids is not None:
             cls_id = int(cls_ids[i])
         else:
-            cls_id = 0 # fake id, assume just one class
+            cls_id = 0  # fake id, assume just one class
         if cls_id != background_id:
             if scores is not None:
                 if scores[i] > thresh:
@@ -620,8 +622,14 @@ def visualize_det_cv2_part(
                     if transparent:
                         cv2.rectangle(
                             img_mask,
-                            (txt_bottom_left[0], txt_bottom_left[1] - ret_val[1] - delta),
-                            (txt_bottom_left[0] + ret_val[0], txt_bottom_left[1] + delta),
+                            (
+                                txt_bottom_left[0],
+                                txt_bottom_left[1] - ret_val[1] - delta,
+                            ),
+                            (
+                                txt_bottom_left[0] + ret_val[0],
+                                txt_bottom_left[1] + delta,
+                            ),
                             unique_color,
                             -1,
                             cv2.LINE_AA,
@@ -629,8 +637,14 @@ def visualize_det_cv2_part(
                     else:
                         cv2.rectangle(
                             img,
-                            (txt_bottom_left[0], txt_bottom_left[1] - ret_val[1] - delta),
-                            (txt_bottom_left[0] + ret_val[0], txt_bottom_left[1] + delta),
+                            (
+                                txt_bottom_left[0],
+                                txt_bottom_left[1] - ret_val[1] - delta,
+                            ),
+                            (
+                                txt_bottom_left[0] + ret_val[0],
+                                txt_bottom_left[1] + delta,
+                            ),
                             unique_color,
                             -1,
                             cv2.LINE_AA,
@@ -702,9 +716,9 @@ def visualize_det_cv2_part(
                     text_label = "{}".format(class_names[cls_id])
                 else:
                     text_label = "{}".format(cls_id)
-                
+
                 if track_ids:
-                    text_label += ' ID: {}'.format(track_ids[i])
+                    text_label += " ID: {}".format(track_ids[i])
 
                 (ret_val, _) = cv2.getTextSize(
                     text_label, font, font_scale, font_thickness
@@ -928,18 +942,14 @@ def draw_one_3d_box_cv2(
             x = np.append(
                 box_3d[
                     0,
-                    face_idx[
-                        i,
-                    ],
+                    face_idx[i,],
                 ],
                 box_3d[0, face_idx[i, 0]],
             )
             y = np.append(
                 box_3d[
                     1,
-                    face_idx[
-                        i,
-                    ],
+                    face_idx[i,],
                 ],
                 box_3d[1, face_idx[i, 0]],
             )

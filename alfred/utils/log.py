@@ -37,8 +37,8 @@ def init_logger():
 def formatter(record):
     # package_name = get_package_name()
     filename = record["file"].name
-    if len(record['file'].name) > 17:
-        filename = record["file"].name[:12] + '..' + record["file"].name[-3:]
+    if len(record["file"].name) > 17:
+        filename = record["file"].name[:12] + ".." + record["file"].name[-3:]
     record["extra"].update(filename=filename)
     return "{time:HH:mm:ss MM.DD} <lvl>{level}</lvl> {extra[filename]}:{line}]: {message}\n{exception}"
 

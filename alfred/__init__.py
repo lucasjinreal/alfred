@@ -24,6 +24,7 @@
 #
 """Bring in all of the public Alfred interface into this module."""
 import importlib
+
 # pylint: disable=g-bad-import-order
 
 from .modules import *
@@ -34,4 +35,4 @@ from .utils.log import logger
 from .dl.torch.common import device
 from .utils.progress import pbar, prange
 
-globals().update(importlib.import_module('alfred').__dict__)
+globals().update(importlib.import_module("alfred").__dict__)
