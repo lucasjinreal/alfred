@@ -11,3 +11,4 @@ vendor/
 a.py
 __pycache__/vendor/
 upload_tpi.sh
+__pycache__/

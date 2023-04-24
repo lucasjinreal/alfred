@@ -41,7 +41,11 @@ class SkelModel:
             self.nJoints = nJoints
             self.kintree = kintree
         else:
-            config = CONFIG[body_type]
+            if body_type in CONFIG.keys():
+                config = CONFIG[body_type]
+            else:
+                print(f'support body_type: {CONFIG.keys()}')
+                exit(0)
             self.nJoints = config['nJoints']
             self.kintree = config['kintree']
         self.body_type = body_type

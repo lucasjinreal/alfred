@@ -7,12 +7,11 @@ from queue import Queue
 import cv2
 import numpy as np
 import os
-
+from alfred import logger
 
 def log(x):
     from datetime import datetime
-    time_now = datetime.now().strftime("%m-%d-%H:%M:%S.%f ")
-    print(time_now + x)
+    logger.info(x)
 
 
 def myarray2string(array, separator=', ', fmt='%.3f', indent=8):
@@ -109,7 +108,7 @@ class BaseSocketClient:
 class BaseSocket:
     def __init__(self, host, port, debug=False) -> None:
         # 创建 socket 对象
-        print('[Info] server start')
+        logger.info('[Info] server start')
         serversocket = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM)
         serversocket.bind((host, port))
@@ -120,6 +119,7 @@ class BaseSocket:
         self.t.start()
         self.debug = debug
         self.disconnect = False
+        self.failure_attempts = 0
 
     @staticmethod
     def recvLine(sock):
@@ -144,20 +144,28 @@ class BaseSocket:
 
     def run(self):
         while True:
-            clientsocket, addr = self.serversocket.accept()
-            print("[Info] Connect: %s" % str(addr))
-            self.disconnect = False
-            while True:
-                flag, l = self.recvLine(clientsocket)
-                if not flag:
-                    print("[Info] Disonnect: %s" % str(addr))
-                    self.disconnect = True
+            try:
+                clientsocket, addr = self.serversocket.accept()
+                logger.info("[Info] Connect: %s" % str(addr))
+                self.disconnect = False
+                while True:
+                    flag, l = self.recvLine(clientsocket)
+                    if not flag:
+                        logger.info("[Info] Disonnect: %s" % str(addr))
+                        self.disconnect = True
+                        break
+                    data = self.recvAll(clientsocket, l)
+                    if self.debug:
+                        log('[Info] Recv data')
+                    self.queue.put(data)
+                clientsocket.close()
+            except Exception as e:
+                logger.error(e)
+                self.failure_attempts += 1
+                self.disconnect = True
+                if self.failure_attempts > 10:
+                    logger.info('maxium failure attempts got. exiting.')
                     break
-                data = self.recvAll(clientsocket, l)
-                if self.debug:
-                    log('[Info] Recv data')
-                self.queue.put(data)
-            clientsocket.close()
 
     def update(self):
         time.sleep(1)
@@ -167,8 +175,12 @@ class BaseSocket:
             self.main(data)
 
     def main(self, datas):
-        print(datas)
-
+        logger.info(datas)
+    
+    def close_conn(self):
+        self.serversocket.close()
+        self.t.join()
+        
     def __del__(self):
         self.serversocket.close()
         self.t.join()

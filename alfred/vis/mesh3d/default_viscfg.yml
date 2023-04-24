@@ -22,31 +22,31 @@ body_model:
 camera:
   phi: 0
   theta: -30
-  cx: 0.
-  cy: 0.
-  cz: 6.
+  cx: 3.
+  cy: 5.
+  cz: 10.
 
 scene:
   - module: "alfred.vis.mesh3d.o3dwrapper.create_coord"
     args:
       camera: [0, 0, 0]
-      radius: 1.
-      scale: 1.
-  - module: "alfred.vis.mesh3d.o3dwrapper.create_bbox"
-    args:
-      min_bound: [-3, -3, 0]
-      max_bound: [3, 3, 2]
-      flip: False
+      radius: 1.6
+      scale: 1.3
+  # - module: "alfred.vis.mesh3d.o3dwrapper.create_bbox"
+  #   args:
+  #     min_bound: [-6, -6, 0]
+  #     max_bound: [6, 6, 2]
+  #     flip: False
   - module: "alfred.vis.mesh3d.o3dwrapper.create_ground"
     args:
       center: [0, 0, 0]
       xdir: [1, 0, 0]
       ydir: [0, 1, 0]
       step: 1
-      xrange: 4
-      yrange: 4
+      xrange: 5
+      yrange: 5
       white: [1., 1., 1.]
-      black: [0.,0.,0.]
+      black: [0.5,0.5,0.5]
       two_sides: True
 
 range:

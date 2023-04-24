@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 from os.path import join
+from alfred import logger
 
 
 def load_sphere():
@@ -77,7 +78,7 @@ def create_ground_(
         center = np.array(center)
         xdir = np.array(xdir)
         ydir = np.array(ydir)
-    print('[Vis Info] {}, x: {}, y: {}'.format(center, xdir, ydir))
+    logger.info('[Vis Info] {}, x: {}, y: {}'.format(center, xdir, ydir))
     xdir = xdir * step
     ydir = ydir * step
     vertls, trils, colls = [], [], []

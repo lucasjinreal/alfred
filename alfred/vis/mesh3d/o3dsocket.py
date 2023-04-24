@@ -14,6 +14,7 @@ from .utils import get_rgb_01
 from alfred.utils.base_config import load_object
 import copy
 from .o3d_visconfig import Config as DefaultConfig
+from alfred import logger
 
 rotate = False
 
@@ -38,12 +39,12 @@ class VisOpen3DSocket(BaseSocket):
         self.out = cfg.out
         self.cfg = cfg
         if self.write:
-            print('[Info] capture the screen to {}'.format(self.out))
+            logger.info('[Info] capture the screen to {}'.format(self.out))
             os.makedirs(self.out, exist_ok=True)
         # scene
         vis = o3d.visualization.VisualizerWithKeyCallback()
         vis.register_key_callback(ord('A'), o3d_callback_rotate)
-        vis.create_window(window_name='Visualizer',
+        vis.create_window(window_name='Alfred Open3D 3D Keypoints Visualizer',
                           width=cfg.width, height=cfg.height)
         self.vis = vis
         # load the scene
@@ -85,6 +86,10 @@ class VisOpen3DSocket(BaseSocket):
         self.previous = {}
         self.critrange = CritRange(**cfg.range)
         self.new_frames = cfg.new_frames
+    
+    def close(self):
+        self.vis.close()
+        self.close_conn()
 
     def add_human(self, zero_params):
         vertices = self.body_model(
@@ -202,7 +207,7 @@ class VisOpen3DSocket(BaseSocket):
             self.previous.clear()
         if not self.queue.empty():
             if self.debug:
-                log('Update' + str(self.queue.qsize()))
+                logger.info('Update' + str(self.queue.qsize()))
             datas = self.queue.get()
             if not self.block:
                 while self.queue.qsize() > 0:
