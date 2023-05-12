@@ -39,10 +39,10 @@ from natsort import natsorted
 
 class VideoCombiner(object):
     def __init__(self, img_dir):
-        self.img_dir = img_dir
+        self.img_dir = os.path.abspath(img_dir)
 
         if not os.path.exists(self.img_dir):
-            print(Fore.RED + "=> Error: " + "{} not exist.".format(self.img_dir))
+            print(Fore.RED + "=> Error: " + "img_dir {} not exist.".format(self.img_dir))
             exit(0)
 
         self._get_video_shape()

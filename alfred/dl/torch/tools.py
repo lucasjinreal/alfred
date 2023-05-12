@@ -86,12 +86,18 @@ def check_tensor_equal(t_a, t_b, epsilon=1e-5):
         return res2, res
 
 
-def torch_load_state_dict_without_module(ckp_file):
+def torch_load_state_dict_without_module(ckp_file, map_location='cpu', specific_key=None):
     """
     this function using for load a model without module
     """
-    checkpoint = torch.load(ckp_file)
-    state_dict = checkpoint["state_dict"]
+    checkpoint = torch.load(ckp_file, map_location=map_location)
+    if 'state_dict' in checkpoint.keys():
+        state_dict = checkpoint["state_dict"]
+    else:
+        if specific_key is not None and specific_key in checkpoint.keys():
+            state_dict = checkpoint[specific_key]
+        else:
+            state_dict = checkpoint
 
     new_state_dict = OrderedDict()
     for k, v in state_dict.items():

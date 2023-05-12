@@ -483,7 +483,7 @@ def main(args=None):
                     )
                     video_reducer = VideoReducer(jump_frames=j)
                     video_reducer.act(v_f)
-                elif action == "2video":
+                elif action == "2video" or action == 'tovideo':
                     d = args_dict["dir"]
                     combiner = VideoCombiner(img_dir=d)
                     print(Fore.BLUE + Style.BRIGHT + "Combine video from {}".format(d))

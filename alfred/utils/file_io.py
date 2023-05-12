@@ -889,3 +889,12 @@ def get_next_frame(iter):
     if os.path.isfile(itm):
         itm = cv.imread(itm)
     return itm
+
+
+def get_new_video_writter(new_width, new_height, fps=30, save_f=None):
+    """
+    for users want save a video with new width and height
+    """
+    fourcc = cv.VideoWriter_fourcc(*"XVID")
+    video_writter = cv.VideoWriter(save_f, fourcc, fps, (new_width, new_height))
+    return video_writter
