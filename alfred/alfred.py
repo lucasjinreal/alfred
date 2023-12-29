@@ -490,7 +490,8 @@ def main(args=None):
             elif module == "ps":
                 r = args_dict["remote"]
                 o = args_dict["origin"]
-                os.system(f"git commit -am 'add from alfred auto' && git push {o} {r}")
+                os.system("git commit -am 'add from alfred auto'")
+                os.system(f"git push {o} {r}")
             elif module == "vision":
                 if action == "extract":
                     v_f = args_dict["video"]
