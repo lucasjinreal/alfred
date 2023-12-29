@@ -493,9 +493,9 @@ def main(args=None):
             elif module == "ps":
                 r = args_dict["remote"]
                 o = args_dict["origin"]
-                if r == 'main' or r == 'master':
-                    o = r
-                    r = 'origin'
+                if o == 'main' or r == 'master':
+                    r = o
+                    o = 'origin'
                 os.system("git commit -am 'add from alfred auto'")
                 os.system(f"git push {o} {r}")
             elif module == "vision":
