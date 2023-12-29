@@ -493,8 +493,7 @@ def main(args=None):
             elif module == "ps":
                 r = args_dict["remote"]
                 o = args_dict["origin"]
-                print(o, r)
-                if o == 'main' or r == 'master':
+                if o == 'main' or o == 'master':
                     r = o
                     o = 'origin'
                     print('call: ', f"git push {o} {r}")
