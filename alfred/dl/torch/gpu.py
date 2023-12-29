@@ -18,13 +18,15 @@ def get_gpu_prop(show=True):
     properties = []
     for dev in range(ngpus):
         prop = torch.cuda.get_device_properties(dev)
-        properties.append({
-            "name": prop.name,
-            "capability": [prop.major, prop.minor],
-            # unit GB
-            "total_momory": round(prop.total_memory / 1073741824, 2),
-            "sm_count": prop.multi_processor_count
-        })
+        properties.append(
+            {
+                "name": prop.name,
+                "capability": [prop.major, prop.minor],
+                # unit GB
+                "total_momory": round(prop.total_memory / 1073741824, 2),
+                "sm_count": prop.multi_processor_count,
+            }
+        )
 
     if show:
         print("cuda: {}".format(torch.cuda.is_available()))

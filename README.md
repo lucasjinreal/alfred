@@ -129,6 +129,10 @@ A glance of alfred, after you installed above package, you will have `alfred`:
 `alfred-py`　has been updating for 3 years, and it will keep going!
 
 - **2050-xxx**: *to be continue*;
+- **2023.04.28**: Update the 3d keypoints visualizer, now you can visualize Human3DM kpts in realtime:
+  ![](https://user-images.githubusercontent.com/21303438/233925339-95eddad2-1441-4567-8a15-a2364b76ce70.gif)
+  For detailes reference to `examples/demo_o3d_server.py`.
+  The result is generated from MotionBert.
 - **2022.01.18**: Now alfred support a Mesh3D visualizer server based on Open3D:
   ```python
   from alfred.vis.mesh3d.o3dsocket import VisOpen3DSocket

@@ -24,7 +24,9 @@ import pycuda.autoinit
 try:
     import cupy as cp
 except ImportError:
-    print('You should install cupy for preprocess with CUDA: https://docs.cupy.dev/en/stable/install.html')
+    print(
+        "You should install cupy for preprocess with CUDA: https://docs.cupy.dev/en/stable/install.html"
+    )
 # from cupy.core.dlpack import toDlpack
 # from cupy.core.dlpack import fromDlpack
 from torch.utils.dlpack import to_dlpack
@@ -33,15 +35,15 @@ from alfred.dl.torch.common import device
 
 
 def preprocess_np(img_path):
-    '''process use numpy
-    '''
+    """process use numpy"""
     im = Image.open(img_path)
     img = im.resize((800, 800), Image.BILINEAR)
     img = np.array(img).astype(np.float32) / 255.0
     img = img.transpose(2, 0, 1)
     # print(img.shape)
-    img = (img - np.array([[[0.485]], [[0.456]], [[0.406]]])
-           )/np.array([[[0.229]], [[0.224]], [[0.225]]])
+    img = (img - np.array([[[0.485]], [[0.456]], [[0.406]]])) / np.array(
+        [[[0.229]], [[0.224]], [[0.225]]]
+    )
 
     # img = img.transpose(1,2,0)
     img = np.expand_dims(img, axis=0)
@@ -52,9 +54,9 @@ def preprocess_np(img_path):
 
 
 class PyTorchTensorHolder(pycuda.driver.PointerHolderBase):
-    '''代码来源:
-        https://github.com/NVIDIA/trt-samples-for-hackathon-cn/blob/master/python/app_onnx_resnet50.py
-    '''
+    """代码来源:
+    https://github.com/NVIDIA/trt-samples-for-hackathon-cn/blob/master/python/app_onnx_resnet50.py
+    """
 
     def __init__(self, tensor):
         super(PyTorchTensorHolder, self).__init__()
@@ -64,16 +66,17 @@ class PyTorchTensorHolder(pycuda.driver.PointerHolderBase):
         return self.tensor.data_ptr()
 
 
-transform = T.Compose([
-    T.Resize((800, 800)),  # PIL.Image.BILINEAR
-    T.ToTensor(),
-    # T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-])
+transform = T.Compose(
+    [
+        T.Resize((800, 800)),  # PIL.Image.BILINEAR
+        T.ToTensor(),
+        # T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ]
+)
 
 
 def preprocess_torch(img_path):
-    '''process use torchvision
-    '''
+    """process use torchvision"""
     im = Image.open(img_path)
     img = transform(im).unsqueeze(0)
     img = PyTorchTensorHolder(img)

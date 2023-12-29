@@ -41,9 +41,9 @@ type_settings = {
     "java": {
         "extensions": [".java", ".scala", ".groovy", ".jape", ".js"],
         "keepFirst": None,
-        "blockCommentStartPattern": re.compile(r'^\s*/\*'),
-        "blockCommentEndPattern": re.compile(r'\*/\s*$'),
-        "lineCommentStartPattern": re.compile(r'\s*//'),
+        "blockCommentStartPattern": re.compile(r"^\s*/\*"),
+        "blockCommentEndPattern": re.compile(r"\*/\s*$"),
+        "lineCommentStartPattern": re.compile(r"\s*//"),
         "lineCommentEndPattern": None,
         "headerStartLine": "/*\n",
         "headerEndLine": " */\n",
@@ -52,111 +52,111 @@ type_settings = {
     },
     "script": {
         "extensions": [".sh", ".csh", ".py", ".pl"],
-        "keepFirst": re.compile(r'^#!|^# -\*-'),
+        "keepFirst": re.compile(r"^#!|^# -\*-"),
         "blockCommentStartPattern": None,
         "blockCommentEndPattern": None,
-        "lineCommentStartPattern": re.compile(r'\s*#'),
+        "lineCommentStartPattern": re.compile(r"\s*#"),
         "lineCommentEndPattern": None,
         "headerStartLine": "##\n",
         "headerEndLine": "##\n",
         "headerLinePrefix": "## ",
-        "headerLineSuffix": None
+        "headerLineSuffix": None,
     },
     "perl": {
         "extensions": [".pl"],
-        "keepFirst": re.compile(r'^#!|^# -\*-'),
+        "keepFirst": re.compile(r"^#!|^# -\*-"),
         "blockCommentStartPattern": None,
         "blockCommentEndPattern": None,
-        "lineCommentStartPattern": re.compile(r'\s*#'),
+        "lineCommentStartPattern": re.compile(r"\s*#"),
         "lineCommentEndPattern": None,
         "headerStartLine": "##\n",
         "headerEndLine": "##\n",
         "headerLinePrefix": "## ",
-        "headerLineSuffix": None
+        "headerLineSuffix": None,
     },
     "python": {
         "extensions": [".py"],
-        "keepFirst": re.compile(r'^#!|^# +pylint|^# +-\*-|^# +coding|^# +encoding'),
+        "keepFirst": re.compile(r"^#!|^# +pylint|^# +-\*-|^# +coding|^# +encoding"),
         "blockCommentStartPattern": None,
         "blockCommentEndPattern": None,
-        "lineCommentStartPattern": re.compile(r'\s*#'),
+        "lineCommentStartPattern": re.compile(r"\s*#"),
         "lineCommentEndPattern": None,
         "headerStartLine": "#\n",
         "headerEndLine": "#\n",
         "headerLinePrefix": "# ",
-        "headerLineSuffix": None
+        "headerLineSuffix": None,
     },
     "robot": {
         "extensions": [".robot"],
-        "keepFirst": re.compile(r'^#!|^# +pylint|^# +-\*-|^# +coding|^# +encoding'),
+        "keepFirst": re.compile(r"^#!|^# +pylint|^# +-\*-|^# +coding|^# +encoding"),
         "blockCommentStartPattern": None,
         "blockCommentEndPattern": None,
-        "lineCommentStartPattern": re.compile(r'\s*#'),
+        "lineCommentStartPattern": re.compile(r"\s*#"),
         "lineCommentEndPattern": None,
         "headerStartLine": None,
         "headerEndLine": None,
         "headerLinePrefix": "# ",
-        "headerLineSuffix": None
+        "headerLineSuffix": None,
     },
     "xml": {
         "extensions": [".xml"],
-        "keepFirst": re.compile(r'^\s*<\?xml.*\?>'),
-        "blockCommentStartPattern": re.compile(r'^\s*<!--'),
-        "blockCommentEndPattern": re.compile(r'-->\s*$'),
+        "keepFirst": re.compile(r"^\s*<\?xml.*\?>"),
+        "blockCommentStartPattern": re.compile(r"^\s*<!--"),
+        "blockCommentEndPattern": re.compile(r"-->\s*$"),
         "lineCommentStartPattern": None,
         "lineCommentEndPattern": None,
         "headerStartLine": "<!--\n",
         "headerEndLine": "  -->\n",
         "headerLinePrefix": "-- ",
-        "headerLineSuffix": None
+        "headerLineSuffix": None,
     },
     "sql": {
         "extensions": [".sql"],
         "keepFirst": None,
         "blockCommentStartPattern": None,  # re.compile('^\s*/\*'),
         "blockCommentEndPattern": None,  # re.compile(r'\*/\s*$'),
-        "lineCommentStartPattern": re.compile(r'\s*--'),
+        "lineCommentStartPattern": re.compile(r"\s*--"),
         "lineCommentEndPattern": None,
         "headerStartLine": "--\n",
         "headerEndLine": "--\n",
         "headerLinePrefix": "-- ",
-        "headerLineSuffix": None
+        "headerLineSuffix": None,
     },
     "c": {
         "extensions": [".c", ".cc", ".cpp", "c++", ".h", ".hpp"],
         "keepFirst": None,
-        "blockCommentStartPattern": re.compile(r'^\s*/\*'),
-        "blockCommentEndPattern": re.compile(r'\*/\s*$'),
-        "lineCommentStartPattern": re.compile(r'\s*//'),
+        "blockCommentStartPattern": re.compile(r"^\s*/\*"),
+        "blockCommentEndPattern": re.compile(r"\*/\s*$"),
+        "lineCommentStartPattern": re.compile(r"\s*//"),
         "lineCommentEndPattern": None,
         "headerStartLine": "/*\n",
         "headerEndLine": " */\n",
         "headerLinePrefix": " * ",
-        "headerLineSuffix": None
+        "headerLineSuffix": None,
     },
     "ruby": {
         "extensions": [".rb"],
         "keepFirst": "^#!",
-        "blockCommentStartPattern": re.compile('^=begin'),
-        "blockCommentEndPattern": re.compile(r'^=end'),
-        "lineCommentStartPattern": re.compile(r'\s*#'),
+        "blockCommentStartPattern": re.compile("^=begin"),
+        "blockCommentEndPattern": re.compile(r"^=end"),
+        "lineCommentStartPattern": re.compile(r"\s*#"),
         "lineCommentEndPattern": None,
         "headerStartLine": "##\n",
         "headerEndLine": "##\n",
         "headerLinePrefix": "## ",
-        "headerLineSuffix": None
+        "headerLineSuffix": None,
     },
     "csharp": {
         "extensions": [".cs"],
         "keepFirst": None,
         "blockCommentStartPattern": None,
         "blockCommentEndPattern": None,
-        "lineCommentStartPattern": re.compile(r'\s*//'),
+        "lineCommentStartPattern": re.compile(r"\s*//"),
         "lineCommentEndPattern": None,
         "headerStartLine": None,
         "headerEndLine": None,
         "headerLinePrefix": "// ",
-        "headerLineSuffix": None
+        "headerLineSuffix": None,
     },
     "vb": {
         "extensions": [".vb"],
@@ -168,7 +168,7 @@ type_settings = {
         "headerStartLine": None,
         "headerEndLine": None,
         "headerLinePrefix": "' ",
-        "headerLineSuffix": None
+        "headerLineSuffix": None,
     },
     "erlang": {
         "extensions": [".erl", ".src", ".config", ".schema"],
@@ -181,14 +181,15 @@ type_settings = {
         "headerEndLine": "%%\n%% %CopyrightEnd%\n\n",
         "headerLinePrefix": "%% ",
         "headerLineSuffix": None,
-    }
+    },
 }
 
 years_pattern = re.compile(
     r"(?<=Copyright\s*(?:\(\s*[Cc©]\s*\)\s*))?([0-9][0-9][0-9][0-9](?:-[0-9][0-9]?[0-9]?[0-9]?)?)",
-    re.IGNORECASE)
+    re.IGNORECASE,
+)
 licensePattern = re.compile(r"license", re.IGNORECASE)
-emptyPattern = re.compile(r'^\s*$')
+emptyPattern = re.compile(r"^\s*$")
 
 # maps each extension to its processing type. Filled from tpeSettings during initialization
 ext2type = {}
@@ -204,7 +205,9 @@ class DictArgs(argparse.Action):
         for value in values:
             n, v = value.split("=")
             if n not in type_settings:
-                LOGGER.error("No valid language '%s' to add additional file extensions for" % n)
+                LOGGER.error(
+                    "No valid language '%s' to add additional file extensions for" % n
+                )
             if v and "," in str(v):
                 dict_args[n] = v.split(",")
             else:
@@ -242,7 +245,7 @@ def read_template(template_file, vardict, safe_subst=False):
     :param safe_subst:
     :return: lines of the template, with variables replaced
     """
-    with open(template_file, 'r') as f:
+    with open(template_file, "r") as f:
         lines = f.readlines()
     if safe_subst:
         lines = [Template(line).safe_substitute(vardict) for line in lines]
@@ -268,7 +271,7 @@ def for_type(templatelines, ftype):
         lines.append(header_start_line)
     for line in templatelines:
         tmp = line
-        if header_line_prefix is not None and line == '\n':
+        if header_line_prefix is not None and line == "\n":
             tmp = header_line_prefix.rstrip() + tmp
         elif header_line_prefix is not None:
             tmp = header_line_prefix + tmp
@@ -281,7 +284,7 @@ def for_type(templatelines, ftype):
 
 
 ##
-def read_file(file, encoding='utf-8'):
+def read_file(file, encoding="utf-8"):
     """
     Read a file and return a dictionary with the following elements:
     :param file: the file to read
@@ -308,7 +311,7 @@ def read_file(file, encoding='utf-8'):
     if not ftype:
         return None
     settings = type_settings.get(ftype)
-    with open(file, 'r', encoding=encoding) as f:
+    with open(file, "r", encoding=encoding) as f:
         lines = f.readlines()
     # now iterate throw the lines and try to determine the various indies
     # first try to find the start of the header: skip over shebang or empty lines
@@ -329,38 +332,46 @@ def read_file(file, encoding='utf-8'):
         elif line_comment_start_pattern and line_comment_start_pattern.findall(line):
             head_start = i
             break
-        elif not block_comment_start_pattern and \
-                line_comment_start_pattern and \
-                line_comment_start_pattern.findall(line):
+        elif (
+            not block_comment_start_pattern
+            and line_comment_start_pattern
+            and line_comment_start_pattern.findall(line)
+        ):
             head_start = i
             break
         else:
             # we have reached something else, so no header in this file
             # logging.debug("Did not find the start giving up at line %s, line is >%s<",i,line)
-            return {"type": ftype,
-                    "lines": lines,
-                    "skip": skip,
-                    "headStart": None,
-                    "headEnd": None,
-                    "yearsLine": None,
-                    "settings": settings,
-                    "haveLicense": have_license
-                    }
+            return {
+                "type": ftype,
+                "lines": lines,
+                "skip": skip,
+                "headStart": None,
+                "headEnd": None,
+                "yearsLine": None,
+                "settings": settings,
+                "haveLicense": have_license,
+            }
         i = i + 1
-    LOGGER.debug("Found preliminary start at {}, i={}, lines={}".format(head_start, i, len(lines)))
+    LOGGER.debug(
+        "Found preliminary start at {}, i={}, lines={}".format(
+            head_start, i, len(lines)
+        )
+    )
     # now we have either reached the end, or we are at a line where a block start or line comment occurred
     # if we have reached the end, return default dictionary without info
     if i == len(lines):
         LOGGER.debug("We have reached the end, did not find anything really")
-        return {"type": ftype,
-                "lines": lines,
-                "skip": skip,
-                "headStart": head_start,
-                "headEnd": head_end,
-                "yearsLine": years_line,
-                "settings": settings,
-                "haveLicense": have_license
-                }
+        return {
+            "type": ftype,
+            "lines": lines,
+            "skip": skip,
+            "headStart": head_start,
+            "headEnd": head_end,
+            "yearsLine": years_line,
+            "settings": settings,
+            "haveLicense": have_license,
+        }
     # otherwise process the comment block until it ends
     if block_comment_start_pattern:
         LOGGER.debug("Found comment start, process until end")
@@ -369,61 +380,67 @@ def read_file(file, encoding='utf-8'):
             if licensePattern.findall(lines[j]):
                 have_license = True
             elif block_comment_end_pattern.findall(lines[j]):
-                return {"type": ftype,
-                        "lines": lines,
-                        "skip": skip,
-                        "headStart": head_start,
-                        "headEnd": j,
-                        "yearsLine": years_line,
-                        "settings": settings,
-                        "haveLicense": have_license
-                        }
+                return {
+                    "type": ftype,
+                    "lines": lines,
+                    "skip": skip,
+                    "headStart": head_start,
+                    "headEnd": j,
+                    "yearsLine": years_line,
+                    "settings": settings,
+                    "haveLicense": have_license,
+                }
             elif years_pattern.findall(lines[j]):
                 have_license = True
                 years_line = j
         # if we went through all the lines without finding an end, maybe we have some syntax error or some other
         # unusual situation, so lets return no header
         LOGGER.debug("Did not find the end of a block comment, returning no header")
-        return {"type": ftype,
-                "lines": lines,
-                "skip": skip,
-                "headStart": None,
-                "headEnd": None,
-                "yearsLine": None,
-                "settings": settings,
-                "haveLicense": have_license
-                }
+        return {
+            "type": ftype,
+            "lines": lines,
+            "skip": skip,
+            "headStart": None,
+            "headEnd": None,
+            "yearsLine": None,
+            "settings": settings,
+            "haveLicense": have_license,
+        }
     else:
         LOGGER.debug("ELSE1")
         for j in range(i, len(lines)):
-            if line_comment_start_pattern.findall(lines[j]) and licensePattern.findall(lines[j]):
+            if line_comment_start_pattern.findall(lines[j]) and licensePattern.findall(
+                lines[j]
+            ):
                 have_license = True
             elif not line_comment_start_pattern.findall(lines[j]):
                 LOGGER.debug("ELSE2")
-                return {"type": ftype,
-                        "lines": lines,
-                        "skip": skip,
-                        "headStart": i,
-                        "headEnd": j - 1,
-                        "yearsLine": years_line,
-                        "settings": settings,
-                        "haveLicense": have_license
-                        }
+                return {
+                    "type": ftype,
+                    "lines": lines,
+                    "skip": skip,
+                    "headStart": i,
+                    "headEnd": j - 1,
+                    "yearsLine": years_line,
+                    "settings": settings,
+                    "haveLicense": have_license,
+                }
             elif years_pattern.findall(lines[j]):
                 have_license = True
                 years_line = j
         # if we went through all the lines without finding the end of the block, it could be that the whole
         # file only consisted of the header, so lets return the last line index
         LOGGER.debug("RETURN")
-        return {"type": ftype,
-                "lines": lines,
-                "skip": skip,
-                "headStart": i,
-                "headEnd": len(lines) - 1,
-                "yearsLine": years_line,
-                "settings": settings,
-                "haveLicense": have_license
-                }
+        return {
+            "type": ftype,
+            "lines": lines,
+            "skip": skip,
+            "headStart": i,
+            "headEnd": len(lines) - 1,
+            "yearsLine": years_line,
+            "settings": settings,
+            "haveLicense": have_license,
+        }
 
 
 def make_backup(file, arguments):
@@ -438,7 +455,15 @@ def make_backup(file, arguments):
         copyfile(file, file + ".bak")
 
 
-def apply_license(owner, proj_n, year=None, url='google.com', files_dir='./', tmpl='apache-2', rm_old=True):
+def apply_license(
+    owner,
+    proj_n,
+    year=None,
+    url="google.com",
+    files_dir="./",
+    tmpl="apache-2",
+    rm_old=True,
+):
     """
     Apply new license to all files under target dir
     :param year:
@@ -452,10 +477,10 @@ def apply_license(owner, proj_n, year=None, url='google.com', files_dir='./', tm
     """
     if not year:
         year = datetime.now().year
-        logger.info('year not specific, using year: {}'.format(year))
-    logger.info('owner: {}'.format(owner))
-    logger.info('project name: {}'.format(proj_n))
-    logger.info('start apply license under: {}'.format(files_dir))
+        logger.info("year not specific, using year: {}".format(year))
+    logger.info("owner: {}".format(owner))
+    logger.info("project name: {}".format(proj_n))
+    logger.info("start apply license under: {}".format(files_dir))
     additional_extensions = []
     for t in type_settings:
         settings = type_settings[t]
@@ -463,7 +488,9 @@ def apply_license(owner, proj_n, year=None, url='google.com', files_dir='./', tm
         # if additional file extensions are provided by the user, they are "merged" here:
         if additional_extensions and t in additional_extensions:
             for aext in additional_extensions[t]:
-                LOGGER.debug("Enable custom file extension '%s' for language '%s'" % (aext, t))
+                LOGGER.debug(
+                    "Enable custom file extension '%s' for language '%s'" % (aext, t)
+                )
                 exts.append(aext)
 
         for ext in exts:
@@ -483,10 +510,12 @@ def apply_license(owner, proj_n, year=None, url='google.com', files_dir='./', tm
 
         # if we have a template name specified, try to get or load the template
         opt_tmpl = tmpl
-        LOGGER.info('using license TEMPLATE: {}'.format(tmpl))
+        LOGGER.info("using license TEMPLATE: {}".format(tmpl))
         # first get all the names of our own templates
         # for this get first the path of this file
-        templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
+        templates_dir = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), "templates"
+        )
         if not os.path.exists(templates_dir):
             LOGGER.error("can not found templates dir! {}".format(templates_dir))
             exit(-1)
@@ -512,11 +541,23 @@ def apply_license(owner, proj_n, year=None, url='google.com', files_dir='./', tm
                     LOGGER.info("Using file {}".format(os.path.abspath(opt_tmpl)))
                     template_lines = read_template(os.path.abspath(opt_tmpl), settings)
                 else:
-                    LOGGER.error("Not a built-in template and not a file, cannot proceed: {}".format(opt_tmpl))
-                    LOGGER.error("Built in templates: {}".format(", ".join([t[0] for t in templates])))
+                    LOGGER.error(
+                        "Not a built-in template and not a file, cannot proceed: {}".format(
+                            opt_tmpl
+                        )
+                    )
+                    LOGGER.error(
+                        "Built in templates: {}".format(
+                            ", ".join([t[0] for t in templates])
+                        )
+                    )
                     error = True
             else:
-                LOGGER.error("There are multiple matching template names: {}".format([t[0] for t in tmpls]))
+                LOGGER.error(
+                    "There are multiple matching template names: {}".format(
+                        [t[0] for t in tmpls]
+                    )
+                )
                 error = True
 
         if not error:
@@ -538,12 +579,17 @@ def apply_license(owner, proj_n, year=None, url='google.com', files_dir='./', tm
                 lines = finfo["lines"]
                 LOGGER.debug(
                     "Info for the file: headStart=%s, headEnd=%s, haveLicense=%s, skip=%s, len=%s, yearsline=%s",
-                    finfo["headStart"], finfo["headEnd"], finfo["haveLicense"], finfo["skip"], len(lines),
-                    finfo["yearsLine"])
+                    finfo["headStart"],
+                    finfo["headEnd"],
+                    finfo["haveLicense"],
+                    finfo["skip"],
+                    len(lines),
+                    finfo["yearsLine"],
+                )
                 # if we have a template: replace or add
                 if template_lines:
                     # make_backup(file, arguments)
-                    with open(file, 'w', encoding='utf-8') as fw:
+                    with open(file, "w", encoding="utf-8") as fw:
                         # if we found a header, replace it
                         # otherwise, add it after the lines to skip
                         head_start = finfo["headStart"]
@@ -551,16 +597,22 @@ def apply_license(owner, proj_n, year=None, url='google.com', files_dir='./', tm
                         have_license = finfo["haveLicense"]
                         ftype = finfo["type"]
                         skip = finfo["skip"]
-                        if head_start is not None and head_end is not None and have_license:
+                        if (
+                            head_start is not None
+                            and head_end is not None
+                            and have_license
+                        ):
                             LOGGER.debug("Replacing header in file {}".format(file))
                             # first write the lines before the header
                             fw.writelines(lines[0:head_start])
                             #  now write the new header from the template lines
                             fw.writelines(for_type(template_lines, ftype))
                             #  now write the rest of the lines
-                            fw.writelines(lines[head_end + 1:])
+                            fw.writelines(lines[head_end + 1 :])
                         else:
-                            LOGGER.debug("Adding header to file {}, skip={}".format(file, skip))
+                            LOGGER.debug(
+                                "Adding header to file {}, skip={}".format(file, skip)
+                            )
                             fw.writelines(lines[0:skip])
                             fw.writelines(for_type(template_lines, ftype))
                             fw.writelines(lines[skip:])
@@ -570,10 +622,14 @@ def apply_license(owner, proj_n, year=None, url='google.com', files_dir='./', tm
                     years_line = finfo["yearsLine"]
                     if years_line is not None:
                         # make_backup(file, arguments)
-                        with open(file, 'w', encoding='utf-8') as fw:
-                            LOGGER.debug("Updating years in file {} in line {}".format(file, years_line))
+                        with open(file, "w", encoding="utf-8") as fw:
+                            LOGGER.debug(
+                                "Updating years in file {} in line {}".format(
+                                    file, years_line
+                                )
+                            )
                             fw.writelines(lines[0:years_line])
                             fw.write(years_pattern.sub(year, lines[years_line]))
-                            fw.writelines(lines[years_line + 1:])
+                            fw.writelines(lines[years_line + 1 :])
     finally:
         logging.shutdown()

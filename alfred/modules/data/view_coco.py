@@ -165,12 +165,12 @@ def get_coco_info(ann_f):
     cats = coco.loadCats(coco.getCatIds())
 
     res = {}
-    res["class_names"] = [i['name'] for i in cats]
+    res["class_names"] = [i["name"] for i in cats]
 
     skeleton_dict = {}
     for c in cats:
         if "skeleton" in c.keys():
-            skeleton_dict[c['name']] = c["skeleton"]
+            skeleton_dict[c["name"]] = c["skeleton"]
     res["skeleton_dict"] = skeleton_dict
     return res
 
@@ -263,13 +263,17 @@ def vis_coco(coco_img_root, ann_f):
                     cv2.LINE_AA,
                 )
             cv2.imshow("rr", img)
-            cv2.waitKey(0)
+            ch = cv2.waitKey(0)
+            if ch == 27:
+                exit()
         else:
             im = cv2.imread(img_f)
             ori_im = showAnns(im, annos, True, cats)
             if ori_im is not None:
                 cv2.imshow("aa", ori_im)
-                cv2.waitKey(0)
+                ch = cv2.waitKey(0)
+                if ch == 27:
+                    exit()
             else:
                 I = Image.open(img_f)
                 plt.imshow(I)

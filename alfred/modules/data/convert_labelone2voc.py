@@ -55,67 +55,67 @@ import sys
 from PIL import Image
 
 try:
-  from lxml.etree import Element, SubElement, tostring, ElementTree, tostring
-  from lxml import etree
+    from lxml.etree import Element, SubElement, tostring, ElementTree, tostring
+    from lxml import etree
 except ImportError:
-  pass
+    pass
 
 
 def convert_one(a):
-    os.makedirs(os.path.dirname(a)+'_voc', exist_ok=True)
+    os.makedirs(os.path.dirname(a) + "_voc", exist_ok=True)
     d = json.load(open(a))
     print(d)
 
-    target_path = os.path.join(os.path.dirname(a)+'_voc', os.path.basename(a).split('.')[0]+'.xml')
-    img_path = os.path.join('images', d['imagePath'])
-    # convert xml 
+    target_path = os.path.join(
+        os.path.dirname(a) + "_voc", os.path.basename(a).split(".")[0] + ".xml"
+    )
+    img_path = os.path.join("images", d["imagePath"])
+    # convert xml
     if os.path.exists(img_path):
         im = Image.open(img_path)
         width = im.size[0]
         height = im.size[1]
-        node_root = Element('annotation')
-        node_folder = SubElement(node_root, 'folder')
-        node_folder.text = 'images'
-        node_filename = SubElement(node_root, 'filename')
-        node_filename.text = d['imagePath']
-        node_size = SubElement(node_root, 'size')
-        node_width = SubElement(node_size, 'width')
+        node_root = Element("annotation")
+        node_folder = SubElement(node_root, "folder")
+        node_folder.text = "images"
+        node_filename = SubElement(node_root, "filename")
+        node_filename.text = d["imagePath"]
+        node_size = SubElement(node_root, "size")
+        node_width = SubElement(node_size, "width")
         node_width.text = str(width)
-        node_height = SubElement(node_size, 'height')
+        node_height = SubElement(node_size, "height")
         node_height.text = str(height)
-        node_depth = SubElement(node_size, 'depth')
-        node_depth.text = '3'
-        
-        for item in d['shapes']:
-            node_object = SubElement(node_root, 'object')
-            node_name = SubElement(node_object, 'name')
-            node_name.text = item['label']
-            node_difficult = SubElement(node_object, 'difficult')
-            node_difficult.text = '0'
-            node_bndbox = SubElement(node_object, 'bndbox')
-            node_xmin = SubElement(node_bndbox, 'xmin')
-            node_xmin.text = str(item['points'][1][0])
-            node_ymin = SubElement(node_bndbox, 'ymin')
-            node_ymin.text = str(item['points'][1][1])
-            node_xmax = SubElement(node_bndbox, 'xmax')
-            node_xmax.text = str(item['points'][3][0])
-            node_ymax = SubElement(node_bndbox, 'ymax')
-            node_ymax.text = str(item['points'][3][1])
-        f = open(target_path, 'wb')
+        node_depth = SubElement(node_size, "depth")
+        node_depth.text = "3"
+
+        for item in d["shapes"]:
+            node_object = SubElement(node_root, "object")
+            node_name = SubElement(node_object, "name")
+            node_name.text = item["label"]
+            node_difficult = SubElement(node_object, "difficult")
+            node_difficult.text = "0"
+            node_bndbox = SubElement(node_object, "bndbox")
+            node_xmin = SubElement(node_bndbox, "xmin")
+            node_xmin.text = str(item["points"][1][0])
+            node_ymin = SubElement(node_bndbox, "ymin")
+            node_ymin.text = str(item["points"][1][1])
+            node_xmax = SubElement(node_bndbox, "xmax")
+            node_xmax.text = str(item["points"][3][0])
+            node_ymax = SubElement(node_bndbox, "ymax")
+            node_ymax.text = str(item["points"][3][1])
+        f = open(target_path, "wb")
         f.write(etree.tostring(node_root, pretty_print=True))
         f.close()
     else:
-        print('xxx {} annotations according image: {} not exist.'.format(a, img_path))
-
+        print("xxx {} annotations according image: {} not exist.".format(a, img_path))
 
 
 def run():
-    all_json_files = glob.glob(os.path.join(sys.argv[1], '*.json'))
+    all_json_files = glob.glob(os.path.join(sys.argv[1], "*.json"))
     print(len(all_json_files))
     for i in all_json_files:
         convert_one(i)
-    print('done!')
-
+    print("done!")
 
 
 if __name__ == "__main__":

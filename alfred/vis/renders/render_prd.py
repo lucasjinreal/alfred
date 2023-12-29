@@ -9,27 +9,25 @@ import trimesh
 
 # autopep8: off
 os_name = platform.platform().lower()
-if 'centos' in os_name or 'windows' in os_name or 'tlinux' in os_name:
-    os.environ['PYOPENGL_PLATFORM'] = 'egl'
-elif 'debian' in os_name or 'ubuntu' in os_name:
-    os.environ['PYOPENGL_PLATFORM'] = 'osmesa'
-print(os.environ['PYOPENGL_PLATFORM'])
+if "centos" in os_name or "windows" in os_name or "tlinux" in os_name:
+    os.environ["PYOPENGL_PLATFORM"] = "egl"
+elif "debian" in os_name or "ubuntu" in os_name:
+    os.environ["PYOPENGL_PLATFORM"] = "osmesa"
+print(os.environ["PYOPENGL_PLATFORM"])
 
 import pyrender
 from pyrender.constants import RenderFlags
 from pyrender.constants import DEFAULT_Z_NEAR
+
 # autopep8: on
 
 
 class WeakPerspectiveCamera(pyrender.Camera):
-    def __init__(self,
-                 scale,
-                 translation,
-                 znear=DEFAULT_Z_NEAR,
-                 zfar=None,
-                 name=None):
+    def __init__(self, scale, translation, znear=DEFAULT_Z_NEAR, zfar=None, name=None):
         super(WeakPerspectiveCamera, self).__init__(
-            znear=znear, zfar=zfar, name=name,
+            znear=znear,
+            zfar=zfar,
+            name=name,
         )
         self.scale = scale
         self.translation = translation
@@ -45,11 +43,18 @@ class WeakPerspectiveCamera(pyrender.Camera):
 
 
 class Renderer:
-    def __init__(self, smpl_faces, resolution=(224, 224), orig_img=False, wireframe=False, use_gpu=True):
+    def __init__(
+        self,
+        smpl_faces,
+        resolution=(224, 224),
+        orig_img=False,
+        wireframe=False,
+        use_gpu=True,
+    ):
         """
         resolution is: h, w
         """
-        self.name = 'pyrender'
+        self.name = "pyrender"
         self.resolution = resolution
         self.faces = smpl_faces
         self.orig_img = orig_img
@@ -61,7 +66,8 @@ class Renderer:
         )
         # set the scene
         self.scene = pyrender.Scene(
-            bg_color=[0.0, 0.0, 0.0, 0.0], ambient_light=(0.3, 0.3, 0.3))
+            bg_color=[0.0, 0.0, 0.0, 0.0], ambient_light=(0.3, 0.3, 0.3)
+        )
 
         # light = pyrender.PointLight(color=[1.0, 1.0, 1.0], intensity=0.8)
         light = pyrender.DirectionalLight(color=[1.0, 1.0, 1.0], intensity=0.8)
@@ -75,7 +81,7 @@ class Renderer:
 
         light_pose[:3, 3] = [1, 1, 2]
         self.scene.add(light, pose=light_pose)
-        print('render initiated.')
+        print("render initiated.")
 
     def render(
         self,
@@ -90,17 +96,15 @@ class Renderer:
     ):
         mesh = trimesh.Trimesh(vertices=verts, faces=self.faces, process=False)
 
-        Rx = trimesh.transformations.rotation_matrix(
-            math.radians(180), [1, 0, 0])
+        Rx = trimesh.transformations.rotation_matrix(math.radians(180), [1, 0, 0])
         mesh.apply_transform(Rx)
-        
+
         if rotate:
             rot = trimesh.transformations.rotation_matrix(np.radians(60), [0, 1, 0])
             mesh.apply_transform(rot)
 
         if angle and axis:
-            R = trimesh.transformations.rotation_matrix(
-                math.radians(angle), axis)
+            R = trimesh.transformations.rotation_matrix(math.radians(angle), axis)
             mesh.apply_transform(R)
 
         if mesh_filename is not None:
@@ -123,7 +127,7 @@ class Renderer:
         )
 
         mesh = pyrender.Mesh.from_trimesh(mesh, material=material)
-        mesh_node = self.scene.add(mesh, 'mesh')
+        mesh_node = self.scene.add(mesh, "mesh")
 
         camera_pose = np.eye(4)
         cam_node = self.scene.add(camera, pose=camera_pose)
@@ -140,7 +144,7 @@ class Renderer:
             image = output_img.astype(np.uint8)
         else:
             # rgb could be 3 channel output
-            valid_mask = (rgb > 0)
+            valid_mask = rgb > 0
             output_img = rgb * valid_mask + (1 - valid_mask) * img
             image = output_img.astype(np.uint8)
 

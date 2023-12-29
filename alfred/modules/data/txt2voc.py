@@ -31,7 +31,7 @@ import glob
 
 
 CLASS_MAPPING = {
-    '0': 'name'
+    "0": "name"
     # Add your remaining classes here.
 }
 
@@ -74,7 +74,7 @@ def read_file(file_path, des_dir):
     image_file_name = "{}.jpg".format(file_prefix)
     img = Image.open("{}/{}".format("images", image_file_name))
     w, h = img.size
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         lines = file.readlines()
         voc_labels = []
         for line in lines:
@@ -97,9 +97,9 @@ def read_file(file_path, des_dir):
 
 
 def start(dir_name):
-    des_d = 'output_xmls'
+    des_d = "output_xmls"
     os.makedirs(des_d, exist_ok=True)
-    txts = glob.glob(os.path.join(dir_name, '*.txt'))
+    txts = glob.glob(os.path.join(dir_name, "*.txt"))
     for filename in txts:
         read_file(filename, des_d)
 

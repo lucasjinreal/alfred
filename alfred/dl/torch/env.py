@@ -99,8 +99,12 @@ def setup_custom_environment(custom_module):
         module = _import_file("dl_lib.utils.env.custom_module", custom_module)
     else:
         module = importlib.import_module(custom_module)
-    assert hasattr(module, "setup_environment") and callable(module.setup_environment), (
+    assert hasattr(module, "setup_environment") and callable(
+        module.setup_environment
+    ), (
         "Custom environment module defined in {} does not have the "
         "required callable attribute 'setup_environment'."
-    ).format(custom_module)
+    ).format(
+        custom_module
+    )
     module.setup_environment()

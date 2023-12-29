@@ -26,6 +26,7 @@ from pytorch3d.renderer import (
     TexturesUV,
     TexturesVertex,
 )
+
 # from pytorch3d.io.mesh
 from pytorch3d.io import IO
 import numpy as np
@@ -67,10 +68,10 @@ class Renderer(nn.Module):
         use_gpu=False,
     ):
         super(Renderer, self).__init__()
-        self.name = 'pytorch3d'
+        self.name = "pytorch3d"
         self.perps = perps
         if use_gpu:
-            self.device = torch.device('cuda')
+            self.device = torch.device("cuda")
             print("visualize in gpu mode")
         else:
             self.device = torch.device("cpu")
@@ -79,15 +80,15 @@ class Renderer(nn.Module):
         if isinstance(faces, np.ndarray):
             faces = torch.from_numpy(faces.astype(np.float))
             faces.to(self.device)
-        self.faces = faces.unsqueeze(0).to(
-            self.device)  # add a BatchSize dim
+        self.faces = faces.unsqueeze(0).to(self.device)  # add a BatchSize dim
         self.default_color = torch.as_tensor(colors["neutral"]).unsqueeze(0)
-        print('default color: ', self.default_color.shape)
+        print("default color: ", self.default_color.shape)
         self.save_io = IO()
 
         if R is None:
             self.default_R = torch.Tensor(
-                [[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]])
+                [[[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]]
+            )
         if T is None:
             self.default_T = torch.Tensor([[0.0, 0.0, 0.0]])
         self.fov = 60
@@ -96,8 +97,11 @@ class Renderer(nn.Module):
             # self.cameras = FoVPerspectiveCameras(zfar=1000,
             #     R=self.default_R, T=self.default_T, fov=60, device=self.device
             # )
-            self.cameras = PerspectiveCameras(focal_length=5000,
-                R=self.default_R, T=self.default_T, device=self.device
+            self.cameras = PerspectiveCameras(
+                focal_length=5000,
+                R=self.default_R,
+                T=self.default_T,
+                device=self.device,
             )
             self.lights = PointLights(
                 ambient_color=((0.56, 0.56, 0.56),),
@@ -124,9 +128,11 @@ class Renderer(nn.Module):
         # 512x512. As we are rendering images for visualization purposes only we will set faces_per_pixel=1
         # and blur_radius=0.0.
         raster_settings = RasterizationSettings(
-            image_size=(resolution[0], resolution[1]), blur_radius=0.0, faces_per_pixel=1
+            image_size=(resolution[0], resolution[1]),
+            blur_radius=0.0,
+            faces_per_pixel=1,
         )
-        print('resolution: ', resolution)
+        print("resolution: ", resolution)
 
         # Create a Phong renderer by composing a rasterizer and a shader. The textured Phong shader will
         # interpolate the texture uv coordinates for each vertex, sample from a texture image and
@@ -142,31 +148,42 @@ class Renderer(nn.Module):
 
     # def render(self, img, verts, cam, angle=None, axis=None, mesh_filename=None, color=[1.0, 1.0, 0.9], rotate=False):
     def render(
-        self, img, verts, faces=None, color=None, 
+        self,
+        img,
+        verts,
+        faces=None,
+        color=None,
         camera_t=torch.zeros([1, 3, 3], dtype=torch.float32),
         camera_rot=torch.zeros([1, 3, 3], dtype=torch.float32),
         focal_length=1000,
-        merge_meshes=True, cam=None, mesh_filename=None, **kwargs
+        merge_meshes=True,
+        cam=None,
+        mesh_filename=None,
+        **kwargs,
     ):
-        assert len(
-            verts.shape) >= 2, f"The input verts of visualizer is bounded to be 3-dims (Nx6890 x3) tensor, but got: {verts.shape}"
+        assert (
+            len(verts.shape) >= 2
+        ), f"The input verts of visualizer is bounded to be 3-dims (Nx6890 x3) tensor, but got: {verts.shape}"
         if isinstance(verts, np.ndarray):
             verts = torch.from_numpy(verts)
         if len(verts.shape) == 2:
             verts = verts.unsqueeze(0)
         if faces is None:
             faces = self.faces
-        
+
         BS = verts.shape[0]
         if verts.shape[0] != faces.shape[0]:
             faces = faces.repeat(BS, 1, 1).to(self.device)
 
         verts = verts.to(self.device)
 
-        if isinstance(color, np.ndarray) or isinstance(color, tuple) or isinstance(color, list):
+        if (
+            isinstance(color, np.ndarray)
+            or isinstance(color, tuple)
+            or isinstance(color, list)
+        ):
             # color = torch.from_numpy(np.array(color)).to(self.device).unsqueeze(1)
-            color = torch.from_numpy(np.array(color)).to(
-                self.device).unsqueeze(0)
+            color = torch.from_numpy(np.array(color)).to(self.device).unsqueeze(0)
         elif color is None:
             color = self.default_color
 
@@ -191,8 +208,9 @@ class Renderer(nn.Module):
                 print(T)
                 # new_cam = FoVPerspectiveCameras(zfar=1000, znear=0.05,
                 #     R=self.default_R, T=T, fov=self.fov, device=self.device)
-                new_cam = PerspectiveCameras(focal_length=focal_length,
-                    R=self.default_R, T=T, device=self.device)
+                new_cam = PerspectiveCameras(
+                    focal_length=focal_length, R=self.default_R, T=T, device=self.device
+                )
             else:
                 R, T, xyz_ranges = cam
                 new_cam = FoVOrthographicCameras(
@@ -219,14 +237,12 @@ def get_renderer(test=False, **kwargs):
         print("dist:", dist)
         model = pickle.load(
             open(
-                os.path.join(args().smpl_model_path, "smpl",
-                             "SMPL_NEUTRAL.pkl"), "rb"
+                os.path.join(args().smpl_model_path, "smpl", "SMPL_NEUTRAL.pkl"), "rb"
             ),
             encoding="latin1",
         )
         np_v_template = (
-            torch.from_numpy(
-                np.array(model["v_template"])).cuda().float()[None]
+            torch.from_numpy(np.array(model["v_template"])).cuda().float()[None]
         )
         face = torch.from_numpy(model["f"].astype(np.int32)).cuda()[None]
         np_v_template = np_v_template.repeat(2, 1, 1)
@@ -236,8 +252,7 @@ def get_renderer(test=False, **kwargs):
         result = renderer(np_v_template, face).cpu().numpy()
         for ri in range(len(result)):
             cv2.imwrite(
-                "test{}.png".format(
-                    ri), (result[ri, :, :, :3] * 255).astype(np.uint8)
+                "test{}.png".format(ri), (result[ri, :, :, :3] * 255).astype(np.uint8)
             )
     return renderer
 

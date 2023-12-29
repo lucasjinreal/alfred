@@ -35,40 +35,47 @@ import numpy as np
 
 
 def split_txt_file(f, ratios, names):
-    assert os.path.exists(f), '{} not exist.'.format(f)
+    assert os.path.exists(f), "{} not exist.".format(f)
     if not ratios:
         ratios = [0.2, 0.8]
     else:
-        ratios = [float(i) for i in ratios.split(',')]
-    logging.info('split ratios: {}'.format(ratios))
+        ratios = [float(i) for i in ratios.split(",")]
+    logging.info("split ratios: {}".format(ratios))
 
     if not names:
-        names = ['part_{}'.format(i) for i in range(len(ratios))]
+        names = ["part_{}".format(i) for i in range(len(ratios))]
     else:
-        names = names.split(',')
-    names = [i+'.txt' for i in names]
-    logging.info('split save to names: {}'.format(names))
+        names = names.split(",")
+    names = [i + ".txt" for i in names]
+    logging.info("split save to names: {}".format(names))
 
     a = sum(ratios)
-    if a != 1.:
+    if a != 1.0:
         logging.info(
-            'ratios: {} does not sum to 1. you must change it first.'.format(ratios))
+            "ratios: {} does not sum to 1. you must change it first.".format(ratios)
+        )
         exit(1)
 
     # read txt file
-    with open(f, 'r') as f:
+    with open(f, "r") as f:
         lines = f.readlines()
-        lines_no_empty = [i for i in lines if i != '' and i != '\n']
-        logging.info('to split file have all {} lines. droped {} empty lines.'.format(len(lines),
-                                                                                      len(lines) - len(lines_no_empty)))
+        lines_no_empty = [i for i in lines if i != "" and i != "\n"]
+        logging.info(
+            "to split file have all {} lines. droped {} empty lines.".format(
+                len(lines), len(lines) - len(lines_no_empty)
+            )
+        )
         lines = lines_no_empty
         # split with ratios
         last_lines = 0
         for i, r in enumerate(ratios):
-            one = lines[last_lines: last_lines+int(r * len(lines))]
-            with open(names[i], 'w') as ff:
+            one = lines[last_lines : last_lines + int(r * len(lines))]
+            with open(names[i], "w") as ff:
                 ff.writelines(one)
-                logging.info('Part {} saved into: {}. portion: {}/{}={}'.format(
-                    i, names[i], len(one), len(lines), len(one)/(len(lines))))
+                logging.info(
+                    "Part {} saved into: {}. portion: {}/{}={}".format(
+                        i, names[i], len(one), len(lines), len(one) / (len(lines))
+                    )
+                )
             last_lines += len(one)
-    logging.info('split done.')
+    logging.info("split done.")

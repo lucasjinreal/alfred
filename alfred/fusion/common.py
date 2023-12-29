@@ -49,10 +49,7 @@ def draw_3d_box(pts, img, color=(255, 0, 255), thickness=1):
     if pts.shape != (8, 2):
         return
         # clockwise face idx
-    face_idx = [[0, 1, 5, 4],
-                [1, 2, 6, 5],
-                [2, 3, 7, 6],
-                [3, 0, 4, 7]]
+    face_idx = [[0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]]
     for ind_f in range(3, -1, -1):
         # 3, 2, 1, 0
         f = face_idx[ind_f]
@@ -60,12 +57,22 @@ def draw_3d_box(pts, img, color=(255, 0, 255), thickness=1):
         # indicates the direction
         for j in range(4):
             if ind_f == 0 and j == 0:
-                cv2.line(img, (pts[f[0], 0], pts[f[0], 1]),
-                         (pts[f[1], 0], pts[f[1], 1]), (255, 255, 0),
-                         thickness, lineType=cv2.LINE_AA)
-            cv2.line(img, (pts[f[j], 0], pts[f[j], 1]),
-                     (pts[f[(j + 1) % 4], 0], pts[f[(j + 1) % 4], 1]), color,
-                     thickness, lineType=cv2.LINE_AA)
+                cv2.line(
+                    img,
+                    (pts[f[0], 0], pts[f[0], 1]),
+                    (pts[f[1], 0], pts[f[1], 1]),
+                    (255, 255, 0),
+                    thickness,
+                    lineType=cv2.LINE_AA,
+                )
+            cv2.line(
+                img,
+                (pts[f[j], 0], pts[f[j], 1]),
+                (pts[f[(j + 1) % 4], 0], pts[f[(j + 1) % 4], 1]),
+                color,
+                thickness,
+                lineType=cv2.LINE_AA,
+            )
 
 
 def compute_3d_box_cam_coords(xyz, lwh, rotation_y):
@@ -99,11 +106,9 @@ def compute_3d_box_cam_coords(xyz, lwh, rotation_y):
     return corners_3d.transpose(1, 0)
 
 
-def compute_3d_box_lidar_coords(centers,
-                                dims,
-                                angles=None,
-                                origin=(0.5, 0.5, 0.5),
-                                axis=2):
+def compute_3d_box_lidar_coords(
+    centers, dims, angles=None, origin=(0.5, 0.5, 0.5), axis=2
+):
     corners = _corners_nd(dims, origin=origin)
     # corners: [N, 8, 3]
     if angles is not None:
@@ -120,24 +125,39 @@ def _rotation_3d_in_axis(points, angles, axis=0):
     ones = np.ones_like(rot_cos)
     zeros = np.zeros_like(rot_cos)
     if axis == 1:
-        rot_mat_T = np.stack([[rot_cos, zeros, -rot_sin], [zeros, ones, zeros],
-                              [rot_sin, zeros, rot_cos]])
+        rot_mat_T = np.stack(
+            [
+                [rot_cos, zeros, -rot_sin],
+                [zeros, ones, zeros],
+                [rot_sin, zeros, rot_cos],
+            ]
+        )
     elif axis == 2 or axis == -1:
-        rot_mat_T = np.stack([[rot_cos, -rot_sin, zeros],
-                              [rot_sin, rot_cos, zeros], [zeros, zeros, ones]])
+        rot_mat_T = np.stack(
+            [
+                [rot_cos, -rot_sin, zeros],
+                [rot_sin, rot_cos, zeros],
+                [zeros, zeros, ones],
+            ]
+        )
     elif axis == 0:
-        rot_mat_T = np.stack([[zeros, rot_cos, -rot_sin],
-                              [zeros, rot_sin, rot_cos], [ones, zeros, zeros]])
+        rot_mat_T = np.stack(
+            [
+                [zeros, rot_cos, -rot_sin],
+                [zeros, rot_sin, rot_cos],
+                [ones, zeros, zeros],
+            ]
+        )
     else:
         raise ValueError("axis should in range")
-    return np.einsum('aij,jka->aik', points, rot_mat_T)
+    return np.einsum("aij,jka->aik", points, rot_mat_T)
 
 
 def _corners_nd(dims, origin=0.5):
     ndim = int(dims.shape[1])
     corners_norm = np.stack(
-        np.unravel_index(np.arange(2 ** ndim), [2] * ndim),
-        axis=1).astype(dims.dtype)
+        np.unravel_index(np.arange(2**ndim), [2] * ndim), axis=1
+    ).astype(dims.dtype)
     # now corners_norm has format: (2d) x0y0, x0y1, x1y0, x1y1
     # (3d) x0y0z0, x0y0z1, x0y1z0, x0y1z1, x1y0z0, x1y0z1, x1y1z0, x1y1z1
     # so need to convert to a format which is convenient to do other computing.
@@ -149,6 +169,5 @@ def _corners_nd(dims, origin=0.5):
     elif ndim == 3:
         corners_norm = corners_norm[[0, 1, 3, 2, 4, 5, 7, 6]]
     corners_norm = corners_norm - np.array(origin, dtype=dims.dtype)
-    corners = dims.reshape([-1, 1, ndim]) * corners_norm.reshape(
-        [1, 2 ** ndim, ndim])
+    corners = dims.reshape([-1, 1, ndim]) * corners_norm.reshape([1, 2**ndim, ndim])
     return corners

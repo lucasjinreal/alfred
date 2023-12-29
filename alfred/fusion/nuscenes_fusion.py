@@ -42,11 +42,12 @@ def project_cam_coords_to_pixel(pts3d_cam, intrinsic):
     if pts3d_cam.shape[0] != 3:
         # if not hstack, try to transpose it
         pts3d_cam = pts3d_cam.T
-    assert pts3d_cam.shape[0] == 3, 'pts3d_cam must be 3 rows.'
-    assert intrinsic.shape == (3, 3), 'intrinsic should be 3x3.'
+    assert pts3d_cam.shape[0] == 3, "pts3d_cam must be 3 rows."
+    assert intrinsic.shape == (3, 3), "intrinsic should be 3x3."
     a = np.dot(intrinsic, pts3d_cam)
-    a = a/a[-1, :]
+    a = a / a[-1, :]
     return a.T[:, :2]
+
 
 # def compute_3d_box_cam_coords_nuscenes(xyz, lwh, quarternion):
 #     """
@@ -74,21 +75,21 @@ def project_cam_coords_to_pixel(pts3d_cam, intrinsic):
 
 def compute_3d_box_cam_coords_nuscenes(xyz, lwh, quarternion):
     """
-        nuScenes camera coordinates using -y as up
-        using quarternion represents rotation of box
+    nuScenes camera coordinates using -y as up
+    using quarternion represents rotation of box
 
-        only calculate rotation_y?: arcsin(2(wy-zx))
+    only calculate rotation_y?: arcsin(2(wy-zx))
     """
     # we get rotation_y from quarternion first
     if isinstance(quarternion, Quaternion):
         l, w, h = lwh[0], lwh[1], lwh[2]
         x_corners = [l / 2, l / 2, -l / 2, -l / 2, l / 2, l / 2, -l / 2, -l / 2]
         # y_corners = [0, 0, 0, 0, -h, -h, -h, -h]
-        y_corners = [-h/2, -h/2, -h/2, -h/2, h/2, h/2, h/2, h/2]
+        y_corners = [-h / 2, -h / 2, -h / 2, -h / 2, h / 2, h / 2, h / 2, h / 2]
         z_corners = [w / 2, -w / 2, -w / 2, w / 2, w / 2, -w / 2, -w / 2, w / 2]
         corners = np.array([x_corners, y_corners, z_corners], dtype=np.float32)
 
-        rotation_y = np.pi/2 - quarternion.radians
+        rotation_y = np.pi / 2 - quarternion.radians
         c, s = np.cos(rotation_y), np.sin(rotation_y)
         R = np.array([[c, 0, s], [0, 1, 0], [-s, 0, c]], dtype=np.float32)
 
@@ -96,8 +97,10 @@ def compute_3d_box_cam_coords_nuscenes(xyz, lwh, quarternion):
         corners_trans += [[i] for i in xyz]
         return corners_trans
     else:
-        raise ValueError('quarternion must be a Quaternion object, make sure '\
-            'you using pyquarternion.')
+        raise ValueError(
+            "quarternion must be a Quaternion object, make sure "
+            "you using pyquarternion."
+        )
 
 
 def load_pc_from_file(pc_f):

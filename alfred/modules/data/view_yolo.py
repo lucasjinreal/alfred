@@ -38,35 +38,48 @@ from alfred.utils.log import logger as logging
 
 
 def vis_det_yolo(img_root, label_root):
-    logging.info('img root: {}, label root: {}'.format(img_root, label_root))
+    logging.info("img root: {}, label root: {}".format(img_root, label_root))
     # auto detection .jpg or .png images
-    txt_files = glob(os.path.join(label_root, '*.txt'))
+    txt_files = glob(os.path.join(label_root, "*.txt"))
     for txt_f in txt_files:
-        img_f = os.path.join(img_root, os.path.basename(txt_f).split('.')[0] + '.jpg')
+        txt_root, txt_ext = os.path.splitext(txt_f)
+        img_f = os.path.join(img_root, os.path.basename(txt_root) + ".jpg")
+        # img_f = os.path.join(img_root, os.path.basename(txt_f).split('.')[0] + '.jpg')
         if os.path.exists(img_f):
             img = cv2.imread(img_f)
             h, w, _ = img.shape
             if os.path.exists(txt_f):
                 with open(txt_f) as f:
-                    annos = f.readlines() 
+                    annos = f.readlines()
                     for ann in annos:
-                        ann = ann.strip().split(' ')
+                        ann = ann.strip().split(" ")
                         category = ann[0]
                         x = float(ann[1]) * w
                         y = float(ann[2]) * h
                         bw = float(ann[3]) * w
                         bh = float(ann[4]) * h
-                        xmin = int(x - bw/2)
-                        ymin = int(y - bh/2)
-                        xmax = int(x + bw/2)
-                        ymax = int(y + bh/2)
+                        xmin = int(x - bw / 2)
+                        ymin = int(y - bh / 2)
+                        xmax = int(x + bw / 2)
+                        ymax = int(y + bh / 2)
                         print(xmin, ymin, xmax, ymax, category)
-                        cv2.putText(img, category, (xmin, ymin), cv2.FONT_HERSHEY_COMPLEX, 0.7, (255, 255, 255))
-                        cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2, 1)
-                cv2.imshow('yolo check', img)
-                cv2.waitKey(0)
+                        cv2.putText(
+                            img,
+                            category,
+                            (xmin, ymin),
+                            cv2.FONT_HERSHEY_COMPLEX,
+                            0.7,
+                            (255, 255, 255),
+                        )
+                        cv2.rectangle(
+                            img, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2, 1
+                        )
+                cv2.imshow("yolo check", img)
+                ch = cv2.waitKey(0)
+                if ch == 27:
+                    exit()
             else:
-                logging.warning('xxxx image: {} not found.'.format(img_f))
+                logging.warning("xxxx image: {} not found.".format(img_f))
 
 
 if __name__ == "__main__":

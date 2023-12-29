@@ -21,12 +21,8 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-import functools
 import inspect
-import sys
 from collections import OrderedDict
-
-import numba
 import numpy as np
 import torch
 
@@ -67,6 +63,7 @@ def change_default_args(**kwargs):
 
     return layer_wrapper
 
+
 def torch_to_np_dtype(ttype):
     type_map = {
         torch.float16: np.dtype(np.float16),
@@ -89,16 +86,22 @@ def check_tensor_equal(t_a, t_b, epsilon=1e-5):
         return res2, res
 
 
-def torch_load_state_dict_without_module(ckp_file):
+def torch_load_state_dict_without_module(ckp_file, map_location='cpu', specific_key=None):
     """
     this function using for load a model without module
     """
-    checkpoint = torch.load(ckp_file)
-    state_dict =checkpoint['state_dict']
+    checkpoint = torch.load(ckp_file, map_location=map_location)
+    if 'state_dict' in checkpoint.keys():
+        state_dict = checkpoint["state_dict"]
+    else:
+        if specific_key is not None and specific_key in checkpoint.keys():
+            state_dict = checkpoint[specific_key]
+        else:
+            state_dict = checkpoint
 
     new_state_dict = OrderedDict()
     for k, v in state_dict.items():
-        if 'module.' in k:
-            k = k[7:] # remove 'module.' of dataparallel
-        new_state_dict[k]=v
+        if "module." in k:
+            k = k[7:]  # remove 'module.' of dataparallel
+        new_state_dict[k] = v
     return new_state_dict

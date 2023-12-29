@@ -8,8 +8,8 @@ class SimpleFormatter:
     Writes lines, "as is".
     """
 
-    format = 'md'
+    format = "md"
 
     @staticmethod
     def write(lines):
-        return ''.join(lines).encode('utf8')
+        return "".join(lines).encode("utf8")

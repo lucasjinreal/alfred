@@ -29,11 +29,12 @@ import cv2
 import matplotlib.pyplot as plt
 
 from alfred.fusion.common import compute_3d_box_lidar_coords
+
 try:
     from open3d import *
     import open3d as o3d
 except ImportError:
-    print('importing 3d_vis in alfred-py need open3d installed.')
+    print("importing 3d_vis in alfred-py need open3d installed.")
     exit(0)
 
 
@@ -55,15 +56,27 @@ def draw_pointclouds_boxes_o3d(pointcloud, boxes_3d, line_color=[0, 1, 0]):
 
     # append boxes to geometries
     for p in boxes_3d:
-        xyz = np.array([p[: 3]])
-        hwl = np.array([p[3: 6]])
+        xyz = np.array([p[:3]])
+        hwl = np.array([p[3:6]])
         r_y = [p[6]]
         pts3d = compute_3d_box_lidar_coords(
-            xyz, hwl, angles=r_y, origin=(0.5, 0.5, 0.5), axis=2)
+            xyz, hwl, angles=r_y, origin=(0.5, 0.5, 0.5), axis=2
+        )
 
-        lines = [[0, 1], [1, 2], [2, 3], [3, 0],
-                 [4, 5], [5, 6], [6, 7], [7, 4],
-                 [0, 4], [1, 5], [2, 6], [3, 7]]
+        lines = [
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [3, 0],
+            [4, 5],
+            [5, 6],
+            [6, 7],
+            [7, 4],
+            [0, 4],
+            [1, 5],
+            [2, 6],
+            [3, 7],
+        ]
         colors = [line_color for i in range(len(lines))]
         line_set = o3d.geometry.LineSet()
         line_set.points = o3d.utility.Vector3dVector(pts3d[0])
@@ -118,6 +131,7 @@ def draw_pcs_open3d(geometries):
     draw_pcs_open3d([point_cloud, line_set])
     ```
     """
+
     def capture_depth(vis):
         depth = vis.capture_depth_float_buffer()
         plt.imshow(np.asarray(depth))
@@ -129,6 +143,7 @@ def draw_pcs_open3d(geometries):
         plt.imshow(np.asarray(image))
         plt.show()
         return False
+
     vis = o3d.visualization.Visualizer()
     vis.create_window()
     for g in geometries:
