@@ -125,3 +125,39 @@ class ATimer:
             else:
                 print('-> [{:20s}]: {:5.1f}ms'.format(self.name,
                       (end-self.start)*1000))
+
+
+
+class TimerManagerDynamic(ABC):
+
+    def __init__(self):
+        self.tpls = []
+    
+    def set_timer_start_now(self, name):
+        setattr(self, name, Timer(name))
+        self.tpls.append(name)
+    
+    def tic_on_timer(self, name):
+        getattr(self, name).tic()
+    
+    def toc_on_timer(self, name):
+        cost = getattr(self, name).toc()
+        return cost
+
+    def collect_avg(self):
+        for tn in self.timer_names:
+            obj = getattr(self, tn)
+            print(f'{obj.name}: {obj.average_time*1000:.3f}ms')
+        print('')
+
+global my_timer
+my_timer = TimerManagerDynamic()
+
+def time_start(name: str):
+    my_timer.set_timer_start_now(name)
+    my_timer.tic_on_timer(name)
+
+def time_stop(name:str):
+    c = my_timer.toc_on_timer(name)
+    print(f'[time]: ({name}) cost: {c}')
+    return c

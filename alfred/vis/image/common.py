@@ -164,6 +164,21 @@ def put_txt_with_newline(image, multi_line_txt, pt, font, font_scale, color, thi
                     line_type)
 
 
+def vis_txt_info_lefttop(txts, im):
+    i = 0
+    for txt in txts:
+        i += 1
+        cv2.putText(
+                im,
+                txt,
+                (10, i*25),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (0, 0, 255),
+                2,
+            )
+
+
 if __name__ == '__main__':
     c = create_unique_color_uchar(1)
     print(c)
