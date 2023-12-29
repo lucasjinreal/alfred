@@ -33,34 +33,37 @@ import argparse
 from colorama import Fore, Back, Style
 import traceback
 
-from .modules.vision.video_extractor import VideoExtractor
-from .modules.scrap.image_scraper import ImageScraper
-from .modules.vision.to_video import VideoCombiner
-from .modules.vision.video_reducer import VideoReducer
+try:
+    from .modules.vision.video_extractor import VideoExtractor
+    from .modules.scrap.image_scraper import ImageScraper
+    from .modules.vision.to_video import VideoCombiner
+    from .modules.vision.video_reducer import VideoReducer
 
-from .modules.data.view_voc import vis_voc
-from .modules.data.view_coco import vis_coco
-from .modules.data.view_txt import vis_det_txt
-from .modules.data.view_yolo import vis_det_yolo
-from .modules.data.gather_voclabels import gather_labels
-from .modules.data.voc2coco import convert
-from .modules.data.eval_voc import eval_voc
-from .modules.data.mergevoc import merge_voc
-from .modules.data.coco2yolo import coco2yolo
-from .modules.data.yolo2voc import yolo2voc
-from .modules.data.voc2yolo import voc2yolo
-from .modules.data.split_coco import split_coco
+    from .modules.data.view_voc import vis_voc
+    from .modules.data.view_coco import vis_coco
+    from .modules.data.view_txt import vis_det_txt
+    from .modules.data.view_yolo import vis_det_yolo
+    from .modules.data.gather_voclabels import gather_labels
+    from .modules.data.voc2coco import convert
+    from .modules.data.eval_voc import eval_voc
+    from .modules.data.mergevoc import merge_voc
+    from .modules.data.coco2yolo import coco2yolo
+    from .modules.data.yolo2voc import yolo2voc
+    from .modules.data.voc2yolo import voc2yolo
+    from .modules.data.split_coco import split_coco
 
-from .modules.cabinet.count_file import count_file
-from .modules.cabinet.split_txt import split_txt_file
-from .modules.cabinet.license import apply_license
-from .modules.cabinet.stack_imgs import stack_imgs
-from .modules.cabinet.webcam import webcam_test
-from .modules.cabinet.markdown_tool import download_images_from_md
-from .modules.cabinet.changesource import change_pypi_source
-from .modules.cabinet.gtrend import get_github_trending
+    from .modules.cabinet.count_file import count_file
+    from .modules.cabinet.split_txt import split_txt_file
+    from .modules.cabinet.license import apply_license
+    from .modules.cabinet.stack_imgs import stack_imgs
+    from .modules.cabinet.webcam import webcam_test
+    from .modules.cabinet.markdown_tool import download_images_from_md
+    from .modules.cabinet.changesource import change_pypi_source
+    from .modules.cabinet.gtrend import get_github_trending
 
-from .modules.dltool.cal_anchors import KmeansYolo
+    from .modules.dltool.cal_anchors import KmeansYolo
+except Exception as e:
+    pass
 from .utils.log import logger as logging
 from .version import __version__, short_version
 from datetime import datetime

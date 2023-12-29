@@ -45,7 +45,7 @@ try:
     CACHED_RESULT_PATH = xdg_cache_home() / "starcli.json"
 except Exception as e:
     CACHED_RESULT_PATH = "/tmp/starcli.json"
-print(f"temp cached path: {CACHED_RESULT_PATH}")
+# print(f"temp cached path: {CACHED_RESULT_PATH}")
 CACHE_EXPIRATION = 1  # Minutes
 API_URL = "https://api.github.com/search/repositories"
 
