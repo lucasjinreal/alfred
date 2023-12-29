@@ -496,6 +496,7 @@ def main(args=None):
                 if o == 'main' or r == 'master':
                     r = o
                     o = 'origin'
+                    print('call: ', f"git push {o} {r}")
                 os.system("git commit -am 'add from alfred auto'")
                 os.system(f"git push {o} {r}")
             elif module == "vision":
