@@ -30,9 +30,9 @@ import importlib
 from .modules import *
 from .vis import *
 from .fusion import *
-from .dl.torch.common import print_shape
+# from .dl.torch.common import print_shape
 from .utils.log import logger
-from .dl.torch.common import device
+# from .dl.torch.common import device
 from .utils.progress import pbar, prange
 
 globals().update(importlib.import_module("alfred").__dict__)
