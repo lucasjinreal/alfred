@@ -33,6 +33,8 @@ import argparse
 from colorama import Fore, Back, Style
 import traceback
 
+from alfred.modules.cabinet.face_crop import extract_and_save_face
+
 try:
     from .modules.vision.video_extractor import VideoExtractor
     from .modules.scrap.image_scraper import ImageScraper
@@ -243,6 +245,12 @@ def arg_parse():
     )
     downmd_parser.set_defaults(which="cab-downmd")
     downmd_parser.add_argument("--file", "-f", help="Also can set file.")
+
+    getface_parser = cabinet_sub_parser.add_parser("getface", help="get faces.")
+    getface_parser.set_defaults(which="cab-getface")
+    getface_parser.add_argument(
+        "--file", "-f", default="./a.png", help="file or dir to get faces"
+    )
 
     # =============== dl tools part =============
     dltool_parser = main_sub_parser.add_parser(
@@ -457,7 +465,7 @@ def print_welcome_msg():
         "         Ver.   : " + Fore.GREEN + Style.BRIGHT + __VERSION__ + Style.RESET_ALL
     )
     print("-" * 70)
-    print("\n")
+    # print("\n")
 
 
 def main(args=None):
@@ -468,9 +476,9 @@ def main(args=None):
     else:
         args_dict = vars(args)
         print_welcome_msg()
-        print(args_dict)
+        # print(args_dict)
         try:
-            if "-" in args_dict["which"] == "help":
+            if "-" in args_dict["which"]:
                 module = args_dict["which"].split("-")[0]
                 action = args_dict["which"].split("-")[1]
             else:
@@ -493,10 +501,10 @@ def main(args=None):
             elif module == "ps":
                 r = args_dict["remote"]
                 o = args_dict["origin"]
-                if o == 'main' or o == 'master':
+                if o == "main" or o == "master":
                     r = o
-                    o = 'origin'
-                    print('call: ', f"git push {o} {r}")
+                    o = "origin"
+                    print("call: ", f"git push {o} {r}")
                 os.system("git commit -am 'add from alfred auto'")
                 os.system(f"git push {o} {r}")
             elif module == "vision":
@@ -594,6 +602,9 @@ def main(args=None):
                     lan = args_dict["language"]
                     layout = args_dict["layout"]
                     get_github_trending(lang=lan, layout=layout)
+                elif action == "getface":
+                    a = args_dict["file"]
+                    extract_and_save_face(a)
             elif module == "dltool":
                 if action == "anchor":
                     ann_dir = args_dict["annotation_dir"]

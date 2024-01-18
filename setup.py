@@ -149,5 +149,6 @@ setup(
         "gtrending",
         "xdg",
         "portalocker",
+        "rich",
     ],
 )
