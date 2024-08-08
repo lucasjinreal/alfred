@@ -24,7 +24,7 @@
 # check setup is correct or not
 python3 setup.py check
 
-bumpver update --patch
+# bumpver update --patch
 
 sudo rm -r build/
 sudo rm -r dist/
