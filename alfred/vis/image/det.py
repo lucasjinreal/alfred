@@ -535,7 +535,6 @@ def visualize_det_cv2_part(
                 )
             force_color = [dynamic_cls_name_color_map[class_names[0]]]
             # class_names.insert(0, 'none')
-
     for i in range(n_boxes):
         if cls_ids is not None:
             cls_id = int(cls_ids[i])
@@ -612,7 +611,9 @@ def visualize_det_cv2_part(
                             text_label = "{} {:.1f}%".format(cls_id, scores[i] * 100)
                         else:
                             text_label = "{} {:.2f}".format(n, scores[i])
-
+                    
+                    if track_ids:
+                        text_label += " id:{}".format(track_ids[i])
                     (ret_val, _) = cv2.getTextSize(
                         text_label, font, font_scale, font_thickness
                     )
@@ -719,7 +720,7 @@ def visualize_det_cv2_part(
 
                 if track_ids:
                     text_label += " ID: {}".format(track_ids[i])
-
+                
                 (ret_val, _) = cv2.getTextSize(
                     text_label, font, font_scale, font_thickness
                 )
