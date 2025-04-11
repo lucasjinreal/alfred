@@ -1,95 +1,82 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright (c) 2020 JinTian.
-#
-# This file is part of alfred
-# (see http://jinfagang.github.io).
-#
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-#
-"""
-this part using for combine image sequences into a single video
-
-as previously version, the sequence are not well ordered so that video were not
-frequent, we solve that problem now
-
-"""
 import os
 import cv2
-from colorama import Fore, Back, Style
 import numpy as np
-import sys
 from natsort import natsorted
+from colorama import Fore, init
 
+init(autoreset=True)  # Auto-reset colorama after each print
 
 class VideoCombiner(object):
     def __init__(self, img_dir):
         self.img_dir = os.path.abspath(img_dir)
 
         if not os.path.exists(self.img_dir):
-            print(Fore.RED + "=> Error: " + "img_dir {} not exist.".format(self.img_dir))
-            exit(0)
+            print(Fore.RED + "=> Error: " + f"img_dir {self.img_dir} does not exist.")
+            exit(1)
 
         self._get_video_shape()
 
     def _get_video_shape(self):
+        # Filter and sort image files
+        valid_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.tif', '.tiff'}
+        all_files = os.listdir(self.img_dir)
+        
+        # Filter image files with valid extensions
         self.all_images = [
-            os.path.join(self.img_dir, i) for i in os.listdir(self.img_dir)
+            os.path.join(self.img_dir, f) 
+            for f in all_files 
+            if os.path.splitext(f)[1].lower() in valid_extensions
         ]
 
-        # this sorted method seems has problem
-        # self.all_images.sort(key=lambda f: int(''.join(filter(str.isdigit, f))))
-        self.all_images = natsorted(self.all_images)
-        for item in self.all_images[: int(len(self.all_images) // 3)]:
-            print(item)
-        # order the images order.
+        if not self.all_images:
+            print(Fore.RED + "=> Error: " + f"No valid image files found in {self.img_dir}")
+            exit(1)
 
-        sample_img = np.random.choice(self.all_images)
-        if os.path.exists(sample_img):
-            img = cv2.imread(sample_img)
-            self.video_shape = img.shape
-        else:
-            print(
-                Fore.RED
-                + "=> Error: "
-                + "{} not found or open failed, try again.".format(sample_img)
-            )
-            exit(0)
+        # Natural sort the images
+        self.all_images = natsorted(self.all_images)
+
+        # Get video shape from first image (more reliable than random)
+        sample_img = self.all_images[0]
+        img = cv2.imread(sample_img)
+        
+        if img is None:
+            print(Fore.RED + "=> Error: " + f"Failed to read sample image {sample_img}")
+            exit(1)
+            
+        self.video_shape = img.shape
 
     def combine(self, target_file="combined.mp4"):
         size = (self.video_shape[1], self.video_shape[0])
-        print("=> target video frame size: ", size)
-        print("=> all {} frames to solve.".format(len(self.all_images)))
-        target_f = "combined_{}.mp4".format(os.path.basename(self.img_dir))
-        video_writer = cv2.VideoWriter(
-            target_f, cv2.VideoWriter_fourcc(*"DIVX"), 26, size
-        )
-        i = 0
-        print("=> Solving, be patient.")
-        for img in self.all_images:
-            img = cv2.imread(img, cv2.COLOR_BGR2RGB)
-            i += 1
-            # print('=> Solving: ', i)
+        print("=> Target video frame size:", size)
+        print(f"=> Total {len(self.all_images)} frames to process")
+
+        # Create video writer with correct parameters
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Better compatibility than DIVX
+        video_writer = cv2.VideoWriter(target_file, fourcc, 30, size)
+
+        if not video_writer.isOpened():
+            print(Fore.RED + "=> Error: " + "Failed to initialize video writer")
+            exit(1)
+
+        print("=> Processing frames...")
+        for i, img_path in enumerate(self.all_images, 1):
+            img = cv2.imread(img_path)
+            if img is None:
+                print(Fore.YELLOW + f"=> Warning: Skipped corrupted/invalid file {img_path}")
+                continue
+
+            # Ensure consistent frame size
+            if img.shape != self.video_shape:
+                img = cv2.resize(img, size)
+                
             video_writer.write(img)
+            if i % 100 == 0:
+                print(f"=> Processed {i}/{len(self.all_images)} frames")
+
         video_writer.release()
-        print("Done!")
+        print(Fore.GREEN + f"=> Success: Video saved as {os.path.abspath(target_file)}")
 
-
-# d = sys.argv[1]
-# combiner = VideoCombiner(d)
-# combiner.combine()
+# Example usage
+if __name__ == "__main__":
+    combiner = VideoCombiner("path/to/your/images")
+    combiner.combine("output_video.mp4")
