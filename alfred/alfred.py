@@ -25,10 +25,7 @@
 """
 main entrance of Alfred
 """
-import imp
 import os
-import subprocess
-import sys
 import argparse
 from colorama import Fore, Back, Style
 import traceback
